@@ -1,0 +1,17 @@
+{
+  "name": "taylor-plugins",
+  "owner": {
+    "name": "Taylor"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugins",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "justfile",
+      "source": "justfile",
+      "description": "Analyzes project structure to recommend high-value justfile recipes"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "name": "justfile",
+  "version": "1.0.0",
+  "description": "Analyzes project structure to recommend high-value justfile recipes"
+}
