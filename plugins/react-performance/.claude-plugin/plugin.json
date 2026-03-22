@@ -1,0 +1,5 @@
+{
+  "name": "react-performance",
+  "version": "1.0.0",
+  "description": "React performance optimization agent for identifying and resolving bottlenecks"
+}

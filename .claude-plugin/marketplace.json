@@ -12,6 +12,11 @@
       "name": "justfile",
       "source": "justfile",
       "description": "Analyzes project structure to recommend high-value justfile recipes"
+    },
+    {
+      "name": "react-performance",
+      "source": "react-performance",
+      "description": "React performance optimization agent for identifying and resolving bottlenecks"
     }
   ]
 }
