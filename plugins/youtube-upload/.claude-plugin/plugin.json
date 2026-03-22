@@ -1,0 +1,5 @@
+{
+  "name": "youtube-upload",
+  "version": "1.0.0",
+  "description": "Resumable YouTube uploads from the command line with retry and progress tracking"
+}

@@ -17,6 +17,11 @@
       "name": "react-performance",
       "source": "react-performance",
       "description": "React performance optimization agent for identifying and resolving bottlenecks"
+    },
+    {
+      "name": "youtube-upload",
+      "source": "youtube-upload",
+      "description": "Resumable YouTube uploads from the command line with retry and progress tracking"
     }
   ]
 }
