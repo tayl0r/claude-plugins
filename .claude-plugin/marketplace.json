@@ -22,6 +22,21 @@
       "name": "youtube-upload",
       "source": "youtube-upload",
       "description": "Resumable YouTube uploads from the command line with retry and progress tracking"
+    },
+    {
+      "name": "address-pr-feedback",
+      "source": "address-pr-feedback",
+      "description": "Fetch, evaluate, and resolve unaddressed PR review comments automatically"
+    },
+    {
+      "name": "better-code-review",
+      "source": "better-code-review",
+      "description": "Multi-agent code review for pull requests with confidence scoring and false positive filtering"
+    },
+    {
+      "name": "sync-latest-git",
+      "source": "sync-latest-git",
+      "description": "Update primary branch from origin and optionally merge or rebase into feature branches"
     }
   ]
 }
