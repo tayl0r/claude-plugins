@@ -1,0 +1,5 @@
+{
+  "name": "address-pr-feedback",
+  "version": "1.0.0",
+  "description": "Fetch, evaluate, and resolve unaddressed PR review comments automatically"
+}

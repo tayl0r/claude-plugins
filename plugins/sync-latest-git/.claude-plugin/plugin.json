@@ -1,0 +1,5 @@
+{
+  "name": "sync-latest-git",
+  "version": "1.0.0",
+  "description": "Update primary branch from origin and optionally merge or rebase into feature branches"
+}
