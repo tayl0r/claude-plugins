@@ -3,39 +3,36 @@
   "owner": {
     "name": "Taylor"
   },
-  "metadata": {
-    "description": "Personal Claude Code plugins",
-    "pluginRoot": "./plugins"
-  },
+  "description": "Personal Claude Code plugins",
   "plugins": [
     {
       "name": "justfile",
-      "source": "justfile",
+      "source": "./plugins/justfile",
       "description": "Analyzes project structure to recommend high-value justfile recipes"
     },
     {
       "name": "react-performance",
-      "source": "react-performance",
+      "source": "./plugins/react-performance",
       "description": "React performance optimization agent for identifying and resolving bottlenecks"
     },
     {
       "name": "youtube-upload",
-      "source": "youtube-upload",
+      "source": "./plugins/youtube-upload",
       "description": "Resumable YouTube uploads from the command line with retry and progress tracking"
     },
     {
       "name": "address-pr-feedback",
-      "source": "address-pr-feedback",
+      "source": "./plugins/address-pr-feedback",
       "description": "Fetch, evaluate, and resolve unaddressed PR review comments automatically"
     },
     {
       "name": "better-code-review",
-      "source": "better-code-review",
+      "source": "./plugins/better-code-review",
       "description": "Multi-agent code review for pull requests with confidence scoring and false positive filtering"
     },
     {
       "name": "sync-latest-git",
-      "source": "sync-latest-git",
+      "source": "./plugins/sync-latest-git",
       "description": "Update primary branch from origin and optionally merge or rebase into feature branches"
     }
   ]
