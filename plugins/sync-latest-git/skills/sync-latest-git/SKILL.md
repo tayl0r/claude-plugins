@@ -16,8 +16,8 @@ digraph sync {
 
   detect [label="Detect primary branch\n(main/master/dev)"];
   on_primary [label="On primary branch?" shape=diamond];
-  fetch_merge [label="git fetch origin\ngit merge --ff-only origin/<primary>"];
-  fetch_update [label="git fetch origin <primary>:<primary>\n(updates local branch without checkout)"];
+  fetch_merge [label="git fetch origin --prune\ngit merge --ff-only origin/<primary>"];
+  fetch_update [label="git fetch origin --prune <primary>:<primary>\n(updates local branch without checkout)"];
   show [label="Show new commits"];
   on_feature [label="On a feature branch?" shape=diamond];
   ask_merge [label="AskUserQuestion:\nMerge primary into feature?"];
@@ -54,13 +54,13 @@ digraph sync {
 
    **If on the primary branch:**
    ```bash
-   git fetch origin
+   git fetch origin --prune
    git merge --ff-only origin/<primary>
    ```
 
    **If on a feature branch** (do NOT checkout primary):
    ```bash
-   git fetch origin <primary>:<primary>
+   git fetch origin --prune <primary>:<primary>
    ```
    This fast-forward updates the local primary branch without switching branches. If it outputs `! [rejected]`, the local branch has diverged — STOP and tell the user.
 
