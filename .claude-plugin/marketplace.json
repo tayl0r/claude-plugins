@@ -34,6 +34,11 @@
       "name": "sync-latest-git",
       "source": "./plugins/sync-latest-git",
       "description": "Update primary branch from origin and optionally merge or rebase into feature branches"
+    },
+    {
+      "name": "dev-flow",
+      "source": "./plugins/dev-flow",
+      "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline with adversarial review at each artifact boundary"
     }
   ]
 }
