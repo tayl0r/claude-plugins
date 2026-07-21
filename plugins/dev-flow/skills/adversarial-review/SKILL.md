@@ -16,7 +16,7 @@ Run a rigorous adversarial review on ONE target artifact and resolve every findi
 
 ## Seed passes
 
-Every mode runs the same two-seed shape: a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents, run in parallel, on the reviewer model (see Model, below). Findings-only is a property of the seed prompts themselves — they read and report, they never edit — so no caller has to remember to enforce it separately.
+Every mode runs the same two-seed shape: a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents, run in parallel, on the seed-reviewer model (`sonnet` — see Model, below). Findings-only is a property of the seed prompts themselves — they read and report, they never edit — so no caller has to remember to enforce it separately.
 
 | Mode | Quality seed | Correctness seed |
 |---|---|---|
@@ -24,7 +24,7 @@ Every mode runs the same two-seed shape: a **quality seed** and a **correctness 
 | **design** | The design rubric (below) *is* the lens, applied adversarially to the proposed approach. | A prose-integrity checklist: placeholders/TBDs, internal contradictions, planning-blocking ambiguity, unstated assumptions, missing or untestable success criteria. |
 | **plan** | The rubric applied to the plan's approach *and* to any embedded code sketches. | The prose checklist above, plus plan-specific checks: task ordering/dependencies, whether each task is executable by a fresh context-free subagent, per-task verification steps, and drift from the design doc. |
 
-Do NOT invoke the `/simplify` skill for the diff-mode quality seed. `/simplify` applies fixes and re-derives its own scope, which breaks both findings-only and the model policy (its agents are not pinned to the reviewer model). It is a harness built-in with no readable file to point a subagent at, so its four angles are transcribed verbatim below instead.
+Do NOT invoke the `/simplify` skill for the diff-mode quality seed. `/simplify` applies fixes and re-derives its own scope, which breaks both findings-only and the model policy (its agents are not pinned to the seed-reviewer model). It is a harness built-in with no readable file to point a subagent at, so its four angles are transcribed verbatim below instead.
 
 **The four `/simplify` angles (verbatim):**
 - **Reuse:** does this duplicate an existing utility/abstraction it could call instead? Consolidate the duplication.
@@ -51,7 +51,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 ## Resolution procedure
 
 1. Collect all findings from the seed passes, plus any additional findings the caller supplied with the invocation.
-2. Group similar issues together. For each group, spawn one agent, on the reviewer model.
+2. Group similar issues together. For each group, spawn one agent, on the resolver model (`fable` — see Model).
 3. Each group-agent:
    - First researches every issue it was assigned.
    - For each issue, determines the **best long-term design** by applying the rubric above, judging the group's findings together rather than in isolation.
@@ -65,7 +65,11 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 
 ## Model
 
-Adversary-side agents — the seed reviewers and the group-resolution agents — run on a capable model different from the artifact's author. Default to `fable` (a harness alias — never a dated model id). If the main session model is already in the Fable family, fall back to `opus` for the adversary side instead. Executors, fixers, and the orchestrator run on the main session model.
+**Group-resolution agents** — the tier that determines the best long-term design and adversarially self-checks — run on a capable model **different from the artifact's author**, where cross-model scrutiny matters most. Default to `fable` (a harness alias — never a dated model id — and the most capable model); if the main session model is already in the Fable family, use `opus` instead.
+
+**Seed reviewers** — the findings-only quality and correctness passes — run on `sonnet`: cheaper than Fable, and still typically different from the `opus`-family author. They only surface findings; the resolvers do the judgment, so Fable's premium isn't warranted here.
+
+**Executors, fixers, and the orchestrator** run on the main session model.
 
 ## Where new issues are filed
 

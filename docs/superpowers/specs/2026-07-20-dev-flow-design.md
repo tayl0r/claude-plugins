@@ -61,7 +61,8 @@ There are exactly three stop boundaries:
 
 Express the invariant, not a constant:
 
-- **Adversary-side agents** (seed reviewers and group-resolution agents) run on a capable model **different from the artifact's author**. Default reviewer model: `fable` (harness alias — never a dated model id). If the main session model is already in the Fable family, use `opus` for the adversary side.
+- **Group-resolution agents** (the best-long-term-design + adversarial-self-check tier) run on a capable model **different from the artifact's author** — the load-bearing cross-model check. Default: `fable` (harness alias, most capable); `opus` if the session model is already Fable.
+- **Seed reviewers** (the findings-only quality + correctness passes) run on `sonnet` — cheaper than Fable and still different from the typical `opus` author; the resolvers do the judgment, so Fable's premium isn't warranted on the seeds.
 - **Executors, fixers, and the orchestrator** run on the main session model.
 
 ## Dispatching to Inherited Skills
@@ -181,7 +182,7 @@ Invoked as `adversarial-review(target, mode[, extra findings])` where `mode ∈ 
 
 ### Seed passes
 
-Every mode runs the **same two-seed shape** — a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents on the reviewer model, in parallel. Findings-only is a property of the seed prompts themselves, so no caller has to remember to enforce it.
+Every mode runs the **same two-seed shape** — a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents on the seed-reviewer model (`sonnet`), in parallel. Findings-only is a property of the seed prompts themselves, so no caller has to remember to enforce it.
 
 | Mode | Quality seed | Correctness seed |
 |---|---|---|
@@ -206,7 +207,7 @@ The four `/simplify` angles (inlined verbatim into the diff-mode quality seed): 
 ### Resolution procedure
 
 1. Collect findings from the seed passes, plus any additional findings the caller supplied with the invocation.
-2. **Group similar issues together.** For each group, spawn one agent (reviewer model).
+2. **Group similar issues together.** For each group, spawn one agent (resolver model — `fable`).
 3. Each group-agent:
    - First **researches all issues** it was assigned.
    - For each issue, determines the **best long-term design** (applying the rubric; judging the group's findings together).

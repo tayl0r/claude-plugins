@@ -23,7 +23,7 @@ These values are copied verbatim from the spec and MUST appear identically where
 - Review marker (literal): `dev-flow: review clean @ <full-head-sha>`.
 - Merge command (literal): `gh pr merge --squash --delete-branch`.
 - Bounded CI wait: `gh pr checks <pr> --watch` under a hard cap (default 10 minutes; `--watch` has no native timeout, so enforce it with the Bash tool `timeout: 600000`), then halt-and-report on red or still-pending.
-- Reviewer model invariant: adversary-side agents run on a model different from the artifact's author; default `fable` (alias, never a dated id), fall back to `opus` when the session model is Fable. Executors/fixers/orchestrator use the main session model.
+- Reviewer model policy: **group-resolution agents** run on `fable` (the adversary tier — different from the author; `opus` if the session model is Fable); **seed reviewers** run on `sonnet`; executors/fixers/orchestrator use the main session model.
 - The design rubric text is reproduced **verbatim** from the spec's "The design rubric (verbatim …)" block — do not paraphrase it.
 - No emojis in skill files. Match the prose density and structure of the existing `plugins/better-code-review/skills/better-code-review/SKILL.md`.
 
@@ -153,7 +153,7 @@ Transcribe the spec's numbered "Resolution procedure" into skill voice. It MUST 
 
 - [ ] **Step 5: Write "Model" and "Where new issues are filed" sections**
 
-- `## Model`: state the reviewer invariant verbatim from Global Constraints (adversary-side ≠ author; default `fable`, fallback `opus` when the session model is Fable; fixers use the main model).
+- `## Model`: state the model policy verbatim from Global Constraints (group-resolvers on `fable` ≠ author, `opus` if session is Fable; seed reviewers on `sonnet`; executors/fixers/orchestrator on the main model).
 - `## Where new issues are filed`: `gh issue create` when a GitHub remote exists, else append to `docs/superpowers/issues/BACKLOG.md`; surface all filed issues in the report.
 
 - [ ] **Step 6: Verify front-matter and required sections**
