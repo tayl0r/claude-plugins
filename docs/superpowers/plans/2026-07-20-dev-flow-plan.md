@@ -1,6 +1,6 @@
 # dev-flow Plugin Implementation Plan
 
-> Revised 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md` (flatten — current authority): nesting removed in Claude Code 2.1.218; the **orchestrator drives all fan-out** itself (only leaf workers spawn). Supersedes the interim `2026-07-22-dev-flow-nested-review-fix-design.md`.
+> Revised 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md` (flatten — current authority): nesting removed in Claude Code 2.1.218; the **orchestrator drives all fan-out** itself (only leaf workers spawn). Supersedes the interim `2026-07-22-dev-flow-nested-review-fix-design.md`. **The body below predates the flatten pivot** — where it describes stage subagents or nesting, the flatten design governs.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

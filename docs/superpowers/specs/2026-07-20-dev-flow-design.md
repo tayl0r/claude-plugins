@@ -1,6 +1,6 @@
 # dev-flow Plugin — Design Spec
 
-> Revised 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md` (flatten — current authority): nested spawning was removed in Claude Code 2.1.218, so the **orchestrator drives all fan-out** (reviews + Execute) itself, spawning only leaf workers; an intake gate checks model availability, not nesting. Supersedes the interim `2026-07-22-dev-flow-nested-review-fix-design.md`.
+> Revised 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md` (flatten — current authority): nested spawning was removed in Claude Code 2.1.218, so the **orchestrator drives all fan-out** (reviews + Execute) itself, spawning only leaf workers; an intake gate checks model availability, not nesting. Supersedes the interim `2026-07-22-dev-flow-nested-review-fix-design.md`. **The body below predates the flatten pivot** — where it describes stage subagents, a fresh subagent per stage, or `EnterWorktree` entry, the flatten design governs.
 
 **Date:** 2026-07-20
 **Status:** Approved for planning (revised after adversarial design review)
