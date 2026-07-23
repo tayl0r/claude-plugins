@@ -1,5 +1,7 @@
 # dev-flow Plugin — Design Spec
 
+> Revised 2026-07-22 by `2026-07-22-dev-flow-nested-review-fix-design.md` (nested-review fix): stages spawn as `general-purpose`; the model-diverse review halts loudly rather than inlining; a mandatory intake capability gate enforces nesting; provenance is forwarded and checked; no main-session fallback.
+
 **Date:** 2026-07-20
 **Status:** Approved for planning (revised after adversarial design review)
 
@@ -227,7 +229,7 @@ The four `/simplify` angles (inlined verbatim into the diff-mode quality seed): 
 
 ## Environment Assumptions
 
-- **Subagent nesting.** The architecture requires spawned subagents to hold the `Agent` and `Skill` tools (a stage subagent spawns the seed/group agents and invokes `adversarial-review`). If they lack those tools, run the seed and group agents from the main session instead of nesting them under a stage subagent. (Some Claude Code installs have historically not granted subagents the agent-spawning tool.)
+- **Subagent nesting (required; enforced by an intake capability gate).** The architecture requires spawned subagents to hold `Agent` + `Skill` (a stage subagent invokes `adversarial-review` and spawns its seed/resolver agents; Execute's SDD spawns implementers/reviewers). Verified working on Claude Code 2.1.217 — documentation, not enforcement, since the grant can be lost version-independently. A mandatory capability probe at intake halts if the environment cannot nest; mid-run degradation is caught by the dispatch-preamble integrity clause and the provenance check. There is **no** inline single-model fallback — a stage that cannot run the model-diverse review halts loudly. (Details in `2026-07-22-dev-flow-nested-review-fix-design.md`.)
 - **GitHub remote** from Stage 4 onward (the pipeline uses `gh` for PR, review marker, CI, merge). This matches the existing plugins' reliance on `gh`.
 
 ## Cross-Cutting Concerns
