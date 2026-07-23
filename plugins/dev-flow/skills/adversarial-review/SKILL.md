@@ -14,6 +14,8 @@ Run a rigorous adversarial review on ONE target artifact and resolve every findi
 
 **Contract:** this skill owns the artifact end-to-end — it reviews, resolves, applies, and **commits** the improved artifact on the current branch, in every mode. The caller never re-applies or re-commits the review's work. It never pushes, posts review results to a PR, or merges — those integration steps are the caller's. (Filing a new issue via `gh`, per "Where new issues are filed," is part of the review, not integration.)
 
+**Review integrity (never inline).** The seed and resolver passes MUST run as separate subagents on their specified models (per Model, below). If they cannot be spawned — no `Agent` tool, or a required model unavailable — halt and report; **never** produce a single-model inline review as a silent substitute. To make the model axis verifiable, every reviewer prompt (seed and resolver) requires the reviewer to state, as the first line of its report, the model its own system prompt names. The review matches each self-report to the tier requested for it — a **family match** (e.g. a "Fable 5" self-report satisfies the `fable` tier), honoring the resolver opus-fallback rather than a hardcoded id — and canonicalizes it to the tier alias (`sonnet`, `fable`, or `opus`). A missing or mismatched first line is treated exactly like a failed spawn: halt.
+
 ## Seed passes
 
 Every mode runs the same two-seed shape: a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents, run in parallel, on the seed-reviewer model (`sonnet` — see Model, below). Findings-only is a property of the seed prompts themselves — they read and report, they never edit — so no caller has to remember to enforce it separately.
@@ -61,7 +63,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 5. Commit the improved artifact — this skill owns the commit in every mode. Do not push or merge — those integration steps are the caller's.
    - **Design / plan docs:** rewrite the doc incorporating the resolutions, **preserving the doc's front-matter block unchanged** (front-matter is caller state, not review content), and commit the rewritten doc on the current branch.
    - **PR diff:** commit the applied fixes on the branch. Then, if the project has a test suite, run it — red means the responsible fix is repaired or reverted before this step completes; never leave the branch red. Report the suite result (green, or "no suite exists") to the caller.
-6. Report back: the commit(s) made, a summary of applied vs. skipped fixes, the post-fix suite result (diff mode), and every new issue filed.
+6. Report back: the commit(s) made, a summary of applied vs. skipped fixes, the post-fix suite result (diff mode), every new issue filed, and a **provenance** line naming the reviewers actually spawned per tier with their canonicalized tier aliases (from Review integrity's family match), in the form `seeds: N× <tier>; resolvers: M× <tier>` with `<tier>` ∈ {`sonnet`, `fable`, `opus`} (e.g. `seeds: 2× sonnet; resolvers: 3× fable`). Provenance is the evidence a caller checks to confirm the review was genuinely model-diverse.
 
 ## Model
 
