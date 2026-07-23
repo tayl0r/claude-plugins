@@ -199,6 +199,7 @@ Dispatch to `superpowers:subagent-driven-development` with these overrides, per 
 ## Cross-Cutting Concerns
 
 - **Context hygiene:** every stage and every review group runs in a fresh subagent; only short summaries return upward.
+- **Review provenance is checked, not assumed.** Every stage that runs `dev-flow:adversarial-review` (Design, Plan, PR — not Execute) forwards the review's provenance line (`seeds: N× <tier>; resolvers: M× <tier>`) in its stage summary (per the dispatch preamble). The orchestrator halts if that line is missing or its tiers violate `dev-flow:adversarial-review`'s Model section (seeds must be the seed tier, resolvers the resolver tier). The tiers are already canonicalized by the review's family match, so this is a direct comparison — and the orchestrator is the only observer outside the stage subagent's context, which is what makes "the review really ran model-diverse" verifiable rather than assumed.
 - **Failure handling:** a stage that cannot proceed cleanly halts and hands back with a clear report and resume invocation; the pipeline never merges work that is worse than what it started with.
 - **Idempotent resume:** guaranteed by the Artifact Contract — every resume decision is a mechanical read of the branch tip or the PR.
 - **Severity-independent, value-gated:** the protocol acts on issues of any severity but only applies a fix when it genuinely improves the codebase.
