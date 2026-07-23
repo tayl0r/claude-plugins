@@ -1,5 +1,5 @@
 {
   "name": "dev-flow",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline with adversarial review at each artifact boundary"
 }
