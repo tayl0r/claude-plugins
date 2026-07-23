@@ -44,6 +44,15 @@ There are exactly three stop boundaries:
 
 Everything this skill spawns directly — stage subagents, executors, bookkeeping agents — runs on the main session model. Reviewer-model selection (adversary-side agents on a capable model different from the artifact's author) is owned by `dev-flow:adversarial-review` and stated once, in its Model section; that rule travels with the review skill wherever it is invoked.
 
+## Capability gate (runs first, every invocation)
+
+Before any drafting, resume routing, or stage dispatch — on first run **and** every resume — dev-flow probes that the environment can run the model-diverse nested review, because the whole pipeline depends on it and the grant can be absent version-independently (restricted spawn type, permission settings, `allowedTools`):
+
+1. Spawn one `general-purpose` subagent. It confirms it holds both `Agent` and `Skill`, then spawns one sub-subagent on the seed model and one on the resolver model — the tiers per `dev-flow:adversarial-review`'s Model section (currently `sonnet` for seeds; `fable`, or `opus` in a Fable-family session, for resolvers) — each returning the model its system prompt names.
+2. If the subagent lacks either tool, either sub-subagent fails to spawn, or a returned model does not match the tier requested, **halt** with a report naming the missing capability and citing the verified-working version (2.1.217) as a diagnostic hint.
+
+This is a hard gate, not advisory: it turns a capability failure into an intake halt — before any design draft is written and then discarded on resume — rather than a mid-run silent degradation. It runs uniformly on every invocation by design; conditional probing ("only when a review will run") would be a remember-which-resume-rows rule.
+
 ## Dispatching to Inherited Skills
 
 dev-flow delegates stages to existing skills (`subagent-driven-development`, `writing-plans`, …). Those skills contain user-facing decision points that have no answerer in a full-auto run. Carry the following rule as a standard preamble in **every** stage-dispatch prompt, so current and future inherited skills are handled correct-by-default:
