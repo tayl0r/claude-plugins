@@ -58,6 +58,8 @@ This is a hard gate, not advisory: it turns a capability failure into an intake 
 dev-flow delegates stages to existing skills (`subagent-driven-development`, `writing-plans`, …). Those skills contain user-facing decision points that have no answerer in a full-auto run. Carry the following rule as a standard preamble in **every** stage-dispatch prompt, so current and future inherited skills are handled correct-by-default:
 
 > **dev-flow never lets an inherited skill talk to the user.** Every user-facing decision point in a delegated skill is handled one of three ways: **(a) pre-answered** — the dispatch states the pipeline's answer as a declared preference; **(b) superseded** — the skill's terminal hand-off steps (integration menus, "what next" offers, follow-on skill invocations, final reviews) are replaced by the dispatch's explicit exit condition, because the pipeline owns all stage transitions; **(c) halted** — any user-directed question not covered by (a) or (b) is a blocker: the stage stops and reports the question verbatim, and the orchestrator hands back. A subagent never invents an answer to an unanticipated gate.
+>
+> **A stage never performs an adversarial review itself.** If the `Skill` tool cannot load `dev-flow:adversarial-review`, or the `Agent` tool is unavailable for the reviewer subagents it must spawn, halt and report the missing capability — an inline single-model review is a contract violation, never a fallback (this clause rides in the dispatch prompt because it is the only channel that reaches the stage subagent regardless of its toolset). When you do invoke `dev-flow:adversarial-review`, pass your pipeline worktree's absolute path as its `working-dir`, and copy the review's returned **provenance** line verbatim into your stage summary.
 
 Corollaries:
 - A skill whose **core mechanism is user dialogue** (`brainstorming`) cannot be dispatched at all — inline its non-interactive parts instead (see Stage 1).
@@ -131,7 +133,7 @@ Plan doc: `dev-flow: {slug: rate-limit, spec: docs/superpowers/specs/2026-07-20-
 
 ## Pipeline
 
-Each stage runs in a fresh subagent carrying the inherited-skills preamble (see Dispatching to Inherited Skills, above), **begins with the worktree-entry procedure (Artifact Contract — the dispatch prompt names the slug, and all stage work happens inside the pipeline worktree)**, and returns only a short summary to the orchestrator.
+Each stage runs in a fresh `general-purpose` subagent (the subagent type verified to carry the `Agent` + `Skill` tools the nested review requires — see Environment Assumptions) carrying the inherited-skills preamble (see Dispatching to Inherited Skills, above), **begins with the worktree-entry procedure (Artifact Contract — the dispatch prompt names the slug, and all stage work happens inside the pipeline worktree)**, and returns only a short summary to the orchestrator.
 
 ### Stage 1 — Design
 
@@ -191,7 +193,7 @@ Dispatch to `superpowers:subagent-driven-development` with these overrides, per 
 
 ## Environment Assumptions
 
-- **Subagent nesting.** This architecture requires spawned subagents to hold the `Agent` and `Skill` tools (a stage subagent spawns the seed/group agents and invokes `dev-flow:adversarial-review`). If spawned subagents lack those tools, run the seed and group agents from the main session instead of nesting them under a stage subagent. (Some Claude Code installs have historically not granted subagents the agent-spawning tool.)
+- **Subagent nesting (required; enforced by the Capability gate).** The pipeline requires spawned subagents to hold `Agent` + `Skill`: a stage subagent invokes `dev-flow:adversarial-review` and spawns its seed/resolver agents, and Execute's SDD spawns implementers/reviewers. Verified working on Claude Code 2.1.217 — documentation, not enforcement, since the grant can be lost version-independently. Enforcement is the Capability gate (above), which halts at intake if the environment cannot nest; mid-run degradation is caught by the dispatch-preamble integrity clause and the provenance check (Cross-Cutting Concerns). There is **no** inline single-model fallback — a stage that cannot run the model-diverse review halts loudly. (The earlier "run the seed and group agents from the main session" fallback is removed: from inside a stage subagent it is unreachable — the entity that detects the missing tool cannot execute a main-session fallback — and its orchestrator-proactive form is the flatten design this approach rejected.)
 - **GitHub remote** is assumed from Stage 4 onward (the pipeline uses `gh` for PR, review marker, CI, and merge). This matches the existing plugins' reliance on `gh`.
 
 ## Cross-Cutting Concerns
