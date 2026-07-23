@@ -1,5 +1,7 @@
 # dev-flow Nested-Review Fix — Implementation Plan
 
+> **Superseded 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md`** — nesting removed in Claude Code 2.1.218; dev-flow 1.2.0 flattened to orchestrator-driven fan-out. Retained for history.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. **Exception:** Task 1 must be run by the orchestrator/main session directly (see its note), not dispatched as an implementer subagent.
 
 **Goal:** Make dev-flow's per-stage adversarial review always run its model-diverse reviewer subagents (sonnet seeds / fable resolvers) or halt loudly — never silently degrade to a single-model inline review — by editing two skill markdown files, verified by a capability probe.
