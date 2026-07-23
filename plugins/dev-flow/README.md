@@ -33,7 +33,15 @@ internally at each stage boundary.
 
 The feature branch is named `<username>/<slug>`, where `<username>` is your
 GitHub login (`gh api user`) when available, falling back to your git
-`user.email` local-part offline.
+`user.email` local-part offline. If you name a task/issue ID in the request
+(a Linear/Jira key like `ENG-1421` or a GitHub issue `#42`), it is folded
+into the slug for traceability — e.g. `<username>/eng-1421-rate-limit`.
+
+On merge, dev-flow **deletes no branches**: your repo's auto-delete-on-merge
+setting removes the remote branch, and the local branch is left for you to
+prune. dev-flow never touches a branch it can't prove it created (one whose
+history carries its design doc), so it will halt rather than build on — or
+delete — a branch of yours that happens to share the name.
 
 ## Stops
 
