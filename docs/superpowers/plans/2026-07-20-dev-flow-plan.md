@@ -1,5 +1,7 @@
 # dev-flow Plugin Implementation Plan
 
+> Revised 2026-07-22 by `2026-07-22-dev-flow-nested-review-fix-design.md` / `…-plan.md` (nested-review fix): stages spawn as `general-purpose`; the review halts loudly rather than inlining; a mandatory intake capability gate enforces nesting; provenance is forwarded and checked; no main-session fallback.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build the `dev-flow` plugin — a two-skill Claude Code plugin that carries a change from design → plan → execute → PR → merge autonomously, running a reusable `adversarial-review` protocol at each artifact boundary.
@@ -283,7 +285,7 @@ Append a `## Pipeline` heading (note: each stage runs in a fresh subagent carryi
 
 - [ ] **Step 5: Write "Environment Assumptions" and "Cross-Cutting Concerns"**
 
-Transcribe both spec sections: subagent nesting requires `Agent` + `Skill` tools on subagents (with the vanilla-Claude-Code degradation path — run seed/group agents from the main session); GitHub remote assumed from Stage 4 on; context hygiene; failure handling with resume invocation; idempotent resume via the Artifact Contract; severity-independent but value-gated.
+Transcribe both spec sections: subagent nesting requires `Agent` + `Skill` tools on subagents, enforced by a mandatory intake capability probe that halts loudly rather than degrading — no main-session fallback (see `2026-07-22-dev-flow-nested-review-fix-design.md`); GitHub remote assumed from Stage 4 on; context hygiene; failure handling with resume invocation; idempotent resume via the Artifact Contract; severity-independent but value-gated.
 
 - [ ] **Step 6: Verify all stages and key mechanisms are present**
 
