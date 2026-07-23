@@ -1,5 +1,7 @@
 # dev-flow — Guarantee the Model-Diverse Review (never silently inline)
 
+> **Superseded 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md`** — nested subagent spawning was removed in Claude Code 2.1.218, so dev-flow 1.2.0 flattened to orchestrator-driven fan-out. This nested design is retained for history.
+
 **Date:** 2026-07-22
 **Status:** Approved for planning
 **Supersedes:** the flatten draft `2026-07-22-dev-flow-flat-fanout-design.md` (deleted in commit `efe5477`; see git history). That draft flattened all fan-out to the orchestrator on the premise that *subagents cannot spawn subagents*. We empirically disproved that premise (see Evidence), so this design keeps the nested architecture and fixes the actual defect instead.

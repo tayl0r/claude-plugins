@@ -1,6 +1,6 @@
 # dev-flow Plugin — Design Spec
 
-> Revised 2026-07-22 by `2026-07-22-dev-flow-nested-review-fix-design.md` (nested-review fix): stages spawn as `general-purpose`; the model-diverse review halts loudly rather than inlining; a mandatory intake capability gate enforces nesting; provenance is forwarded and checked; no main-session fallback.
+> Revised 2026-07-22 by `2026-07-22-dev-flow-flatten-design.md` (flatten — current authority): nested spawning was removed in Claude Code 2.1.218, so the **orchestrator drives all fan-out** (reviews + Execute) itself, spawning only leaf workers; an intake gate checks model availability, not nesting. Supersedes the interim `2026-07-22-dev-flow-nested-review-fix-design.md`. **The body below predates the flatten pivot** — where it describes stage subagents, a fresh subagent per stage, or `EnterWorktree` entry, the flatten design governs.
 
 **Date:** 2026-07-20
 **Status:** Approved for planning (revised after adversarial design review)
@@ -229,7 +229,7 @@ The four `/simplify` angles (inlined verbatim into the diff-mode quality seed): 
 
 ## Environment Assumptions
 
-- **Subagent nesting (required; enforced by an intake capability gate).** The architecture requires spawned subagents to hold `Agent` + `Skill` (a stage subagent invokes `adversarial-review` and spawns its seed/resolver agents; Execute's SDD spawns implementers/reviewers). Verified working on Claude Code 2.1.217 — documentation, not enforcement, since the grant can be lost version-independently. A mandatory capability probe at intake halts if the environment cannot nest; mid-run degradation is caught by the dispatch-preamble integrity clause and the provenance check. There is **no** inline single-model fallback — a stage that cannot run the model-diverse review halts loudly. (Details in `2026-07-22-dev-flow-nested-review-fix-design.md`.)
+- **Flat topology — the orchestrator is the only spawner.** Every subagent is a leaf; no subagent spawns a subagent. Required: Claude Code 2.1.218 removed spawned subagents' `Agent` tool (nesting gone; the harness recommends top-level orchestration only). The orchestrator invokes all fan-out skills (`adversarial-review`, SDD) in-context and spawns their workers itself — one level, any version. An intake gate checks model *availability*. (Details in `2026-07-22-dev-flow-flatten-design.md`.)
 - **GitHub remote** from Stage 4 onward (the pipeline uses `gh` for PR, review marker, CI, merge). This matches the existing plugins' reliance on `gh`.
 
 ## Cross-Cutting Concerns
