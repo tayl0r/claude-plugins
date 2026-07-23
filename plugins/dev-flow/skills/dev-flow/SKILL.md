@@ -45,15 +45,6 @@ There are exactly three stop boundaries:
 
 The orchestrator spawns produce-subagents and executors on the main session model, and does its own bookkeeping (checkbox commits, front-matter) inline. Reviewer-model selection — the orchestrator spawns the review's seed/resolver leaves directly, on a capable model different from the artifact's author — is owned by `dev-flow:adversarial-review` and stated once, in its Model section; that rule travels with the review skill wherever it is invoked.
 
-## Model-availability gate (runs first, every invocation)
-
-Before any drafting, resume routing, or stage work — on first run **and** every resume — the orchestrator confirms it can spawn the review's diverse models. No nested spawning is used anywhere in this pipeline; the orchestrator is the only spawner, so this is a one-level check:
-
-1. Spawn one `sonnet` leaf and one `fable` leaf (or `opus` in a Fable-family session, per `dev-flow:adversarial-review`'s Model section), each returning the model its system prompt names and confirming it holds the `Skill` tool (produce-subagents need `Skill` to load their delegated skill).
-2. If either fails to spawn, lacks `Skill`, or reports the wrong tier (by family match — e.g. a "Fable 5" report satisfies `fable`), **halt** with a report naming the missing capability — before any draft is written and later discarded on resume.
-
-This is a hard, fail-fast gate: model availability can fail version-independently (permissions, `allowedTools`, alias changes). It does **not** probe nested spawning — that capability is neither present (removed in Claude Code 2.1.218) nor needed, since the orchestrator spawns every worker at one level.
-
 ## Dispatching to Inherited Skills
 
 dev-flow delegates *produce* work to existing skills (`writing-plans`, the inlined `brainstorming` bones). Those skills contain user-facing decision points that have no answerer in a full-auto run. Carry the following rule as a standard preamble in **every produce-subagent** dispatch (Stages 1–2), so current and future inherited skills are handled correct-by-default. The orchestrator runs the *fan-out* skills — `adversarial-review` and `subagent-driven-development` — itself, in-context, and self-applies these rules directly (there is no dispatch prompt to carry them):
@@ -204,7 +195,7 @@ The **orchestrator** invokes `superpowers:subagent-driven-development` directly 
 
 ## Environment Assumptions
 
-- **Flat topology — the orchestrator is the only spawner.** Every subagent dev-flow spawns is a leaf; no subagent spawns a subagent. This is required, not a preference: **Claude Code 2.1.218 does not grant spawned subagents the `Agent` tool** (nested spawning was removed; the harness's recommended pattern is top-level orchestration only). So the orchestrator invokes every fan-out skill (`dev-flow:adversarial-review`, `subagent-driven-development`) in-context and spawns their worker leaves itself — always one level, works on every version. The intake gate above checks model *availability*, not nesting. (Nesting worked on 2.1.217 and was relied on by this plugin's 1.1.0; the 2.1.218 removal is why 1.2.0 flattened.)
+- **Flat topology — the orchestrator is the only spawner.** Every subagent dev-flow spawns is a leaf; no subagent spawns a subagent. This is required, not a preference: **Claude Code 2.1.218 does not grant spawned subagents the `Agent` tool** (nested spawning was removed; the harness's recommended pattern is top-level orchestration only). So the orchestrator invokes every fan-out skill (`dev-flow:adversarial-review`, `subagent-driven-development`) in-context and spawns their worker leaves itself — always one level, works on every version. (Nesting worked on 2.1.217 and was relied on by this plugin's 1.1.0; the 2.1.218 removal is why 1.2.0 flattened.)
 - **Shared checkout.** Because dev-flow works on the feature branch in your current checkout (no worktree), a run owns that working tree while it is active — don't edit files there mid-run. The dirty-checkout gate (Artifact Contract) protects any uncommitted work you already had when a run starts or resumes. If you want the pipeline to never touch your main checkout, use the `dev-flow-worktree` plugin instead.
 - **GitHub remote** is assumed from Stage 4 onward (the pipeline uses `gh` for PR, review marker, CI, and merge). This matches the existing plugins' reliance on `gh`. (The `<username>` resolver *prefers* `gh api user` when a remote is reachable but falls back to git config, so Design and Plan still run with no remote.)
 
