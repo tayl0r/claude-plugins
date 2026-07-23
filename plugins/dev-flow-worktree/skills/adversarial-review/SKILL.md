@@ -1,6 +1,6 @@
 ---
 name: adversarial-review
-description: Use to run a rigorous adversarial review on a single artifact — a design doc, a plan doc, or a PR/diff. Seeds with findings-only quality and correctness passes, then groups issues and resolves each to the best long-term design with adversarial self-checks. Triggers on "adversarial review", "review this design/plan/PR properly", or is called internally by dev-flow at each stage.
+description: Use to run a rigorous adversarial review on a single artifact — a design doc, a plan doc, or a PR/diff. Seeds with findings-only quality and correctness passes, then groups issues and resolves each to the best long-term design with adversarial self-checks. Triggers on "adversarial review", "review this design/plan/PR properly", or is called internally by dev-flow-worktree at each stage.
 ---
 
 # Adversarial Review
@@ -8,8 +8,8 @@ description: Use to run a rigorous adversarial review on a single artifact — a
 Run a rigorous adversarial review on ONE target artifact and resolve every finding to the best long-term design, applying only fixes that earn their place.
 
 **Invocation:** `adversarial-review(target, mode[, extra findings][, working-dir])` where `mode` is one of `design`, `plan`, `diff`, and `working-dir` is an optional absolute path to the checkout/worktree the review reads and commits in (see the Contract's working-directory rule; absent → the invoking checkout).
-- When called by dev-flow, the mode is passed explicitly.
-- When called by dev-flow, the review runs in-context on the feature branch checked out in the invoking checkout, so `working-dir` is omitted — it defaults to that checkout (see dev-flow's branch-entry rule). dev-flow uses no worktree.
+- When called by dev-flow-worktree, the mode is passed explicitly.
+- When called by dev-flow-worktree, `working-dir` is the pipeline worktree's absolute path — the orchestrator passes it explicitly and invokes the review in-context (see dev-flow-worktree's worktree-entry rule).
 - Standalone, infer the mode: a path under `specs/` -> `design`; under `plans/` -> `plan`; a PR number, branch, or SHA range -> `diff`.
 - A caller may pass additional findings (e.g. leftovers from an earlier review); they join the seed findings in Resolution step 1.
 
@@ -66,7 +66,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 5. Commit the improved artifact — this skill owns the commit in every mode. Do not push or merge — those integration steps are the caller's.
    - **Design / plan docs:** rewrite the doc incorporating the resolutions, **preserving the doc's front-matter block unchanged** (front-matter is caller state, not review content), and commit the rewritten doc on the working directory's branch.
    - **PR diff:** commit the applied fixes on the branch. Then, if the project has a test suite, run it — red means the responsible fix is repaired or reverted before this step completes; never leave the branch red. Report the suite result (green, or "no suite exists") to the caller.
-6. Report back: the commit(s) made, a summary of applied vs. skipped fixes, the post-fix suite result (diff mode), every new issue filed, and a **provenance** line naming the reviewers actually spawned per tier with their canonicalized tier aliases (from Review integrity's family match), in the form `seeds: N× <tier>; resolvers: M× <tier>` with `<tier>` ∈ {`sonnet`, `fable`, `opus`} (e.g. `seeds: 2× sonnet; resolvers: 3× fable`; a review that surfaces no findings spawns no resolvers and reports `resolvers: 0`, tierless). Provenance is the evidence the invoking caller (dev-flow's orchestrator, when called by dev-flow) checks directly to confirm the review was genuinely model-diverse.
+6. Report back: the commit(s) made, a summary of applied vs. skipped fixes, the post-fix suite result (diff mode), every new issue filed, and a **provenance** line naming the reviewers actually spawned per tier with their canonicalized tier aliases (from Review integrity's family match), in the form `seeds: N× <tier>; resolvers: M× <tier>` with `<tier>` ∈ {`sonnet`, `fable`, `opus`} (e.g. `seeds: 2× sonnet; resolvers: 3× fable`; a review that surfaces no findings spawns no resolvers and reports `resolvers: 0`, tierless). Provenance is the evidence the invoking caller (dev-flow-worktree's orchestrator, when called by dev-flow-worktree) checks directly to confirm the review was genuinely model-diverse.
 
 ## Model
 
