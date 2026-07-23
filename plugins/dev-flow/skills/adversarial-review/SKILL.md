@@ -7,14 +7,17 @@ description: Use to run a rigorous adversarial review on a single artifact — a
 
 Run a rigorous adversarial review on ONE target artifact and resolve every finding to the best long-term design, applying only fixes that earn their place.
 
-**Invocation:** `adversarial-review(target, mode[, extra findings])` where `mode` is one of `design`, `plan`, `diff`.
+**Invocation:** `adversarial-review(target, mode[, extra findings][, working-dir])` where `mode` is one of `design`, `plan`, `diff`, and `working-dir` is an optional absolute path to the checkout/worktree the review reads and commits in (see the Contract's working-directory rule; absent → the invoking checkout).
 - When called by dev-flow, the mode is passed explicitly.
+- When called by dev-flow, `working-dir` is the pipeline worktree's absolute path (dev-flow passes it explicitly — see dev-flow's stage-dispatch preamble).
 - Standalone, infer the mode: a path under `specs/` -> `design`; under `plans/` -> `plan`; a PR number, branch, or SHA range -> `diff`.
 - A caller may pass additional findings (e.g. leftovers from an earlier review); they join the seed findings in Resolution step 1.
 
 **Contract:** this skill owns the artifact end-to-end — it reviews, resolves, applies, and **commits** the improved artifact on the current branch, in every mode. The caller never re-applies or re-commits the review's work. It never pushes, posts review results to a PR, or merges — those integration steps are the caller's. (Filing a new issue via `gh`, per "Where new issues are filed," is part of the review, not integration.)
 
 **Review integrity (never inline).** The seed and resolver passes MUST run as separate subagents on their specified models (per Model, below). If they cannot be spawned — no `Agent` tool, or a required model unavailable — halt and report; **never** produce a single-model inline review as a silent substitute. To make the model axis verifiable, every reviewer prompt (seed and resolver) requires the reviewer to state, as the first line of its report, the model its own system prompt names. The review matches each self-report to the tier requested for it — a **family match** (e.g. a "Fable 5" self-report satisfies the `fable` tier), honoring the resolver opus-fallback rather than a hardcoded id — and canonicalizes it to the tier alias (`sonnet`, `fable`, or `opus`). A missing or mismatched first line is treated exactly like a failed spawn: halt.
+
+**Working directory (resolve once, thread always).** Resolve the working directory exactly once at invocation: the explicit `working-dir` argument if given, else the invoking checkout root (`git rev-parse --show-toplevel`), normalized to an absolute path; resolution failure (not a git repo) is a loud halt at invocation, because the contract requires committing. Thread that absolute path into every spawned agent's prompt — seeds, resolvers, and fixers — so no spawned agent derives its location from inherited cwd (process cwd is global mutable state; parallel fixers make ambient cwd a race). Read-only reviewers receive absolute artifact/diff paths and need no entry. Write-side fixers address the root explicitly with `git -C <path>` and absolute file paths (a depth-2 `EnterWorktree` probe found harness worktree-entry unavailable at that depth — see the design spec's Evidence section — and explicit addressing is also the only mechanism that works for standalone reviews of checkouts outside `.claude/worktrees/`). The `working-dir` argument is an override only — omission cannot produce ambient-cwd behavior.
 
 ## Seed passes
 
