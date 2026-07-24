@@ -245,6 +245,12 @@ So marker validity is redefined once, at the shared boundary (the Artifact Contr
 tail. First run and resume then travel the identical path, and no resume-only entry point
 exists anywhere.
 
+Redefined at the boundary means every call site reads the new rule: the resume table's two
+`Open PR` rows re-key from "marker SHA equals head" to Marker validity — the same two
+generic routes, no new entry point — since with the old wording a crash between the strip
+push and the merge routes to "PR review," the spurious re-review Acceptance Criterion 4
+forbids.
+
 **Marker validity** (replaces "marker SHA equals head"): the marker is valid iff the
 marker SHA equals the current head, **or** every commit in `<marker-sha>..HEAD` carries
 the trailer `dev-flow-stripped: <slug>` **and** `git diff --name-status <marker-sha> HEAD`
@@ -375,7 +381,7 @@ Prose only — these plugins contain no executable code.
 
 | File | Change |
 |---|---|
-| `plugins/dev-flow/skills/dev-flow/SKILL.md` | Artifact Contract (settings resolution, front-matter schema, ownership clause, resume table row, **marker-validity clause in Review state**), branch-entry step 0 (ignore enforcement), Stage 1 intake, **Stage 4 PR body** (under `docs: strip`, one line noting the docs live in the PR's commit history and are removed before merge by repo policy), Stage 5 sequencing, **Cross-Cutting Concerns (standing Command-discipline bullet — Decision 0 items 1–2)** |
+| `plugins/dev-flow/skills/dev-flow/SKILL.md` | Artifact Contract (settings resolution, front-matter schema, ownership clause, resume table rows (the no-design route, and both `Open PR` marker rows re-keyed to Marker validity), **marker-validity clause in Review state**), branch-entry step 0 (ignore enforcement), Stage 1 intake, **Stage 4 PR body** (under `docs: strip`, one line noting the docs live in the PR's commit history and are removed before merge by repo policy), Stage 5 sequencing, **Cross-Cutting Concerns (standing Command-discipline bullet — Decision 0 items 1–2)** |
 | `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` | Same, with `dev-flow-worktree:` / `dev-flow-worktree-stripped:` naming — **plus Command discipline item 3**: every git command this design adds (fetch, merge-base, cat-file, `git rm`, the strip commit, `git diff --name-status`, the strip push) is cwd/branch-derived and joins worktree-entry's enumeration of commands driven from inside the pipeline worktree or explicitly addressed. The exclude-ensure moves per Decision 1. The Cross-Cutting Concerns bullet lands here too, identical (Decision 0 items 1–2); only item 3 is worktree-specific. **The port is a mechanism extension, not a rename.** |
 | `plugins/dev-flow/README.md` | Document the setting and its consequences |
 | `plugins/dev-flow-worktree/README.md` | Same |
