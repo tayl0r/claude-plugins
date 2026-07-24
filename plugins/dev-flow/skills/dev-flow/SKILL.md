@@ -141,6 +141,14 @@ Any path failing any gate is left alone. **No `git rm -r` of a directory, ever.*
 *Base ref (creation only).* Resolve the default branch mechanically: `git symbolic-ref --short refs/remotes/origin/HEAD` (strip `origin/`); if unset, `git remote set-head origin --auto` and retry; if there is no remote, use `main` if that ref exists, else `master`, else halt and report. Base off `origin/<default>` when it exists (after a best-effort `git fetch origin <default>`), else local `<default>`. Never branch from the invoking checkout's HEAD.
 
 *Branch entry — the orchestrator runs this at each stage boundary, first run and resume:*
+0. **Ensure the settings file is excluded** — idempotent, and first, *before* the dirty-checkout gate, so a not-yet-excluded settings file cannot trip that gate as an untracked file. Per Command discipline the exclude file is resolved through git, never spelled as a `.git/...` literal:
+
+   ```sh
+   exclude_file=$(git rev-parse --git-path info/exclude)   # failure or empty halts
+   grep -qxF '.claude/dev-flow.local.md' "$exclude_file" || printf '%s\n' '.claude/dev-flow.local.md' >> "$exclude_file"
+   ```
+
+   A local exclude, never a committed `.gitignore` edit — which would itself pollute the PR diff. Grep the file rather than `git check-ignore`. Because entry runs at every stage boundary and this check is idempotent, a settings file created mid-run is excluded before any Execute-stage broad `git add` can sweep it in.
 1. **Already there:** if the current branch is `<username>/<slug>`, no switch is needed — skip to step 5 (ensure runnable) / step 6 (resume dirtiness).
 2. **Dirty-checkout gate (before any switch).** A switch onto the feature branch — creating it (step 3) or checking it out (step 4) — first inspects `git status --porcelain` (which already excludes git-ignored files). If it reports **anything** — tracked modifications, staged changes, or untracked non-ignored files — the orchestrator **halts and asks the user** how to proceed with those pre-existing changes, offering exactly three choices, then acts and switches:
    - **proceed as-is** — carry the changes into the working tree onto the feature branch. If git reports the switch would overwrite or conflict, they cannot be cleanly carried: re-present *stash* / *revert*. These carried changes stay **uncommitted** and are **not pipeline state** — the Artifact Contract's "committed or on the PR" guarantee covers only what the pipeline itself commits. dev-flow never deliberately commits them, but it cannot stop an Execute-stage implementer's broad `git add` from sweeping in files it touches, so choose this **only for changes on paths unrelated to the feature**; otherwise prefer *stash*. This is the one category of pre-existing uncommitted state the pipeline knowingly tolerates (at the user's explicit direction); step 6's stricter treatment governs uncommitted state that appears *after* the pipeline has taken over.
