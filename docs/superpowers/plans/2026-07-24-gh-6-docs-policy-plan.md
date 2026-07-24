@@ -73,7 +73,7 @@ No files are created. No files are deleted.
 
 **Context:** Every command later tasks add is governed by two standing rules — resolve git-internal paths through git, and never let an empty captured variable stand in for a real value. The design makes them permanent rules for all future contributors, not this-change-only rationale, so they land as a Cross-Cutting Concerns bullet rather than being repeated at each call site.
 
-- [ ] **Step 1: Insert the bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Insert the bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this line (it is the last bullet of `## Cross-Cutting Concerns`):
 
@@ -87,7 +87,7 @@ Insert the following single line **immediately before** it (one new line, then t
 - **Command discipline:** resolve git-internal paths through git (`git rev-parse --git-path …`), never as `.git/...` literals — `.git` is a file, not a directory, in any linked worktree. Capture, validate non-empty, and quote any command output a later command consumes; a failed producer halts the run and never substitutes an empty string — an empty variable silently *inverts* git predicates (an empty `<merge-base>` turns `git log <mb>..HEAD` into the empty range `HEAD..HEAD`, a false "no matches", and turns `git cat-file -e :<path>` into an index lookup that falsely succeeds).
 ```
 
-- [ ] **Step 2: Insert the byte-identical bullet in the worktree SKILL.md**
+- [x] **Step 2: Insert the byte-identical bullet in the worktree SKILL.md**
 
 Find the same last bullet in `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`:
 
@@ -97,7 +97,7 @@ Find the same last bullet in `plugins/dev-flow-worktree/skills/dev-flow-worktree
 
 Insert **the exact same line as Step 1, byte for byte** immediately before it. This bullet is one of the few places where the two files are *identical* — it contains no plugin name, so the Global Constraints substitution table does not apply. Do not adapt it.
 
-- [ ] **Step 3: Verify presence and byte-identity**
+- [x] **Step 3: Verify presence and byte-identity**
 
 Run:
 
@@ -111,7 +111,7 @@ diff <(grep -F '**Command discipline:**' plugins/dev-flow/skills/dev-flow/SKILL.
 
 Expected: `1`, `1`, then `IDENTICAL`.
 
-- [ ] **Step 4: Verify the bullet landed inside Cross-Cutting Concerns, not elsewhere**
+- [x] **Step 4: Verify the bullet landed inside Cross-Cutting Concerns, not elsewhere**
 
 Run:
 
@@ -124,7 +124,7 @@ done
 
 Expected for each file: three lines, in this order — the `## Cross-Cutting Concerns` heading, then `- **Command discipline:`, then `- **Severity-independent`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
