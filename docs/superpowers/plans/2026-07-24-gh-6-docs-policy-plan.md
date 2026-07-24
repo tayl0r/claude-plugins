@@ -292,7 +292,7 @@ git commit -m "dev-flow: add the Docs policy setting and its resolution to the A
 
 **Context:** A strip must remove only *this run's* docs and never a path that predates the branch. Gate 3 (`git cat-file -e "$merge_base:$P"` fails) is the gate that actually delivers that — slug-scoping alone does not, because a previously shipped feature's docs can legitimately match the slug globs. `merge_base` must be a validated variable: an empty one turns `git cat-file -e :P` into an *index* lookup that falsely succeeds.
 
-- [ ] **Step 1: Append the two sub-sections in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Append the two sub-sections in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find the paragraph Task 2 added that begins `*Resolution happens once, at intake.*` and ends:
 
@@ -323,7 +323,7 @@ Any path failing any gate is left alone. **No `git rm -r` of a directory, ever.*
 *The stripped state, defined once.* A branch is **stripped** iff the design doc is absent at tip **and** at least one commit in `<merge-base>..HEAD` carries the trailer `dev-flow-stripped: <slug>`. In this state, front-matter reads have **defined answers, not failed producers**: the recorded `stops` is empty — a recorded `pre-merge` stop halts at the merge gate's `stops` consultation (Stage 5), *before* any strip, so no branch reaches the stripped state with a stop outstanding — and `docs:` is never consulted, because no path can pass gate 2 above once the strip removed it. This is the same move gate 3 already makes: once the surrounding state is validated (here, the trailer proven in range), a negative probe is an unambiguous answer, so Command discipline's halt-on-failure rule is satisfied, not suspended — nothing failed to produce. An absent design doc **without** the trailer is not the stripped state and keeps its existing meaning exactly: foreign branch, halt.
 ````
 
-- [ ] **Step 2: Append the mirrored sub-sections in the worktree SKILL.md**
+- [x] **Step 2: Append the mirrored sub-sections in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, append the same two sub-sections after the `*Resolution happens once, at intake.*` paragraph. Exactly one substitution applies to this text:
 
@@ -331,7 +331,7 @@ In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, append the sam
 
 Everything else — both `sh` fences, the three numbered gates, the glob patterns, every sentence — is byte-identical.
 
-- [ ] **Step 3: Verify the gates and the trailer naming**
+- [x] **Step 3: Verify the gates and the trailer naming**
 
 Run:
 
@@ -355,7 +355,7 @@ Expected: `1` for each of the eight `grep -c` checks, and each `grep -n` prints 
 
 Note: gate 1 is checked as its **full line**, not as a bare glob total. The bare glob `docs/superpowers/specs/*-<slug>-design.md` appears **twice** per file after this task — gate 1 plus the pre-existing Branch-ownership bullet — so a whole-file glob count would be `2`, not `1` (Global Constraints, *Verification-command form*).
 
-- [ ] **Step 4: Verify no cross-contaminated trailer names**
+- [x] **Step 4: Verify no cross-contaminated trailer names**
 
 Run:
 
@@ -369,7 +369,7 @@ grep -c -F 'dev-flow-worktree-stripped: <slug>' plugins/dev-flow-worktree/skills
 
 Expected: `0`, `0`, `1`, `1`. (`dev-flow-worktree-stripped` does not contain the substring `dev-flow-stripped`, so the second count being `0` is a real check, not a tautology.)
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
