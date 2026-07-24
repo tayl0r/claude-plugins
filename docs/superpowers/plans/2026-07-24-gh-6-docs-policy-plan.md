@@ -147,7 +147,7 @@ git commit -m "dev-flow: add the standing Command discipline rule to both varian
 
 **Context:** The setting is `.claude/dev-flow.local.md` — the plugin-settings pattern (`.claude/<plugin>.local.md`, YAML front-matter, user-local, git-ignored). Both variants read the **same** file and the **same** bare `docs:` key, because "does scaffolding land in the default branch?" is a question about the repo, with one answer per repo. The resolved value is stamped once at intake into the design doc's plugin-scoped front-matter block; every later stage reads the artifact, never the settings file.
 
-- [ ] **Step 1: Extend the front-matter schema example in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Extend the front-matter schema example in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this fenced block (under `**Front-matter (the only new schema).** Design doc:`):
 
@@ -176,7 +176,7 @@ dev-flow:
 
 Align the `#` of the new line with the `#` on the `stops` line above it.
 
-- [ ] **Step 2: Insert the Docs policy block in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 2: Insert the Docs policy block in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this paragraph (the last line of the Front-matter block):
 
@@ -210,7 +210,7 @@ The default is `commit` because it is the pre-existing behavior and the resume-s
 *Resolution happens once, at intake.* Stage 1 reads the file and stamps the resolved value into the design doc's `dev-flow` front-matter block, alongside `slug` and `stops`. **Every later stage reads the artifact, never the settings file again.** Precedence: front-matter (present on any resume) > settings file (first run only) > default `commit`. This follows the contract's "state lives in artifacts" rule and mirrors how `stops` already works, and it matters more here than for `stops`: the settings file is git-ignored, so it may not exist in the checkout where a run resumes, and a resumed run must not silently flip policy. `dev-flow:adversarial-review` preserves front-matter across rewrites, so the key survives every review.
 ````
 
-- [ ] **Step 3: Make the mirrored edits in the worktree SKILL.md**
+- [x] **Step 3: Make the mirrored edits in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, apply Steps 1 and 2 with the Global Constraints substitutions. Concretely:
 
@@ -237,7 +237,7 @@ Then, immediately after the paragraph beginning `Plan doc: \`dev-flow-worktree: 
 
 Everything else — the yaml fence, the five-row table, both italic sub-headings — is byte-identical to Step 2.
 
-- [ ] **Step 4: Verify the block, the key, and the shared filename**
+- [x] **Step 4: Verify the block, the key, and the shared filename**
 
 Run:
 
@@ -255,7 +255,7 @@ done
 
 Expected for **each** file, in order: `1` (the block is present), `1` (the settings path is named once — in this block's `*The setting.*` line; Tasks 4 and 7 add two more sites later), `0` (**the per-variant filename must never appear**), `1` (the front-matter example carries the key), then exactly three numbered lines **in this order** — the Plan-doc paragraph, the Docs policy heading, the Doc-git-lifecycle paragraph — proving the block landed between its two anchors rather than elsewhere in the Artifact Contract.
 
-- [ ] **Step 5: Verify the resolution table is complete and identical in both files**
+- [x] **Step 5: Verify the resolution table is complete and identical in both files**
 
 Run:
 
@@ -269,7 +269,7 @@ diff <(sed -n '/^| State | Resolves to |/,/^| Any other value/p' plugins/dev-flo
 
 Expected: `5`, `5`, then `TABLES-IDENTICAL` (the resolution table contains no plugin name, so the two copies must match byte for byte).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
