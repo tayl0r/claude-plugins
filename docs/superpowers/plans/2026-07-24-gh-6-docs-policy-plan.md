@@ -394,7 +394,7 @@ git commit -m "dev-flow: define qualifying paths and the stripped state in the A
 
 In `dev-flow-worktree` this is an *extension of existing machinery, not new machinery*: the Create step already ensured `.claude/worktrees/` was excluded. That ensure **moves** to step 0 and covers both patterns in one block. Step 0 still precedes Create's `git worktree add`, so the container is ignored before it exists.
 
-- [ ] **Step 1: Insert step 0 in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Insert step 0 in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find these two consecutive lines:
 
@@ -416,7 +416,7 @@ Insert the following **between** them (i.e. after the italic heading line, befor
    A local exclude, never a committed `.gitignore` edit — which would itself pollute the PR diff. Grep the file rather than `git check-ignore`. Because entry runs at every stage boundary and this check is idempotent, a settings file created mid-run is excluded before any Execute-stage broad `git add` can sweep it in.
 ````
 
-- [ ] **Step 2: Insert step 0 in the worktree SKILL.md**
+- [x] **Step 2: Insert step 0 in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find these two consecutive lines:
 
@@ -440,7 +440,7 @@ Insert the following **between** them. Note this variant covers **two** patterns
    `--git-path` resolves to the main repository's shared `info/exclude` from any worktree, so one write covers the main checkout and every worktree at once. A local exclude, never a committed `.gitignore` edit — which would itself pollute the PR diff. Grep the file rather than `git check-ignore`, which misfires on the not-yet-created directory. This step precedes step 3's `git worktree add`, so the container is ignored before it is created.
 ````
 
-- [ ] **Step 3: Remove the now-duplicated exclude-ensure from the worktree's Create step**
+- [x] **Step 3: Remove the now-duplicated exclude-ensure from the worktree's Create step**
 
 In the same file, find step 3 in full:
 
@@ -456,7 +456,7 @@ Replace it with:
 
 This must leave **exactly one** `.claude/worktrees/` exclude-ensure in the file — the one in step 0. The old `<main-root>/.git/info/exclude` literal is deleted, not kept: it is precisely the `.git/...` literal Command discipline forbids.
 
-- [ ] **Step 4: Extend worktree entry step 4's addressing enumeration (Command discipline item 3)**
+- [x] **Step 4: Extend worktree entry step 4's addressing enumeration (Command discipline item 3)**
 
 Still in `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, inside step 4 (**Enter**), find this exact fragment:
 
@@ -472,7 +472,7 @@ and **Stage 4's `gh pr create`, the branch push on any halt/stop, the `review cl
 
 This is the worktree-specific third item of Command discipline, and this enumeration is its durable home: every git command this change adds derives its target from cwd and the current branch, so it must be driven from inside the pipeline worktree or explicitly addressed via `git -C <worktree-path>`. The commands named here are added by Tasks 6 and 9; naming them now is intentional — this is prose, so there is no ordering dependency.
 
-- [ ] **Step 5: Verify step 0 exists in both, and the worktree duplicate is gone**
+- [x] **Step 5: Verify step 0 exists in both, and the worktree duplicate is gone**
 
 Run:
 
@@ -493,7 +493,7 @@ grep -n -F "'.claude/worktrees/'" plugins/dev-flow-worktree/skills/dev-flow-work
 
 Expected: `1`, `1`, `1`, `1`; then `0`, `0` — the forbidden literal is gone. It was `0` in the dev-flow file and `1` in the worktree file before this task, so the worktree `0` is the real check that Step 3's deletion landed. The Command-discipline bullet mentions `.git/...`, which does not contain this literal, so `0` is achievable. The last command must print **exactly one** line, and its line number must fall inside entry step 0 (before the `1. **Locate:**` line).
 
-- [ ] **Step 6: Read back step 0 and step 3 in the worktree file**
+- [x] **Step 6: Read back step 0 and step 3 in the worktree file**
 
 Run:
 
@@ -504,7 +504,7 @@ sed -n '/^\*Worktree entry/,/^5\. \*\*Ensure runnable/p' plugins/dev-flow-worktr
 
 Confirm by reading: step 0 exists and loops over both patterns; step 1 (Locate), 2 (Re-attach) unchanged; step 3 (Create) no longer contains any `grep -qxF` or `info/exclude` text and now says "already ignored by step 0"; step 4 (Enter) enumerates the merge gate's commands.
 
-- [ ] **Step 7: Verify the numbering was not disturbed**
+- [x] **Step 7: Verify the numbering was not disturbed**
 
 Run:
 
@@ -518,7 +518,7 @@ sed -n '/^\*Worktree entry — the orchestrator/,/^6\. /p' plugins/dev-flow-work
 
 Expected: `7` and `7` (was 6 before this task), then `0. 1. 2. 3. 4. 5. 6.` twice — ascending, no gaps, no duplicates.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
