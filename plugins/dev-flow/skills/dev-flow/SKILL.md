@@ -87,10 +87,33 @@ Intake collision check: before creating `<username>/<slug>`, if it already exist
 dev-flow:
   slug: rate-limit
   stops: [post-plan, pre-merge]   # [] = full-auto to merge
+  docs: commit                    # commit | strip — resolved and stamped once at intake (see Docs policy)
 ---
 ```
 
 Plan doc: `dev-flow: {slug: rate-limit, spec: docs/superpowers/specs/2026-07-20-rate-limit-design.md}` (linkage only). **Stops live solely in the design doc.** The PR body links both doc paths. `dev-flow:adversarial-review` preserves front-matter on every rewrite (part of its contract), so this block survives all reviews.
+
+**Docs policy — commit or strip the scaffolding.** Whether this pipeline's design and plan docs reach the default branch is a **per-repo setting**, resolved once at intake and then carried in the artifact.
+
+*The setting.* `.claude/dev-flow.local.md` — the plugin-settings pattern (`.claude/<plugin>.local.md`: YAML front-matter, user-local, git-ignored by definition). Keys are bare; the filename scopes them, so the file carries no plugin block at all:
+
+```yaml
+---
+docs: strip      # commit | strip
+---
+```
+
+| State | Resolves to |
+|---|---|
+| File absent | `commit` |
+| File present, no `docs:` key | `commit` |
+| `docs: commit` | `commit` |
+| `docs: strip` | `strip` |
+| Any other value | `commit`, **and emit a one-line warning naming the bad value** |
+
+The default is `commit` because it is the pre-existing behavior and the resume-safe one. The warning on an unrecognized value exists because a typo'd `strip` silently meaning `commit` fails in the direction that surprises the user — scaffolding appears in the default branch after they believed they had turned it off. **Both plugin variants read this same file and this same key** (`dev-flow` is the family name they share): the keep-vs-strip question is about the repo's default branch, and its answer does not change with the variant you invoked, so there is one file, not two — parallel per-variant files would be two things to keep in sync for a question with one answer. Because the file is git-ignored, what it holds is each developer's local declaration of the repo's convention, not a team-enforced fact. The strict `dev-flow:` front-matter namespacing rule is untouched and never applied here: it governs plugin-scoped blocks in *artifacts*, where the branch-ownership predicate keys off the block name, and this file is input, not an artifact.
+
+*Resolution happens once, at intake.* Stage 1 reads the file and stamps the resolved value into the design doc's `dev-flow` front-matter block, alongside `slug` and `stops`. **Every later stage reads the artifact, never the settings file again.** Precedence: front-matter (present on any resume) > settings file (first run only) > default `commit`. This follows the contract's "state lives in artifacts" rule and mirrors how `stops` already works, and it matters more here than for `stops`: the settings file is git-ignored, so it may not exist in the checkout where a run resumes, and a resumed run must not silently flip policy. `dev-flow:adversarial-review` preserves front-matter across rewrites, so the key survives every review.
 
 **Doc git lifecycle — branch at design start.** Creating `<username>/<slug>` and checking it out in your working directory is the *first* act of Stage 1 (the Create step of the branch lifecycle, below; design and plan only need the branch checked out — runnable setup is ensured at entry from Execute onward). Write and commit all docs **on the branch, in your checkout**. A doc's content is committed **only by `dev-flow:adversarial-review`, as the final step of its rewrite** — so "doc committed at tip" is equivalent to "stage complete" by construction, which removes the need for any separate "reviewed" marker on docs. (dev-flow itself commits only pipeline-state edits: front-matter `stops` updates and plan-checkbox ticks.) Adopt-existing-file entry: branch from main, copy the file in, stamp front-matter, then review — the review rewrites and commits. On every halt/stop, push the branch if a remote exists.
 
