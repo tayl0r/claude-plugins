@@ -828,7 +828,7 @@ git commit -m "dev-flow: resolve and stamp the docs policy at Stage 1 intake"
 
 **Context:** A stripped PR's body links doc paths that will not exist on the default branch after merge. The design rejected fixing that with SHA permalinks (a Stage 4 step to repair two dead links in a merged PR body — a fix roughly as costly as the wart). Instead the body carries one free line saying so.
 
-- [ ] **Step 1: Insert the bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Insert the bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this line (the first bullet of `### Stage 4 — PR`):
 
@@ -842,11 +842,11 @@ Insert the following single line **immediately after** it:
 - **Under `docs: strip`** (front-matter, per Docs policy), the PR body also carries one line noting that the design and plan live in this PR's commit history and are removed before merge by repo policy — so the linked paths will not exist on the default branch after the merge. Under `docs: commit` the body is unchanged.
 ```
 
-- [ ] **Step 2: Insert the mirrored bullet in the worktree SKILL.md**
+- [x] **Step 2: Insert the mirrored bullet in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find the identical first bullet of `### Stage 4 — PR` (its text is the same in both files) and insert the same line immediately after it. **No substitutions apply** — this bullet contains no plugin name.
 
-- [ ] **Step 3: Verify byte-identity and placement**
+- [x] **Step 3: Verify byte-identity and placement**
 
 Run:
 
@@ -861,7 +861,7 @@ done
 
 Expected: `IDENTICAL`, then for each file three lines whose numbers ascend in exactly that order (heading, `gh pr create`, the new bullet).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
