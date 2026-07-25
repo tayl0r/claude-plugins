@@ -884,7 +884,7 @@ git commit -m "dev-flow: disclose the pending strip in the PR body under docs: s
 
 **Context:** The strip runs *inside* the gate and **re-enters it at step 1** rather than running a private post-strip tail, so first run and resume travel the identical path and no resume-only entry point exists. The re-wait at step 2 is load-bearing: where branch protection requires checks, GitHub demands they pass on the new head. Step 1's leading `git push` closes a real crash window — a crash between the strip commit and its push would otherwise merge the un-stripped remote head. Step 3 (the `stops` read) sits deliberately **before** step 4 (the strip), so a `pre-merge` halt always leaves the branch intact with both docs at tip.
 
-- [ ] **Step 1: Replace the first four bullets of Stage 5 in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Replace the first four bullets of Stage 5 in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this contiguous block — it begins at the first line after `### Stage 5 — Merge` and ends at the `- **Merge:**` bullet, inclusive:
 
@@ -917,7 +917,7 @@ The merge gate is five steps and is **re-entrant**: step 4 can send the run back
 
 Leave the `- **Cleanup (idempotent …)**` and `- **Final report:**` bullets that follow **exactly as they are**. Insert a blank line between step 5 and the `- **Cleanup` bullet so the numbered list and the bullet list render as separate lists.
 
-- [ ] **Step 2: Make the mirrored replacement in the worktree SKILL.md**
+- [x] **Step 2: Make the mirrored replacement in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` the same four bullets appear, with one difference: its `- **Merge:**` bullet reads `No \`--delete-branch\`, and no manual branch deletion —` (no "anywhere") and ends with the extra sentence `(Cleanup below still removes the pipeline's own *worktree* — that is the pipeline's artifact, not your branch.)`.
 
@@ -929,7 +929,7 @@ Apply the same replacement, with exactly these differences from Step 1's text:
 
 Everything else, including all four CI-wait sub-bullets, is byte-identical to Step 1.
 
-- [ ] **Step 3: Verify the gate's shape**
+- [x] **Step 3: Verify the gate's shape**
 
 Run:
 
@@ -944,7 +944,7 @@ done
 
 Expected for each file: `1`, then exactly five numbered lines `1.` through `5.` in ascending order.
 
-- [ ] **Step 4: Verify ordering invariants and the removed old text**
+- [x] **Step 4: Verify ordering invariants and the removed old text**
 
 Run:
 
@@ -969,7 +969,7 @@ grep -c -F -e '- **Final report:**' plugins/dev-flow-worktree/skills/dev-flow-wo
 
 Expected: the three line numbers ascend (3 < 4 < 5) in each file; then `0`, `0`; then `1`, `1`, `1`, `1`.
 
-- [ ] **Step 5: Read back Stage 5 in full, both files**
+- [x] **Step 5: Read back Stage 5 in full, both files**
 
 Run:
 
@@ -982,7 +982,7 @@ sed -n '/^### Stage 5 — Merge/,/^---$/p' plugins/dev-flow-worktree/skills/dev-
 
 Read both and confirm: the numbered gate renders as one list; the CI sub-bullets are indented under step 2; the Cleanup bullet is separated by a blank line; the worktree copy names the worktree in its opening paragraph and uses the `dev-flow-worktree-stripped` trailer.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
