@@ -752,7 +752,7 @@ git commit -m "dev-flow: redefine marker validity so a verified strip does not f
 
 **Context:** Resolution happens exactly once, at intake, and the stamp must land **before** the review runs, because the review rewrites the doc and (by its contract) preserves front-matter. A resume never re-reads the settings file: the front-matter value wins.
 
-- [ ] **Step 1: Insert the intake bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Insert the intake bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this line inside `### Stage 1 — Design`:
 
@@ -766,7 +766,7 @@ Insert the following single line **immediately before** it:
 - **Docs policy (intake):** resolve `docs` per the Artifact Contract's Docs policy — read `.claude/dev-flow.local.md`, apply the resolution table (emitting the one-line warning on an unrecognized value), and stamp the result into the design doc's `dev-flow` front-matter block alongside `slug` and `stops`. Do this **before** the review runs, so the review's rewrite carries it. A `docs` value already present in the front-matter wins outright — a resume never re-reads the settings file.
 ```
 
-- [ ] **Step 2: Insert the mirrored bullet in the worktree SKILL.md**
+- [x] **Step 2: Insert the mirrored bullet in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find:
 
@@ -776,7 +776,7 @@ In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find:
 
 Insert the same bullet immediately before it, with one substitution: `the design doc's \`dev-flow\` front-matter block` → `the design doc's \`dev-flow-worktree\` front-matter block`. `.claude/dev-flow.local.md` is **not** substituted.
 
-- [ ] **Step 3: Verify placement and ordering**
+- [x] **Step 3: Verify placement and ordering**
 
 Run:
 
@@ -791,7 +791,7 @@ done
 
 Expected for each file: exactly one `Docs policy (intake)` line, and its line number is **lower** than the `mode: design` review line (the stamp precedes the review).
 
-- [ ] **Step 4: Verify the settings file is named once per Stage 1**
+- [x] **Step 4: Verify the settings file is named once per Stage 1**
 
 Run:
 
@@ -805,7 +805,7 @@ grep -c -F -e 'dev-flow-worktree.local.md' plugins/dev-flow-worktree/skills/dev-
 
 Expected: each `grep -n` prints exactly **three** numbered lines, one per site — the Docs policy block's `*The setting.*` sentence, entry step 0's one-line `grep`/`for`, and this task's Stage 1 bullet — then `0`, `0`. Listing the lines rather than counting them makes a mis-placed site visible instead of merely uncounted.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
