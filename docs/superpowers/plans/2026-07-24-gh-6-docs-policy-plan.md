@@ -1005,7 +1005,7 @@ git commit -m "dev-flow: make Stage 5 a re-entrant merge gate that strips under 
 
 **Context:** Three consequences are accepted by the design and must be stated plainly, because a user who does not know them will be surprised: the policy is per-developer (the file is git-ignored, so a teammate without it commits the docs); merging outside the pipeline skips the strip; and a stripped PR's body links paths that stop existing after merge.
 
-- [ ] **Step 1: Add the section to `plugins/dev-flow/README.md`**
+- [x] **Step 1: Add the section to `plugins/dev-flow/README.md`**
 
 Find this line (the last line of the `## Stops` section):
 
@@ -1064,7 +1064,7 @@ Three consequences worth knowing:
   history.
 ````
 
-- [ ] **Step 2: Add a smoke-test step to `plugins/dev-flow/README.md`**
+- [x] **Step 2: Add a smoke-test step to `plugins/dev-flow/README.md`**
 
 Find the last numbered item of `## How to smoke-test`:
 
@@ -1085,7 +1085,7 @@ Insert the following **after** it:
    reach the default branch as before.
 ```
 
-- [ ] **Step 3: Add the mirrored section and smoke-test step to `plugins/dev-flow-worktree/README.md`**
+- [x] **Step 3: Add the mirrored section and smoke-test step to `plugins/dev-flow-worktree/README.md`**
 
 Apply Steps 1 and 2 to `plugins/dev-flow-worktree/README.md`, anchored on the same two lines (both files carry the identical `adversarial-review` closing sentence, and the worktree file's step 2 reads `continue dev-flow-worktree on <slug>`). Substitutions:
 
@@ -1093,7 +1093,7 @@ Apply Steps 1 and 2 to `plugins/dev-flow-worktree/README.md`, anchored on the sa
 - `.claude/dev-flow.local.md` → **unchanged**, everywhere. Add this sentence right after the "one answer per repo, not one per plugin" sentence: `The file keeps the family name \`dev-flow\` for that reason, even here.`
 - In Step 2's smoke-test text, `run dev-flow full-auto` → `run dev-flow-worktree full-auto`, and append this final sentence: `Confirm the same run from the linked worktree — the exclude and every git command the merge gate runs must work from there, not just from the main checkout.`
 
-- [ ] **Step 4: Verify both READMEs**
+- [x] **Step 4: Verify both READMEs**
 
 Run:
 
@@ -1116,7 +1116,7 @@ Expected for **each** file: the first `grep -n` prints four numbered lines **in 
 
 Note: the settings path is listed by line, not counted. A whole-file total here is `4`, not `3` — the value the arithmetic-based form of this check originally asserted, which would have failed on a correctly executed task (Global Constraints, *Verification-command form*).
 
-- [ ] **Step 5: Verify line width**
+- [x] **Step 5: Verify line width**
 
 Run:
 
@@ -1127,7 +1127,7 @@ git diff -- plugins/dev-flow/README.md plugins/dev-flow-worktree/README.md | gre
 
 Expected: no output. This checks only the lines this task **added** (the `+` prefix costs one column, so a threshold of 80 permits 79 content columns — Step 1's block deliberately carries two 79-column lines). A whole-file check would flag a pre-existing 81-column line in `plugins/dev-flow-worktree/README.md` that is not ours to touch. If any line is reported, re-wrap it at ~72 columns.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
