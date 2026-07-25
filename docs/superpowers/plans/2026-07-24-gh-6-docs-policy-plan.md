@@ -541,7 +541,7 @@ git commit -m "dev-flow: enforce the settings-file ignore at entry step 0 in bot
 
 **Context:** Between the strip commit and the merge, the branch tip carries no design doc. Under today's ownership predicate that reads as **foreign**, so the user gets a halt telling them to rename the slug or delete the branch — for a branch that is entirely ours and one command from merging. One narrow, explicit clause fixes it. Ownership is deliberately *not* broadened to "the branch's history ever contained our design doc": that is inference, and it weakens a load-bearing guard for every non-strip case in order to serve one.
 
-- [ ] **Step 1: Extend the Branch ownership bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Extend the Branch ownership bullet in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find the end of the `- **Branch ownership …**` bullet, which currently reads:
 
@@ -555,7 +555,7 @@ Append the following to that **same line** (it is one long unwrapped bullet — 
  **dev-flow also owns a branch if any commit in `<merge-base>..HEAD` carries the trailer `dev-flow-stripped: <slug>`** — the stripped state (Docs policy), where the design doc is deliberately gone from tip and the branch is one command from merging. Detection: `git log "$merge_base..HEAD" --grep='^dev-flow-stripped: <slug>$' --format=%H` is non-empty, using the validated `merge_base` from Docs policy — an empty one silently yields the range `HEAD..HEAD`, which would report "no trailer" and produce exactly the misleading foreign-branch halt this clause exists to prevent. Scanning the commit range rather than only the tip commit is free and strictly more robust: it survives a stripped-state halt that the user pushed a commit on top of. Ownership is deliberately **not** broadened to "the branch's history ever contained our design doc" — that would work, but it is inference, and it weakens a load-bearing safety guard for every non-strip case in order to serve one; the trailer is explicit and fires only where it is written.
 ```
 
-- [ ] **Step 2: Replace the resume table's no-design row in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 2: Replace the resume table's no-design row in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this table row (one line):
 
@@ -571,7 +571,7 @@ Replace it with:
 
 The three outcomes are evaluated in that written order: empty first, trailer second, foreign last.
 
-- [ ] **Step 3: Make both mirrored edits in the worktree SKILL.md**
+- [x] **Step 3: Make both mirrored edits in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, apply Steps 1 and 2 with these substitutions and no others:
 
@@ -581,7 +581,7 @@ In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, apply Steps 1 
 
 The worktree file's ownership bullet ends with the identical sentence `(The pipeline itself deletes no branches — see Stage 5 — so the only thing to guard is *building on* a branch that isn't ours, never destroying one.)`, so the anchor is the same.
 
-- [ ] **Step 4: Verify both edits**
+- [x] **Step 4: Verify both edits**
 
 Run:
 
@@ -600,7 +600,7 @@ grep -c -F '| **Foreign** (has commits beyond `<base>`, per Branch ownership) ->
 
 Expected: `1`, `1`, `1`, `1`, `0`, `0`.
 
-- [ ] **Step 5: Verify the resume table still has exactly one row per check**
+- [x] **Step 5: Verify the resume table still has exactly one row per check**
 
 Run:
 
@@ -612,7 +612,7 @@ grep -c -E '^\| (No |Branch exists|Design committed|Plan at tip|Plan fully check
 
 Expected: `11` and `11` — the same eleven rows as before this task; the no-design row gained an outcome, it did not split into new rows.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
