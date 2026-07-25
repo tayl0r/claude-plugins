@@ -635,7 +635,7 @@ git commit -m "dev-flow: own the stripped state in branch ownership and route it
 
 **Context:** A strip commit moves the head, so the `review clean @ <sha>` marker goes stale, and the contract's current rule says stale means re-review. Re-review in the stripped state is incoherent — it would be a `diff`-mode review of a branch whose design doc *and* plan are deleted, with no artifact to review against; if it committed anything the head would move again. So validity is redefined once, here at the shared boundary, rather than exempted at the call site. The redefinition is unsatisfiable on a `commit`-policy run, so "any push invalidates the marker" still holds everywhere it held before.
 
-- [ ] **Step 1: Replace the Review state paragraph in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
+- [x] **Step 1: Replace the Review state paragraph in `plugins/dev-flow/skills/dev-flow/SKILL.md`**
 
 Find this paragraph (one line):
 
@@ -661,7 +661,7 @@ stripped=$(git rev-list --count --grep='^dev-flow-stripped: <slug>$' "<marker-sh
 Both counts derive from the same range, so equality is exactly "every commit matched"; one trailer-less commit — a manual push, a merge from the default branch — breaks it. The grep is anchored at both ends so a prefix- or suffix-sharing slug cannot false-match. On inequality, the offending SHAs come from the same grep inverted: `git log "<marker-sha>..HEAD" --grep='^dev-flow-stripped: <slug>$' --invert-grep --format=%H`. Per Command discipline, `<marker-sha>` is validated non-empty before either command — an empty one collapses the range to `HEAD..HEAD`, where `0 -eq 0` would falsely validate.
 ````
 
-- [ ] **Step 2: Make the mirrored edit in the worktree SKILL.md**
+- [x] **Step 2: Make the mirrored edit in the worktree SKILL.md**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find the corresponding paragraph:
 
@@ -676,7 +676,7 @@ Replace it with the same text as Step 1, with exactly these substitutions:
 
 Everything else, including the `sh` fence's alignment, is byte-identical.
 
-- [ ] **Step 3: Update the resume table's two marker rows to speak of validity, in both files**
+- [x] **Step 3: Update the resume table's two marker rows to speak of validity, in both files**
 
 Marker validity is redefined **once, at the shared boundary**, so every call site must read the new rule rather than the old "SHA equals head" test. The resume table has two such call sites. They matter in a real case: if the design doc was already committed on the default branch before the branch was created, gate 3 spares it, only the plan is stripped, and the doc is still at tip — so the stripped-state resume row does not match and these two rows decide the route. Left unchanged they would force a spurious re-review of a branch whose strip is already mechanically proven.
 
@@ -696,7 +696,7 @@ with:
 
 Apply the identical replacement in `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`; both files' rows are byte-identical before and after (they contain no plugin name).
 
-- [ ] **Step 4: Verify**
+- [x] **Step 4: Verify**
 
 Run:
 
@@ -729,7 +729,7 @@ grep -c -E '^\| (No |Branch exists|Design committed|Plan at tip|Plan fully check
 
 Expected: `1`, `1`, `1`, `1`, `0`, `0`. Then each anchored-trailer `grep -n` prints exactly **three** numbered lines — the Branch-ownership clause (Task 5), the `stripped=$(git rev-list …)` fence line, and the `--invert-grep` prose line. Then each ordering loop prints four lines per file in the order `**Review state.**`, `**Marker validity.**`, the count fence, `**Resume table**` — proving Marker validity landed between the Review state paragraph it extends and the resume table, not elsewhere. Then `0`, `0`, `1`, `1`, and finally `11`, `11` — the resume table still has exactly eleven rows.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
