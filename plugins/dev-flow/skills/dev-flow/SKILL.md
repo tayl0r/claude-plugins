@@ -164,7 +164,19 @@ Routing reads never depend on which branch is currently checked out: the orchest
 
 **Execution-complete signal.** When a task's review comes back clean, the orchestrator (SDD's controller) ticks that task's `- [ ]` checkboxes in the plan file and commits them, alongside SDD's ledger append. **Committed checkboxes are the durable, authoritative cross-session signal; SDD's `.superpowers/sdd/progress.md` ledger stays in-session scratch (it is git-ignored and is not durable pipeline state).** Execution is complete if and only if zero `- [ ]` remain in the plan at branch tip. Tie-break: if `git log` shows a task's commits but its boxes are unticked (a crash in the gap), verify via `git log`, tick the boxes, and do not re-implement.
 
-**Review state.** After Stage 4's review has committed its fixes and the stage has pushed, post a PR comment with the marker line `dev-flow: review clean @ <full-head-sha>`. Detection: marker SHA equals the current head -> merge gate; stale SHA -> re-review (any push, including a CI fix, correctly invalidates the marker); no marker -> PR review. (A label can't carry the SHA and goes silently stale — rejected.)
+**Review state.** After Stage 4's review has committed its fixes and the stage has pushed, post a PR comment with the marker line `dev-flow: review clean @ <full-head-sha>`. Detection: marker **valid** -> merge gate; marker present but **invalid** -> re-review; no marker -> PR review. (A label can't carry the SHA and goes silently stale — rejected.)
+
+**Marker validity.** The marker is valid **iff** the marker SHA equals the current head, **or** every commit in `<marker-sha>..HEAD` carries the trailer `dev-flow-stripped: <slug>` **and** `git diff --name-status <marker-sha> HEAD` contains only `D` entries, each for a path satisfying Docs policy's qualifying-path gates 1 and 3 — gate 2 ("exists at `HEAD`") is evaluated **at the marker SHA** here, since the paths being gone from head is the point. That second clause is a mechanical proof that the only change since the reviewed head is the intended deletion: any non-deletion entry, any deletion outside this branch's own scaffolding, or any trailer-less commit in the range invalidates it. It is unsatisfiable on a `commit`-policy run (no trailer commits can exist), so "any push, including a CI fix, correctly invalidates the marker" still holds everywhere it held before. The strip is verified by this rule, **not** by re-posting the marker — re-posting would assert "reviewed and suite-green at this SHA" for a SHA nothing reviewed, and would be fooled by an unrelated commit landing in the gap.
+
+The trailer conjunct is mechanical, not eyeballed:
+
+```sh
+total=$(git rev-list --count "<marker-sha>..HEAD")                                          # failure or empty halts
+stripped=$(git rev-list --count --grep='^dev-flow-stripped: <slug>$' "<marker-sha>..HEAD")  # failure or empty halts
+[ "$total" -eq "$stripped" ]    # equal <=> every commit in the range carries the trailer
+```
+
+Both counts derive from the same range, so equality is exactly "every commit matched"; one trailer-less commit — a manual push, a merge from the default branch — breaks it. The grep is anchored at both ends so a prefix- or suffix-sharing slug cannot false-match. On inequality, the offending SHAs come from the same grep inverted: `git log "<marker-sha>..HEAD" --grep='^dev-flow-stripped: <slug>$' --invert-grep --format=%H`. Per Command discipline, `<marker-sha>` is validated non-empty before either command — an empty one collapses the range to `HEAD..HEAD`, where `0 -eq 0` would falsely validate.
 
 **Resume table** (checks run top-to-bottom, first match wins; each is mechanical; "latest PR" = the highest-numbered result of `gh pr list --head <username>/<slug> --state all`):
 
@@ -178,8 +190,8 @@ Routing reads never depend on which branch is currently checked out: the orchest
 | Design committed at tip; no plan doc at tip | Plan |
 | Plan at tip has ≥1 unchecked `- [ ]` | Execute — resume at first unchecked task (cross-check ledger + `git log`) |
 | Plan fully checked; no PR for the branch (`--state all` list empty) | PR: create + review |
-| Open PR; no `review clean @ <current head>` marker | PR review |
-| Open PR; marker matches head | Merge gate (CI, `stops` from front-matter) |
+| Open PR; no `review clean` marker, or the marker is **invalid** (Marker validity) | PR review |
+| Open PR; marker **valid** (Marker validity — SHA equals head, or a proven strip since) | Merge gate (CI, `stops` from front-matter) |
 | No row matches (e.g. resume with an unknown slug) | Nothing to resume — report it. If `gh pr list --head <username>/<slug> --state merged` shows a PR, say "already shipped (PR #N)"; else list `<username>/*` branches (local + origin, both candidate prefixes) as candidates. |
 
 ---
