@@ -204,6 +204,7 @@ The orchestrator drives every stage, running the worktree-entry procedure (Artif
   3. Consider 2-3 approaches, pick one, and record the choice plus rejected alternatives and reasoning.
   4. Record defensible-default assumptions explicitly. A genuinely blocking ambiguity — one with no defensible default — is a halt-and-report, not a guess.
   5. Run brainstorming's spec self-review checklist (placeholders, consistency, scope, ambiguity).
+- **Docs policy (intake):** resolve `docs` per the Artifact Contract's Docs policy — read `.claude/dev-flow.local.md`, apply the resolution table (emitting the one-line warning on an unrecognized value), and stamp the result into the design doc's `dev-flow-worktree` front-matter block alongside `slug` and `stops`. Do this **before** the review runs, so the review's rewrite carries it. A `docs` value already present in the front-matter wins outright — a resume never re-reads the settings file.
 - The **orchestrator** invokes `dev-flow-worktree:adversarial-review` (mode: `design`) in-context from inside the worktree, passing the worktree as `working-dir` — it is the approval gate that substitutes for the user's. The review rewrites the design and commits it on the branch (its contract); the orchestrator then checks the returned provenance line (Cross-Cutting Concerns) before proceeding. No separate apply or commit step.
 - **Bare-idea entry defaults to a `post-design` stop** (see Stops, above).
 
