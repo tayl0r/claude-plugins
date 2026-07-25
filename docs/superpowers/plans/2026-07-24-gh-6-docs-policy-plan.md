@@ -1151,7 +1151,7 @@ git commit -m "dev-flow: document the docs commit/strip setting in both READMEs"
 
 **Context:** Nothing mechanically enforces that the two variants stay identical (drift control is tracked in issue #8). This task is the manual stand-in: a mechanical sweep that the mirrored prose is the same modulo naming, run **before** the bumps so a drifted pair is never released.
 
-- [ ] **Step 1: Sweep for cross-contaminated names**
+- [x] **Step 1: Sweep for cross-contaminated names**
 
 Run:
 
@@ -1169,7 +1169,7 @@ grep -rn -F 'dev-flow-worktree-stripped' plugins/dev-flow/ || echo NONE
 
 Expected: the last three each print `NONE`. The first prints exactly **two** lines, both pre-existing: the Branch-ownership bullet's "a feature of the sibling `dev-flow-worktree` plugin", and Environment Assumptions' "use the `dev-flow-worktree` plugin instead". More than two means an edit from this change leaked the wrong variant's name into the wrong file.
 
-- [ ] **Step 2: Sweep that every new element exists in both SKILL.md files**
+- [x] **Step 2: Sweep that every new element exists in both SKILL.md files**
 
 Run:
 
@@ -1194,7 +1194,7 @@ done
 
 Expected: every row shows `A=1 B=1`.
 
-- [ ] **Step 3: Confirm the two files' new prose matches modulo naming**
+- [x] **Step 3: Confirm the two files' new prose matches modulo naming**
 
 Run:
 
@@ -1222,7 +1222,7 @@ Anything else is drift introduced by this change — fix it before continuing.
 
 Why the before/after form: a plain whole-file normalized diff emits ~130 lines across ~26 hunks, of which ~113 pre-date this change, and asks the reader to decide "pre-existing, or drift I just introduced?" — which is not mechanically decidable from that output. The delta form reduces it to ~43 lines, all falling inside the five enumerated items.
 
-- [ ] **Step 4: Bump `plugins/dev-flow/.claude-plugin/plugin.json`**
+- [x] **Step 4: Bump `plugins/dev-flow/.claude-plugin/plugin.json`**
 
 Change the version line from:
 
@@ -1238,7 +1238,7 @@ to:
 
 Leave `name` and `description` untouched.
 
-- [ ] **Step 5: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
+- [x] **Step 5: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
 
 Change the version line from:
 
@@ -1254,7 +1254,7 @@ to:
 
 Leave `name` and `description` untouched.
 
-- [ ] **Step 6: Verify both manifests are valid JSON with the right versions**
+- [x] **Step 6: Verify both manifests are valid JSON with the right versions**
 
 Run:
 
@@ -1272,7 +1272,7 @@ for p, want in [('plugins/dev-flow/.claude-plugin/plugin.json','2.2.0'),
 
 Expected: two `OK` lines, no assertion error.
 
-- [ ] **Step 7: Confirm the whole change touches only the six intended files**
+- [x] **Step 7: Confirm the whole change touches only the six intended files**
 
 Run:
 
@@ -1294,7 +1294,7 @@ plugins/dev-flow/skills/dev-flow/SKILL.md
 
 (The branch will also contain `docs/superpowers/specs/` and `docs/superpowers/plans/` paths — this plan and its design doc. Those are expected; the `-- plugins/` filter excludes them.)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
