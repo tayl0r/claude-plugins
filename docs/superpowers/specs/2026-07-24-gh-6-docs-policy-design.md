@@ -253,8 +253,11 @@ forbids.
 
 **Marker validity** (replaces "marker SHA equals head"): the marker is valid iff the
 marker SHA equals the current head, **or** every commit in `<marker-sha>..HEAD` carries
-the trailer `dev-flow-stripped: <slug>` **and** `git diff --name-status <marker-sha> HEAD`
-contains only `D` entries, each for a path matching Decision 3's slug patterns and failing
+the trailer `dev-flow-stripped: <slug>` **and** `git diff --no-renames --name-status <marker-sha> HEAD`
+contains only `D` entries (`--no-renames` pins the shape: by default git collapses a
+delete-plus-add pair into a single `R` entry — also invalidating, but the only-`D` read
+must not vary with the user's `diff.renames`. Judge the full listing, never
+`--diff-filter=D`, which silently hides the very entries that invalidate.), each for a path matching Decision 3's slug patterns and failing
 the merge-base test. Decision 3's "exists at `HEAD`" gate is evaluated **at the marker
 SHA** here — the paths being gone from head is the point.
 
@@ -264,8 +267,8 @@ absent at tip **and** at least one commit in `<merge-base>..HEAD` carries the
 `merge_base` from Decision 3). In this state, front-matter reads have **defined answers,
 not failed producers**: the recorded `stops` is empty — a recorded `pre-merge` stop halts
 at step 3, *before* any strip, so no branch reaches the stripped state with a stop
-outstanding — and `docs:` is never consulted, because no path can pass Decision 3's gate 2
-(exists at `HEAD`) after the strip removed it. This is the same move Decision 3's gate 3
+outstanding — and `docs:` is never consulted, because step 4 short-circuits on the absent doc
+before any policy read. This is the same move Decision 3's gate 3
 already makes: once the surrounding state is validated (here, the trailer proven in
 range), a negative probe is an unambiguous answer, and Decision 0 item 2's halt-on-failure
 rule — which otherwise governs every read this design touches — is satisfied, not
@@ -301,17 +304,16 @@ empty one collapses the range to `HEAD..HEAD`, where `0 -eq 0` would falsely val
    In the stripped state there is no doc at tip and this read is not attempted: the
    recorded stops are empty by the stripped-state rule above — proceed, never halt. (A
    doc-less tip *without* the trailer cannot reach this step: step 1 already halted it.)
-4. If any path qualifies under Decision 3 **and** the front-matter at tip says
-   `docs: strip`: remove the qualifying paths, commit with the trailer
-   `dev-flow-stripped: <slug>` (`git commit -m "<msg>" --trailer "dev-flow-stripped: <slug>"`),
-   push, and **re-enter the gate at step 1**. Evaluate qualification *first*. Decision 3's
-   gates are policy-agnostic — they return the same answer under `commit` and `strip` — so
-   a `commit`-policy pass on an intact branch does reach the policy read and no-ops on the
-   second conjunct. The ordering matters for exactly one case, the already-stripped branch:
-   gate 2 (exists at `HEAD`) fails for every removed path, so the step no-ops before any
-   policy read — which is the point, because the stripped state has no front-matter left to
-   read (stripped-state rule above). Re-entry terminates by construction: the strip removed
-   every qualifying path, so the next pass falls through.
+4. If the design doc is absent at tip, this is the stripped state (step 1 halted every
+   other doc-less branch) — the strip already ran; no-op. Otherwise read `docs:` from the
+   front-matter at tip (the doc step 3 just consulted): `commit` → no-op, with no gate
+   evaluation — the default path never runs the base-ref fetch or merge-base, so a shallow
+   checkout still merges under `commit` exactly as today (Requirement 2). Only under
+   `strip`: validate `merge_base` and evaluate Decision 3's gates; if any path qualifies,
+   remove the qualifying paths, commit with the trailer `dev-flow-stripped: <slug>`
+   (`git commit -m "<msg>" --trailer "dev-flow-stripped: <slug>"`), push, and **re-enter
+   the gate at step 1**. Re-entry terminates by construction: the next pass finds no doc at
+   tip and no-ops here.
 5. `gh pr merge --squash`.
 
 The strip is verified by the marker rule itself, not by re-posting the marker. Re-posting
@@ -450,8 +452,10 @@ distribution model — see Known Consequences and #8.
 2. Scaffolding from previously shipped features on `main` is untouched by that strip,
    including when a prior feature's docs match the slug patterns.
 3. A checkout with no settings file, or with `docs: commit`, behaves exactly as it does
-   today — Stage 5 steps 1–3 and 5 are identical, and step 4 evaluates its gates, reads
-   `docs: commit`, and removes nothing: no strip commit, no trailer, no head movement.
+   today — Stage 5 steps 1–3 and 5 are identical, and step 4 reads `docs: commit` and
+   no-ops without evaluating gates: no base-ref fetch, no merge-base, no strip commit, no
+   trailer, no head movement. A shallow checkout that cannot compute a merge-base still
+   merges under `commit`.
 4. Interrupting a `strip` run anywhere between the strip commit and the merge, then
    resuming, re-enters the merge gate and completes — no foreign-branch halt, no spurious
    re-review, and no rule the user had to know.
