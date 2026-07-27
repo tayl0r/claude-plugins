@@ -633,7 +633,7 @@ git commit -m "check-sync: correct Check A output"
 
 Only one pair is enrolled: `adversarial-review` (81/81 lines, one 1:1 divergence at line 12). The pipeline `SKILL.md` pair and the two `README.md`s are deliberately **not** enrollable under this schema — do not add them (design Decision 6).
 
-- [ ] **Step 1: Replace the module docstring's Check A paragraph with the two-check version**
+- [x] **Step 1: Replace the module docstring's Check A paragraph with the two-check version**
 
 Find these lines near the top of `scripts/check-sync.py`:
 
@@ -661,7 +661,7 @@ Both checks run every time, so one run reports every problem in the tree.
 Exit 0 iff every check passed, 1 otherwise. Python 3 stdlib only, no flags.
 ```
 
-- [ ] **Step 2: Insert the `MIRROR_PAIRS` table**
+- [x] **Step 2: Insert the `MIRROR_PAIRS` table**
 
 Find this line:
 
@@ -702,7 +702,7 @@ MIRROR_PAIRS = [
 ]
 ```
 
-- [ ] **Step 3: Verify the exception strings reconstruct the real file lines**
+- [x] **Step 3: Verify the exception strings reconstruct the real file lines**
 
 Do this before writing any more code — a single mistyped character here makes every later step confusing.
 
@@ -728,7 +728,7 @@ b matches file line 12: True
 
 If either prints `False`, re-copy that string. (Loading the module runs nothing: `main()` is guarded by `if __name__ == "__main__"`.)
 
-- [ ] **Step 4: Append the Check B section**
+- [x] **Step 4: Append the Check B section**
 
 Insert the following block between `check_manifests`'s closing `return plural(len(manifests), "plugin"), problems` and the existing `def main():`. Leave exactly two blank lines before the block's first line and exactly two blank lines after its last line (`    return summary, [header, *items]`), so `def main():` still has two blank lines above it:
 
@@ -917,7 +917,7 @@ def check_pair(pair):
 
 ```
 
-- [ ] **Step 5: Wire Check B into `main()`**
+- [x] **Step 5: Wire Check B into `main()`**
 
 Find this block in `main()`:
 
@@ -944,7 +944,7 @@ Replace it with:
     if failures:
 ```
 
-- [ ] **Step 6: Run it — the pair is green today**
+- [x] **Step 6: Run it — the pair is green today**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -970,7 +970,7 @@ rtk proxy wc -l plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-
 
 Expected: `81` for both.
 
-- [ ] **Step 7: Confirm the imports are still stdlib-only and nothing under `plugins/` moved**
+- [x] **Step 7: Confirm the imports are still stdlib-only and nothing under `plugins/` moved**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -988,7 +988,7 @@ Expected: the same four imports as Task 2 — now reported at lines 19–22, bec
  M scripts/check-sync.py
 ```
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
