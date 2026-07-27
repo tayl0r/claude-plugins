@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-10-opus-resolver
-  stops: []
+  stops: [pre-merge]
   docs: commit
 ---
 
