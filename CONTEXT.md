@@ -27,16 +27,10 @@ The check that a reviewer's self-reported model belongs to the family its reques
 The line a review returns stating how many reviewers it actually spawned per tier. Evidence of fan-out and tier conformance — never of model diversity.
 
 **Angle**:
-One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement.
+One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude.
 
 **Pass**:
-A named, self-contained check a seed runs over an artifact, carrying its own trigger and stopping conditions. An angle is a lens *within* a seed; a pass is a whole check.
-
-**Trigger**:
-The precondition deciding whether a pass or angle applies to a given artifact at all. A check without one runs on everything and manufactures false positives.
-
-**Reportability rule**:
-The bar a candidate finding must clear before a seed may state it. Where a trigger narrows *which artifacts get asked*, a reportability rule narrows *what may be said*.
+A named check a seed runs over an artifact. An angle is one lens *within* a seed's list; a pass is a whole check.
 
 **Design rubric**:
 The nine-bullet statement of what "best long-term design" means. Both the design/plan quality seed's lens and every resolver's judgment criteria in all three modes, making it the widest-broadcast text in the skill.
