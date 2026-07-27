@@ -512,7 +512,7 @@ git commit -m "dev-flow 2.3.0, dev-flow-worktree 1.5.0"
 
 This earns its place because the next person doing a hand-mirrored edit reads the auto-loaded `CLAUDE.md`, not the design doc. It puts the backstop at the shared boundary so every future hand-mirrored edit inherits the pattern instead of reinventing it — which is exactly what Task 2 had to do.
 
-- [ ] **Step 1: Append the sentence to the hand-mirroring bullet**
+- [x] **Step 1: Append the sentence to the hand-mirroring bullet**
 
 Locate:
 
@@ -531,7 +531,7 @@ For any hand-mirrored edit, put a residue grep in the change's verification — 
 
 Do not start a new line, a new bullet, or a new paragraph — this is one sentence appended to the existing bullet.
 
-- [ ] **Step 2: Verify — the sentence landed, on the right line, with no line added**
+- [x] **Step 2: Verify — the sentence landed, on the right line, with no line added**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -541,7 +541,7 @@ git diff --numstat -- CLAUDE.md
 
 Expected: exactly one hit, on **line 9** (the same line as `mirror those by hand`), and `--numstat` showing exactly `1	1	CLAUDE.md`. A hit on any other line number, or `1	0`, means the sentence was added as a new line instead of appended — fix it.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
