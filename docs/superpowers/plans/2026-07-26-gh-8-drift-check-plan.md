@@ -1511,7 +1511,7 @@ git commit -m "check-sync: correct Check B output"
 
 Making this a **required** status check is a repo setting, not a file: out of scope here, and not something to attempt.
 
-- [ ] **Step 1: Create the workflow file**
+- [x] **Step 1: Create the workflow file**
 
 Create `.github/workflows/check-sync.yml` (creating the two parent directories) with exactly this content:
 
@@ -1531,7 +1531,7 @@ jobs:
       - run: python3 scripts/check-sync.py
 ```
 
-- [ ] **Step 2: Verify the file is byte-exact**
+- [x] **Step 2: Verify the file is byte-exact**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1564,7 +1564,7 @@ Expected output:
 byte-exact: True
 ```
 
-- [ ] **Step 3: Confirm the run command matches the documented local command exactly**
+- [x] **Step 3: Confirm the run command matches the documented local command exactly**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1581,7 +1581,7 @@ Expected:
 0
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
