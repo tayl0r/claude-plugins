@@ -21,7 +21,7 @@ Run a rigorous adversarial review on ONE target artifact and resolve every findi
 
 ## Seed passes
 
-Every mode runs the same two-seed shape: a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents, run in parallel, on the seed-reviewer model (`sonnet` — see Model, below). Findings-only is a property of the seed prompts themselves — they read and report, they never edit — so no caller has to remember to enforce it separately.
+Every mode runs the same two-seed shape: a **quality seed** and a **correctness seed**, both **findings-only** reviewer subagents, run in parallel, on the seed-reviewer model (see Model, below). Findings-only is a property of the seed prompts themselves — they read and report, they never edit — so no caller has to remember to enforce it separately.
 
 | Mode | Quality seed | Correctness seed |
 |---|---|---|

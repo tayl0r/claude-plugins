@@ -64,7 +64,7 @@ No — remove it. After this change exactly two tiers may be spawned, so a `fabl
 
 The **family-match clause stays**, minus its fallback sub-clause. Family matching was never about the fallback: a reviewer's self-report names a product ("Claude Opus 5"), not a harness alias, and dated model ids drift, so matching by family is what makes the check robust at all. What drops is the "honoring the resolver opus-fallback" qualifier, which existed only because the requested resolver tier was conditional. The clause's example must also move off `fable` — an example naming a tier the enum no longer contains would be a trap for the next reader.
 
-One structural fix rides along in the rewrites above. This is the second tier change to force the same four-spot lockstep edit inside each `adversarial-review/SKILL.md` (lines 18, 59, 69, 73/75 — introducing the fallback did it once, removing it does it again), and `check-sync.py` only enforces agreement *between* the two copies, never *within* one file. So the replacement text stops restating the roster where the restatement is not load-bearing: the resolution-procedure step and the family-match clause now point at Model instead of naming aliases. What still names tiers is exactly what must: the Model section (the owner) and this enum (deliberately explicit, so an off-tier report is ill-formed by construction — the point of this section), plus illustrative examples, which are leftover-text-detectable by the same residue-grep idiom the Verification section uses for `fable`. The next tier change edits Model, the enum, and two examples — no normative restatements left to silently miss.
+One structural fix rides along in the rewrites above. This is the second tier change to force the same four-spot lockstep edit inside each `adversarial-review/SKILL.md` (lines 18, 59, 69, 73/75 — introducing the fallback did it once, removing it does it again), and `check-sync.py` only enforces agreement *between* the two copies, never *within* one file. So the replacement text stops restating the roster wherever the restatement is not load-bearing: the seed-passes first mention, the resolution-procedure step, and the family-match clause now point at Model instead of naming aliases. What still names tiers is exactly what must: the Model section (the owner) and this enum (deliberately explicit, so an off-tier report is ill-formed by construction — the point of this section), plus illustrative examples, which are leftover-text-detectable by the same residue-grep idiom the Verification section uses for `fable`. The next tier change edits Model, the enum, and two examples — no normative restatements left to silently miss.
 
 ## Exact change list
 
@@ -72,7 +72,7 @@ Seven files. Every wording below is the literal replacement text.
 
 ### 1 & 2. `plugins/dev-flow/skills/adversarial-review/SKILL.md` and `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`
 
-These two are a declared `check-sync.py` mirror pair. **Every edit below lands identically in both files**, with the sole difference being the `dev-flow` / `dev-flow-worktree` variant tokens already present in line 69, which the mirror check canonicalizes away. No line is added or removed in either file; all five edits are in-place single-line replacements, so both files stay at 81 lines.
+These two are a declared `check-sync.py` mirror pair. **Every edit below lands identically in both files**, with the sole difference being the `dev-flow` / `dev-flow-worktree` variant tokens already present in line 69, which the mirror check canonicalizes away. No line is added or removed in either file; all six edits are in-place and none spans a line break, so both files stay at 81 lines. Five replace a whole line; the sixth (line 24) replaces a phrase inside one.
 
 #### Line 18 — Review integrity, family-match clause
 
@@ -83,6 +83,14 @@ Replace the whole line with:
 ```
 
 Changes: the example moves from `"Fable 5"` / `` `fable` `` to `"Opus 5"` / `` `opus` ``; the "honoring the resolver opus-fallback" qualifier is replaced with the durable reason family matching is used at all; and the canonicalization no longer restates the alias roster — it maps each self-report to the requested tier's alias, leaving the tier set stated normatively only by Model and the step-6 enum (see the enum section's closing paragraph).
+
+#### Line 24 — Seed passes, the seed-tier first mention
+
+A phrase-level edit, not a whole-line replacement. Replace `on the seed-reviewer model (`sonnet` — see Model, below)` with `on the seed-reviewer model (see Model, below)`. Nothing else on the line changes.
+
+This is the same de-restatement applied to line 59 below, at the seed tier. It is included because without it the invariant this section claims — that no normative tier restatement survives outside Model and the step-6 enum — would be false: line 24 is exactly such a restatement, and leaving it would mean the next seed-tier change has one more place to remember, in a document that tells the reader there are none. The two tiers' first mentions also end up in the same shape, so the next editor cannot copy the wrong one.
+
+Deliberately **not** given as a fenced block: the design-conformance check in the plan's verification enumerates this document's plain-fenced blocks positionally, and this edit was added during the PR review, after that check was authored and run. Documenting it as a phrase edit (as line 8's is) leaves that check valid and re-runnable. The edit is small enough to verify by grep — see Verification step 6.
 
 #### Line 59 — Resolution procedure, step 2
 
@@ -165,7 +173,7 @@ This earns its place because the next person doing a hand-mirrored edit reads th
 
 ### Blast radius — verified complete
 
-A repo-wide search outside `docs/` for `fable`, `opus`, `sonnet`, `resolver`, `model-diverse`, and `diversity` confirms the change list is complete, with one caveat a rerun of that search must expect: not every hit is an edit target. `fable`, `opus`, and `model-diverse` occur only on lines the change list already replaces, and `diversity` occurs nowhere. The other two terms have benign residual hits that must **not** be edited: `sonnet` appears on the unchanged seed-tier line of both `adversarial-review/SKILL.md` copies (line 24 — seeds stay `sonnet`) and at `plugins/better-code-review/skills/better-code-review/SKILL.md:13`, an unrelated plugin's own reviewer fan-out; `resolver` appears as a plain tier name on unchanged lines 20 and 63 of both `adversarial-review` copies, and in an unrelated sense entirely — the branch/`<username>` resolver — at `plugins/dev-flow/skills/dev-flow/SKILL.md` lines 78 and 268 and `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` lines 76 and 262. (This is also why Verification step 3 pins the mechanical post-change check to `fable` alone: it is the one term with no homonym, so empty output is meaningful.) Specifically confirmed clean and requiring **no** tier edit: both `plugins/dev-flow*/README.md` (no model or tier references at all), `.claude-plugin/marketplace.json`, `scripts/check-sync.py`, `.github/workflows/check-sync.yml`, and `docs/agents/*.md`. `CLAUDE.md` likewise needs no tier edit, but this change does add one sentence to its hand-mirroring bullet (change 7) so the residue-grep backstop becomes standing policy rather than a one-off. The `.superpowers/` SDD scratch tree is out of scope whatever it happens to contain: it is git-ignored (`.superpowers/sdd/.gitignore` contains `*`), so `git grep` never sees it, and it holds per-run in-session artifacts rather than repo content — leave it alone.
+A repo-wide search outside `docs/` for `fable`, `opus`, `sonnet`, `resolver`, `model-diverse`, and `diversity` confirms the change list is complete, with one caveat a rerun of that search must expect: not every hit is an edit target. `fable`, `opus`, and `model-diverse` occur only on lines the change list already replaces, and `diversity` occurs nowhere. The other two terms have benign residual hits that must **not** be edited: `sonnet` appears at `plugins/better-code-review/skills/better-code-review/SKILL.md:13`, an unrelated plugin's own reviewer fan-out (line 24 of both `adversarial-review/SKILL.md` copies was a third benign hit when this section was first written; the PR review then de-restated it — see the Line 24 entry above — so it is now an edit target, not a residual); `resolver` appears as a plain tier name on unchanged lines 20 and 63 of both `adversarial-review` copies, and in an unrelated sense entirely — the branch/`<username>` resolver — at `plugins/dev-flow/skills/dev-flow/SKILL.md` lines 78 and 268 and `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` lines 76 and 262. (This is also why Verification step 3 pins the mechanical post-change check to `fable` alone: it is the one term with no homonym, so empty output is meaningful.) Specifically confirmed clean and requiring **no** tier edit: both `plugins/dev-flow*/README.md` (no model or tier references at all), `.claude-plugin/marketplace.json`, `scripts/check-sync.py`, `.github/workflows/check-sync.yml`, and `docs/agents/*.md`. `CLAUDE.md` likewise needs no tier edit, but this change does add one sentence to its hand-mirroring bullet (change 7) so the residue-grep backstop becomes standing policy rather than a one-off. The `.superpowers/` SDD scratch tree is out of scope whatever it happens to contain: it is git-ignored (`.superpowers/sdd/.gitignore` contains `*`), so `git grep` never sees it, and it holds per-run in-session artifacts rather than repo content — leave it alone.
 
 ## Sync constraint
 
@@ -173,8 +181,8 @@ A repo-wide search outside `docs/` for `fable`, `opus`, `sonnet`, `resolver`, `m
 
 **Check B (mirror pair `adversarial-review`)** requires the two `adversarial-review/SKILL.md` files to be line-for-line identical after substituting `dev-flow-worktree` → `dev-flow` on both sides, except for the one declared exception (the `working-dir` bullet at line 12). This imposes three requirements on the edit:
 
-1. **All five line edits must land in both files.** A one-sided edit produces an undeclared-divergence failure naming the line.
-2. **No line may be added or removed in either file.** All five edits are in-place replacements of a single line, so both files remain at 81 lines. A line-count mismatch is a distinct, harder-to-read failure mode (`LINE_COUNT_FIX`), and the pair's schema can only express same-index one-line-for-one-line divergences — so a new one-sided line could not be declared as an exception even if someone wanted to.
+1. **All six edits must land in both files.** A one-sided edit produces an undeclared-divergence failure naming the line.
+2. **No line may be added or removed in either file.** All six edits are in-place and confined to one line each, so both files remain at 81 lines. A line-count mismatch is a distinct, harder-to-read failure mode (`LINE_COUNT_FIX`), and the pair's schema can only express same-index one-line-for-one-line divergences — so a new one-sided line could not be declared as an exception even if someone wanted to.
 3. **The variant tokens on line 69 must stay in place.** The replacement text for line 69 keeps `dev-flow's orchestrator, when called by dev-flow` in the `dev-flow` copy and `dev-flow-worktree's orchestrator, when called by dev-flow-worktree` in the worktree copy; those canonicalize to the same string, so the line still compares equal.
 
 **No new exception is needed, and none becomes stale.** The single declared exception covers line 12, which this change does not touch — so it still fires, and the "stale exception" check stays satisfied.
@@ -229,6 +237,14 @@ Run every step from the repo root; all must pass before the change is considered
    Expect **no output** (exit 1). Each of the three hand-mirrored pipeline edits removes one of these phrases, and after the change they appear nowhere in tracked files outside the immutable history (the `adversarial-review` lines that also lose them are already guarded by step 1's mirror check). Any hit is an unedited side of the pipeline pair — this is the backstop `check-sync.py` cannot provide for that pair. Like step 3, it detects leftover old text, not a botched replacement; the new prose itself is verified by reading the two copies side by side.
 
 5. **Spot-check the two version strings** — `grep -n '"version"' plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json` should show `2.3.0` and `1.5.0`.
+
+6. **The line-24 de-restatement landed in both copies:**
+
+   ```sh
+   git grep -nF 'seed-reviewer model (`sonnet`' -- ':!docs/superpowers'
+   ```
+
+   Expect **no output** (exit 1). This is the residue check for the Line 24 edit, and it is needed because `check-sync.py` structurally cannot cover that edit: the mirror check compares the two copies to *each other*, so a miss on **both** sides leaves them identical and passes clean. Only a residue grep sees it. `-F` is deliberate — the pattern contains a backtick and a parenthesis, and a fixed-string match avoids any regex interpretation.
 
 ## Assumptions recorded
 
