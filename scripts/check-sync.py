@@ -171,13 +171,17 @@ def check_manifests():
 
         entry_description = entry.get("description")
         if entry_description != description:
+            # A non-string (or absent) value renders as JSON, like "source" above,
+            # so a missing key prints null rather than Python's None.
+            shown = (entry_description if isinstance(entry_description, str)
+                     else json.dumps(entry_description))
             problems.append(
                 f"{name}: description differs between the two manifests.\n"
                 f"CLAUDE.md requires them to be identical.\n\n"
                 f"  {rel}\n"
                 f"    {description}\n"
                 f"  {MARKETPLACE}\n"
-                f"    {entry_description}"
+                f"    {shown}"
             )
 
     for name in by_name:
@@ -218,15 +222,38 @@ contorting the prose to fit. The schema, not your edit, is what needs extending.
 
 def canonicalize(text, substitutions):
     """Apply every substitution to the text, longest source token first, so a token
-    containing another as a substring is always replaced first."""
+    containing another as a substring is always replaced first. Substitutions are
+    applied sequentially: a destination that contains another entry's source would
+    be replaced again by that entry — declare disjoint tokens."""
     for src, dst in sorted(substitutions, key=lambda pair: -len(pair[0])):
         text = text.replace(src, dst)
     return text
 
 
+def split_lines(text):
+    """Split on "\\n" only, dropping the final empty string a trailing newline
+    produces, so the reported count agrees with `wc -l`. str.splitlines() would
+    also break on form feed, NEL, and U+2028/9 — one invisible pasted control
+    character and the reported counts contradict `wc -l`."""
+    lines = text.split("\n")
+    if lines[-1] == "":
+        lines.pop()
+    return lines
+
+
 def format_why(why):
     return textwrap.fill(why, width=84, initial_indent="  why: ",
                          subsequent_indent="       ")
+
+
+def exception_block(headline, exc, trailer=None):
+    """The shared rendering for every problem block about one declared exception:
+    headline, then the entry itself. Three of these would otherwise drift apart."""
+    lines = [headline, format_why(exc["why"]),
+             f"  A: {exc['a']}", f"  B: {exc['b']}"]
+    if trailer is not None:
+        lines.append(trailer)
+    return "\n".join(lines)
 
 
 def check_pair(pair):
@@ -248,8 +275,8 @@ def check_pair(pair):
             return "", [header, f"cannot read {side.upper()}: {exc}"]
 
     canon = {side: canonicalize(texts[side], subs) for side in ("a", "b")}
-    lines = {side: canon[side].splitlines() for side in ("a", "b")}
-    raw_lines = {side: texts[side].splitlines() for side in ("a", "b")}
+    lines = {side: split_lines(canon[side]) for side in ("a", "b")}
+    raw_lines = {side: split_lines(texts[side]) for side in ("a", "b")}
 
     items = []
 
@@ -267,18 +294,30 @@ def check_pair(pair):
     # Step 3: fully identical after canonicalization -> skip the line comparison.
     identical = canon["a"] == canon["b"]
 
-    # Step 6 (part 1): an exception whose two sides match after canonicalization
-    # declares no divergence and can never fire. Split usable from malformed up
-    # front: both the line-count scan and the positional comparison match
-    # against the usable set.
+    # Step 6 (part 1): classify every declared exception before any matching, so
+    # both the line-count scan and the positional comparison match against one
+    # usable set. An entry is unusable three ways: it is missing a required key;
+    # its two sides match after canonicalization, so it declares no divergence
+    # and can never fire; or an earlier entry already declares the same
+    # divergence, and one entry permits it everywhere it occurs.
     usable = []
     malformed = []
+    invalid = []
+    duplicates = []
+    declared = set()
     for exc in exceptions:
+        missing = [key for key in ("why", "a", "b") if key not in exc]
+        if missing:
+            invalid.append((missing, exc))
+            continue
         canon_a = canonicalize(exc["a"], subs)
         canon_b = canonicalize(exc["b"], subs)
         if canon_a == canon_b:
             malformed.append(exc)
+        elif (canon_a, canon_b) in declared:
+            duplicates.append(exc)
         else:
+            declared.add((canon_a, canon_b))
             usable.append((canon_a, canon_b, exc))
 
     def declared_at(index):
@@ -344,29 +383,45 @@ def check_pair(pair):
         if undeclared:
             items.append(DIVERGENCE_FIX.format(name=pair["name"]))
 
-    for exc in malformed:
+    # An invalid entry cannot use exception_block: it is defined by not having
+    # the keys that block renders.
+    for missing, exc in invalid:
+        names = ", ".join(f'"{key}"' for key in missing)
         items.append(
+            f'invalid exception: missing {names} — every exception declares '
+            f'"why", "a", and "b".\n'
+            f'Complete the entry in scripts/check-sync.py:\n'
+            f'  {exc!r}'
+        )
+
+    for exc in malformed:
+        items.append(exception_block(
             "malformed exception: after canonicalization its two sides are identical,\n"
             "so it declares no divergence and can never match. The canonicalization\n"
             "already permits this difference; remove the entry from "
-            "scripts/check-sync.py.\n"
-            f"{format_why(exc['why'])}\n"
-            f"  A: {exc['a']}\n"
-            f"  B: {exc['b']}"
-        )
+            "scripts/check-sync.py.",
+            exc,
+        ))
+
+    for exc in duplicates:
+        items.append(exception_block(
+            "duplicate exception: it declares the same divergence as an earlier entry\n"
+            "(identical after canonicalization). One entry permits a divergence "
+            "everywhere\n"
+            "it occurs; remove the duplicate from scripts/check-sync.py.",
+            exc,
+        ))
 
     for position, (_, _, exc) in enumerate(usable):
         if position in used:
             continue
-        items.append(
+        items.append(exception_block(
             "stale exception: the divergence it describes no longer appears in the "
-            "files.\n"
-            f"{format_why(exc['why'])}\n"
-            f"  A: {exc['a']}\n"
-            f"  B: {exc['b']}\n"
+            "files.",
+            exc,
             "Remove the entry from scripts/check-sync.py, or restore the divergence "
-            "it describes."
-        )
+            "it describes.",
+        ))
 
     if not items:
         return summary, []

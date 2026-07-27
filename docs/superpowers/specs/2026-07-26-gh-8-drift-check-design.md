@@ -232,16 +232,17 @@ place to look. Extending it is one entry.
    definition stale.
 4. If exactly one of the two canonicalized texts ends in a newline, the pair fails,
    naming the file that lacks it; comparison still continues, since the remaining steps
-   are insensitive to it. Split both into lines with `str.splitlines()`, so a final
-   newline does not produce a phantom empty last line and the reported count agrees with
-   `wc -l`. **If the line counts differ, the pair fails** with both counts *and* the
-   1-based index of the first *undeclared* divergence — a scan over the common prefix
-   that **skips positions whose canonicalized lines match a declared exception**, the same
-   content match step 5 performs — plus both raw lines there; if the common prefix
-   contains no undeclared divergence (the extra lines sit at the end of the longer file),
-   say so and name the first unmatched line instead. Steps 5–6 are then skipped for that
-   pair: past a one-sided insertion every later index is offset, so positional comparison
-   is meaningless.
+   are insensitive to it. Split both into lines on `\n` only, dropping the final empty
+   string a trailing newline produces, so there is no phantom empty last line and the
+   reported count agrees with `wc -l` (`str.splitlines()` would also break on form feed,
+   NEL, and U+2028/9, silently disagreeing with `wc -l`). **If the line counts differ,
+   the pair fails** with both counts *and* the 1-based index of the first *undeclared*
+   divergence — a scan over the common prefix that **skips positions whose canonicalized
+   lines match a declared exception**, the same content match step 5 performs — plus both
+   raw lines there; if the common prefix contains no undeclared divergence (the extra
+   lines sit at the end of the longer file), say so and name the first unmatched line
+   instead. Steps 5–6 are then skipped for that pair: past a one-sided insertion every
+   later index is offset, so positional comparison is meaningless.
 
    Skipping declared exceptions in this scan is not a refinement — without it the scan
    stops at the pair's first declared divergence and reports that line for *every*
@@ -261,7 +262,10 @@ place to look. Extending it is one entry.
    and can never match; report it as **malformed** — "the canonicalization already permits
    this difference; remove the entry" — rather than letting it surface as stale, which
    would tell an author staring at two visibly different raw lines that the divergence
-   "no longer appears."
+   "no longer appears." An entry missing `why`, `a`, or `b` is reported as **invalid**
+   and excluded from matching; an entry whose canonicalized sides equal an earlier
+   entry's is reported as a **duplicate** — one entry already permits that divergence
+   everywhere it occurs.
 
 Positional line-for-line comparison, rather than a diff, is the right primitive for a pair
 declared line-parallel: the invariant we actually want is *"these files are parallel line
@@ -381,6 +385,31 @@ Check B failure, malformed exception (a declared exception whose two sides are e
     why: Deliberately malformed probe entry.
     A: - When called by dev-flow, the mode is passed explicitly.
     B: - When called by dev-flow-worktree, the mode is passed explicitly.
+```
+
+Check B failure, invalid exception (an entry missing one of the three keys the schema
+requires — it is excluded from matching, and this is the one exception block that cannot
+render `why`/`A`/`B`, because those are what it lacks):
+
+```
+  invalid exception: missing "why" — every exception declares "why", "a", and "b".
+  Complete the entry in scripts/check-sync.py:
+    {'a': '- probe divergence, A side.', 'b': '- probe divergence, B side.'}
+```
+
+Check B failure, duplicate exception (a second entry declaring a divergence an earlier
+entry already declares; only the first could ever be matched, so reporting the second as
+stale would print, two lines below, the divergence it claims no longer appears):
+
+```
+  duplicate exception: it declares the same divergence as an earlier entry
+  (identical after canonicalization). One entry permits a divergence everywhere
+  it occurs; remove the duplicate from scripts/check-sync.py.
+    why: The two pipelines pass working-dir differently: dev-flow omits it and the
+         review defaults to the invoking checkout; dev-flow-worktree passes the
+         worktree path explicitly.
+    A: - When called by dev-flow, the review runs in-context on the feature branch ...
+    B: - When called by dev-flow-worktree, `working-dir` is the pipeline worktree's ...
 ```
 
 These blocks are the complete catalog: **every distinct string the script emits appears
