@@ -235,11 +235,20 @@ place to look. Extending it is one entry.
    are insensitive to it. Split both into lines with `str.splitlines()`, so a final
    newline does not produce a phantom empty last line and the reported count agrees with
    `wc -l`. **If the line counts differ, the pair fails** with both counts *and* the
-   1-based index of the first position where the canonicalized lines differ — a scan over
-   the common prefix — plus both raw lines there; if the common prefix is entirely equal
-   (one file is a strict prefix of the other), say so and name the first extra line
-   instead. Steps 5–6 are then skipped for that pair: past a one-sided insertion every
-   later index is offset, so positional comparison is meaningless.
+   1-based index of the first *undeclared* divergence — a scan over the common prefix
+   that **skips positions whose canonicalized lines match a declared exception**, the same
+   content match step 5 performs — plus both raw lines there; if the common prefix
+   contains no undeclared divergence (the extra lines sit at the end of the longer file),
+   say so and name the first unmatched line instead. Steps 5–6 are then skipped for that
+   pair: past a one-sided insertion every later index is offset, so positional comparison
+   is meaningless.
+
+   Skipping declared exceptions in this scan is not a refinement — without it the scan
+   stops at the pair's first declared divergence and reports that line for *every*
+   length-changing edit below it. Measured on the enrolled pair, whose one exception sits
+   at line 12 of 81: deletions anywhere in lines 13–81 all report "line 12". One
+   definition of "declared divergence", shared by this scan and step 5, is what keeps
+   Decision 4's promise that every failure names the exact location.
 5. Compare index by index. At each index where the canonicalized lines differ, look for a
    declared exception whose canonicalized `a`/`b` equal the canonicalized `a`/`b` lines at
    that index. Found → allowed, and that exception is marked used. Not found → report
@@ -322,7 +331,7 @@ Check B failure, line-count mismatch:
 
 ```
   line count differs: A has 81, B has 82.
-  first divergence at line 44:
+  first undeclared divergence at line 44:
     A: - **Baseline:** branch entry has already ensured setup (deps installed); run ...
     B: - **Baseline:** the worktree's own setup runs first; run the baseline suite ...
 
@@ -332,6 +341,15 @@ Check B failure, line-count mismatch:
   If the extra line is an *intentional* one-sided divergence, note that Check B's
   line-parallel schema cannot declare it — see the design doc (Decision 6) before
   contorting the prose to fit. The schema, not your edit, is what needs extending.
+```
+
+When the common prefix holds no undeclared divergence — the extra lines sit at the end of
+the longer file — the two `first undeclared divergence` lines are replaced by:
+
+```
+  the files match through the end of the shorter (modulo declared exceptions);
+  the first unmatched line is line 82 of B:
+    B: ...
 ```
 
 Check B failure, trailing newline:
@@ -352,6 +370,22 @@ Check B failure, stale exception:
     B: - When called by dev-flow-worktree, `working-dir` is the pipeline worktree's ...
   Remove the entry from scripts/check-sync.py, or restore the divergence it describes.
 ```
+
+Check B failure, malformed exception (a declared exception whose two sides are equal
+*after* canonicalization declares no divergence and can never match):
+
+```
+  malformed exception: after canonicalization its two sides are identical,
+  so it declares no divergence and can never match. The canonicalization
+  already permits this difference; remove the entry from scripts/check-sync.py.
+    why: Deliberately malformed probe entry.
+    A: - When called by dev-flow, the mode is passed explicitly.
+    B: - When called by dev-flow-worktree, the mode is passed explicitly.
+```
+
+These blocks are the complete catalog: **every distinct string the script emits appears
+above.** A message specified only in prose is one the next editor will "normalize" without
+knowing the design cares.
 
 Every failure names the invariant, the exact location, and the two ways out. A check that
 prints a raw diff and stops makes the reader re-derive the rule.
@@ -463,6 +497,15 @@ rule belongs. One bullet in **Changing a plugin**:
 The second surface is the PR check itself, which appears on every PR whether or not
 anyone read CLAUDE.md. The first teaches the rule; the second catches you regardless.
 
+The same edit repairs CLAUDE.md's opening line, which this change falsifies. "Markdown and
+one Python script — no build, test, or lint tooling" becomes "Markdown plus a couple of
+Python scripts — no build, test, or lint tooling beyond `scripts/check-sync.py`." The
+branch adds a second Python script and the repo's first CI check; left unedited, that line
+would contradict the new bullet three lines below it, in the one file every session loads.
+The replacement is deliberately count-free — an exact hand-maintained count is the same
+drifting-fact class this whole change exists to kill, and "one" went stale in this very
+branch.
+
 ### 8. No plugin version bump, and no new marketplace entry
 
 This change touches **no file under `plugins/`**. It adds `scripts/check-sync.py` and
@@ -489,7 +532,7 @@ to the existing one.
 | `scripts/check-sync.py` | **New.** Python 3 stdlib. Check A (derived manifest sync) + Check B (`MIRROR_PAIRS`, one entry, one exception). Exit 0/1. |
 | `.github/workflows/check-sync.yml` | **New.** The repo's first workflow; `pull_request` + `push: [main]`; one step. |
 | `.claude-plugin/marketplace.json` | Fix the `dev-flow-worktree` description to match its `plugin.json` (missing comma after "pipeline"). Required — otherwise the check is red on arrival. |
-| `CLAUDE.md` | One bullet in **Changing a plugin** (Decision 7). |
+| `CLAUDE.md` | One bullet in **Changing a plugin**, and the opening line's now-false repo description (Decision 7). |
 
 No file under `plugins/` is touched. No version bump (Decision 8).
 
@@ -618,7 +661,10 @@ Traceable to #8's two acceptance bullets.
    makes `python3 scripts/check-sync.py` exit non-zero, naming the pair, both paths, the
    1-based line number, and both lines.
 2. Adding or removing a line in one and not the other fails with both line counts **and
-   the 1-based line number of the first divergence**.
+   the 1-based line number of the first *undeclared* divergence** — declared exceptions
+   are skipped, so the reported line is where content actually stops aligning, never the
+   declared line-12 divergence. If every line of the shorter file aligns, the failure
+   names the first unmatched line at the end of the longer file instead.
 3. Mirroring the same edit into both files exits 0, with **no** edit to
    `scripts/check-sync.py` — the check is not a tax on doing it correctly.
 4. Changing only the `dev-flow` ↔ `dev-flow-worktree` namespacing in a mirrored line still
@@ -669,8 +715,9 @@ Run from a clean checkout of the branch.
 3. Change one word in `plugins/dev-flow/skills/adversarial-review/SKILL.md` (say line 18,
    not line 12) → exits 1, naming that line number. Mirror the same change into the
    sibling → exits 0 with the script untouched. Revert both.
-4. Delete one line from one of the pair → exits 1 with `81` vs `80` **and a first-
-   divergence line number**. Restore.
+4. Delete line 30 from one of the pair → exits 1 with `81` vs `80` and **`first
+   undeclared divergence at line 30`** — not line 12, the declared exception. Delete the
+   *last* line instead → exits 1 naming the first unmatched line, line 81. Restore.
 5. Strip the trailing newline from one file of the pair → exits 1 naming that file.
    Restore.
 6. Replace `dev-flow` with `dev-flow-worktree` in a mirrored line of the worktree file's
