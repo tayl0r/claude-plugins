@@ -1607,7 +1607,7 @@ The same edit repairs the file's **opening line**, which this branch falsifies: 
 
 **Line style:** every bullet in this file is a **single long unwrapped line**. Do not introduce manual line breaks inside the bullet.
 
-- [ ] **Step 1: Insert the bullet**
+- [x] **Step 1: Insert the bullet**
 
 Find this line in `CLAUDE.md` (line 8, the second bullet of `## Changing a plugin`):
 
@@ -1623,7 +1623,7 @@ Insert the following as a **single line immediately after it**, before the `- Va
 
 Change nothing else in the file *except* what Step 2 specifies.
 
-- [ ] **Step 2: Repair line 3's closing sentence**
+- [x] **Step 2: Repair line 3's closing sentence**
 
 Line 3 currently ends with this sentence:
 
@@ -1639,7 +1639,7 @@ Markdown plus a couple of Python scripts — no build, test, or lint tooling bey
 
 Everything else on line 3 stays byte-identical, and line 3 remains a single line — so every line number asserted in Step 3 is unaffected. The reference deliberately omits the `python3 ` prefix, which keeps Step 3's `grep -c 'python3 scripts/check-sync.py' CLAUDE.md` at exactly `1` (the bullet, and only the bullet).
 
-- [ ] **Step 3: Verify placement, the line-3 repair, and that the bullet is one line**
+- [x] **Step 3: Verify placement, the line-3 repair, and that the bullet is one line**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1660,7 +1660,7 @@ Expected output — three consecutive line numbers in this order, exactly one me
 
 The order 8 → 9 → 10 is the assertion: the new bullet sits between the marketplace bullet it extends and the validate bullet (a different tool). The trailing `0` is Step 2's assertion — the stale "one Python script" phrase is gone, and the line numbers prove the sentence replacement did not add or remove a line.
 
-- [ ] **Step 4: Confirm the documented command is the one CI runs**
+- [x] **Step 4: Confirm the documented command is the one CI runs**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1669,7 +1669,7 @@ rtk proxy grep -oh 'python3 scripts/check-sync.py' CLAUDE.md .github/workflows/c
 
 Expected: the identical string printed twice.
 
-- [ ] **Step 5: Verify only CLAUDE.md changed, then commit**
+- [x] **Step 5: Verify only CLAUDE.md changed, then commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
