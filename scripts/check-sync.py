@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Mechanical drift check for the facts this repo duplicates by hand.
 
-Check A: every plugins/<dir>/.claude-plugin/plugin.json agrees with its
-.claude-plugin/marketplace.json entry (name, source, description), and every
-marketplace entry has a plugin directory.
+Two independent checks, one command, no flags:
 
+  Check A  every plugins/<dir>/.claude-plugin/plugin.json agrees with its
+           .claude-plugin/marketplace.json entry (name, source, description),
+           and every marketplace entry has a plugin directory.
+
+  Check B  each pair declared in MIRROR_PAIRS is line-for-line identical after
+           canonicalization, except where an exception declares otherwise.
+
+Both checks run every time, so one run reports every problem in the tree.
 Exit 0 iff every check passed, 1 otherwise. Python 3 stdlib only, no flags.
 
 Design: docs/superpowers/specs/2026-07-26-gh-8-drift-check-design.md
@@ -17,6 +23,34 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE = ".claude-plugin/marketplace.json"
+
+# Pairs of files that must stay line-for-line parallel. Enrollment requires
+# line-for-line parallelism: this schema can only declare same-index,
+# one-line-for-one-line divergences. See the design doc, Decision 6.
+MIRROR_PAIRS = [
+    {
+        "name": "adversarial-review",
+        "a": "plugins/dev-flow/skills/adversarial-review/SKILL.md",
+        "b": "plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md",
+        # applied to both sides; the script substitutes longest token first
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [
+            {
+                "why": "The two pipelines pass working-dir differently: dev-flow omits "
+                       "it and the review defaults to the invoking checkout; "
+                       "dev-flow-worktree passes the worktree path explicitly.",
+                "a": "- When called by dev-flow, the review runs in-context on the "
+                     "feature branch checked out in the invoking checkout, so "
+                     "`working-dir` is omitted — it defaults to that checkout (see "
+                     "dev-flow's branch-entry rule). dev-flow uses no worktree.",
+                "b": "- When called by dev-flow-worktree, `working-dir` is the pipeline "
+                     "worktree's absolute path — the orchestrator passes it explicitly "
+                     "and invokes the review in-context (see dev-flow-worktree's "
+                     "worktree-entry rule).",
+            },
+        ],
+    },
+]
 
 
 def plural(count, word):
@@ -157,12 +191,199 @@ def check_manifests():
     return plural(len(manifests), "plugin"), problems
 
 
+# --------------------------------------------------------------------------
+# Check B: declared mirror pairs
+# --------------------------------------------------------------------------
+
+PAIR_HEADER = """\
+These two files must stay line-for-line identical after canonicalizing
+{subs}. Every cross-cutting edit lands in both.
+
+  A: {a}
+  B: {b}"""
+
+DIVERGENCE_FIX = """\
+Fix: mirror the edit into both files. If the divergence is genuinely variant-specific,
+add it to MIRROR_PAIRS["{name}"]["exceptions"] in scripts/check-sync.py
+with a one-line reason."""
+
+LINE_COUNT_FIX = """\
+A line-for-line pair cannot differ in length — one side gained or lost a line that was
+not mirrored. Mirror it, then re-run.
+
+If the extra line is an *intentional* one-sided divergence, note that Check B's
+line-parallel schema cannot declare it — see the design doc (Decision 6) before
+contorting the prose to fit. The schema, not your edit, is what needs extending."""
+
+
+def canonicalize(text, substitutions):
+    """Apply every substitution to the text, longest source token first, so a token
+    containing another as a substring is always replaced first."""
+    for src, dst in sorted(substitutions, key=lambda pair: -len(pair[0])):
+        text = text.replace(src, dst)
+    return text
+
+
+def format_why(why):
+    return textwrap.fill(why, width=84, initial_indent="  why: ",
+                         subsequent_indent="       ")
+
+
+def check_pair(pair):
+    """Returns (summary, problems). summary is the OK suffix for the progress line.
+    On failure, problems[0] is the pair's shared header block."""
+    subs = pair.get("canonicalize", [])
+    exceptions = pair.get("exceptions", [])
+    header = PAIR_HEADER.format(
+        subs=", ".join(f'"{src}" -> "{dst}"' for src, dst in subs) or "nothing",
+        a=pair["a"],
+        b=pair["b"],
+    )
+
+    texts = {}
+    for side in ("a", "b"):
+        try:
+            texts[side] = read_text(pair[side])
+        except READ_ERRORS as exc:
+            return "", [header, f"cannot read {side.upper()}: {exc}"]
+
+    canon = {side: canonicalize(texts[side], subs) for side in ("a", "b")}
+    lines = {side: canon[side].splitlines() for side in ("a", "b")}
+    raw_lines = {side: texts[side].splitlines() for side in ("a", "b")}
+
+    items = []
+
+    ends_nl = {side: canon[side].endswith("\n") for side in ("a", "b")}
+    if ends_nl["a"] != ends_nl["b"]:
+        with_nl, without_nl = ("A", "B") if ends_nl["a"] else ("B", "A")
+        items.append(
+            f"trailing newline differs: {with_nl} ends with a newline, "
+            f"{without_nl} does not.\nMirror it, then re-run."
+        )
+
+    summary = f"{plural(len(lines['a']), 'line')}, " \
+              f"{plural(len(exceptions), 'declared exception')}"
+
+    # Step 3: fully identical after canonicalization -> skip the line comparison.
+    identical = canon["a"] == canon["b"]
+
+    # Step 6 (part 1): an exception whose two sides match after canonicalization
+    # declares no divergence and can never fire. Split usable from malformed up
+    # front: both the line-count scan and the positional comparison match
+    # against the usable set.
+    usable = []
+    malformed = []
+    for exc in exceptions:
+        canon_a = canonicalize(exc["a"], subs)
+        canon_b = canonicalize(exc["b"], subs)
+        if canon_a == canon_b:
+            malformed.append(exc)
+        else:
+            usable.append((canon_a, canon_b, exc))
+
+    def declared_at(index):
+        """Position in `usable` of the exception matching the canonicalized lines
+        at this index, or None. The single definition of 'declared divergence'."""
+        return next(
+            (
+                position
+                for position, (canon_a, canon_b, _) in enumerate(usable)
+                if canon_a == lines["a"][index] and canon_b == lines["b"][index]
+            ),
+            None,
+        )
+
+    if not identical and len(lines["a"]) != len(lines["b"]):
+        common = min(len(lines["a"]), len(lines["b"]))
+        first = next(
+            (
+                i for i in range(common)
+                if lines["a"][i] != lines["b"][i] and declared_at(i) is None
+            ),
+            None,
+        )
+        block = (
+            f"line count differs: A has {len(lines['a'])}, "
+            f"B has {len(lines['b'])}.\n"
+        )
+        if first is None:
+            longer = "A" if len(lines["a"]) > len(lines["b"]) else "B"
+            block += (
+                f"the files match through the end of the shorter (modulo declared "
+                f"exceptions);\nthe first unmatched line is line {common + 1} "
+                f"of {longer}:\n"
+                f"  {longer}: {raw_lines[longer.lower()][common]}"
+            )
+        else:
+            block += (
+                f"first undeclared divergence at line {first + 1}:\n"
+                f"  A: {raw_lines['a'][first]}\n"
+                f"  B: {raw_lines['b'][first]}"
+            )
+        items.append(block)
+        items.append(LINE_COUNT_FIX)
+        return summary, [header, *items]
+
+    used = set()
+    undeclared = False
+    if not identical:
+        # Step 5: positional comparison.
+        for index in range(len(lines["a"])):
+            if lines["a"][index] == lines["b"][index]:
+                continue
+            match = declared_at(index)
+            if match is not None:
+                used.add(match)
+                continue
+            undeclared = True
+            items.append(
+                f"line {index + 1}: undeclared divergence\n"
+                f"  A: {raw_lines['a'][index]}\n"
+                f"  B: {raw_lines['b'][index]}"
+            )
+        if undeclared:
+            items.append(DIVERGENCE_FIX.format(name=pair["name"]))
+
+    for exc in malformed:
+        items.append(
+            "malformed exception: after canonicalization its two sides are identical,\n"
+            "so it declares no divergence and can never match. The canonicalization\n"
+            "already permits this difference; remove the entry from "
+            "scripts/check-sync.py.\n"
+            f"{format_why(exc['why'])}\n"
+            f"  A: {exc['a']}\n"
+            f"  B: {exc['b']}"
+        )
+
+    for position, (_, _, exc) in enumerate(usable):
+        if position in used:
+            continue
+        items.append(
+            "stale exception: the divergence it describes no longer appears in the "
+            "files.\n"
+            f"{format_why(exc['why'])}\n"
+            f"  A: {exc['a']}\n"
+            f"  B: {exc['b']}\n"
+            "Remove the entry from scripts/check-sync.py, or restore the divergence "
+            "it describes."
+        )
+
+    if not items:
+        return summary, []
+    return summary, [header, *items]
+
+
 def main():
     failures = 0
 
     summary, problems = check_manifests()
     if not report("manifest descriptions", summary, problems):
         failures += 1
+
+    for pair in MIRROR_PAIRS:
+        summary, problems = check_pair(pair)
+        if not report(f'mirror pair "{pair["name"]}"', summary, problems):
+            failures += 1
 
     if failures:
         print(f"check-sync: {plural(failures, 'check')} failed")
