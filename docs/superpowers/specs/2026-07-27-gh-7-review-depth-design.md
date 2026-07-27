@@ -121,7 +121,9 @@ If this angle fires on most diffs, the trigger is wrong. Expected behaviour on a
 
 The issue suggests invoking or recommending these when a stage introduces new domain types. Grounded in what the two skills actually contain (read at `~/.claude/plugins/cache/mattpocock/mattpocock-skills/1.2.0/skills/engineering/`), the answer is **neither invoke nor recommend — borrow one principle instead.**
 
-**`domain-modeling` is disqualified on mechanism.** Its body is user dialogue: *"call it out immediately"*, *"propose a precise canonical term"*, *"force the user to be precise"*, *"offer to create an ADR"*. That is the same disqualifier that already bars `brainstorming` from this pipeline — dev-flow's stated corollary is that a skill whose core mechanism is user dialogue cannot be dispatched at all. It also *writes* repo state (`CONTEXT.md`, `docs/adr/`), which a findings-only seed may not do and which falls outside `adversarial-review`'s "owns the artifact end-to-end" contract. And its subject is project-wide vocabulary, not the artifact under review. There is nothing here to invoke and nothing to borrow.
+**`domain-modeling` is disqualified on mechanism.** Its body is user dialogue: *"call it out immediately"*, *"propose a precise canonical term"*, *"force the user to be precise"*, *"offer to create an ADR"*. That is the same disqualifier that already bars `brainstorming` from this pipeline — dev-flow's stated corollary is that a skill whose core mechanism is user dialogue cannot be dispatched at all. It also *writes* repo state (`CONTEXT.md`, `docs/adr/`), which a findings-only seed may not do and which falls outside `adversarial-review`'s "owns the artifact end-to-end" contract. Those two reasons are sufficient and they are the whole of the case: a review leaf cannot interview a user, and cannot write files.
+
+**What is *not* a reason to reject it — corrected.** An earlier draft added a third disqualifier: that `domain-modeling`'s subject is project-wide vocabulary rather than the artifact under review. That is false, and this design is the counterexample. Run against this document during its own `post-design` stop, a glossary pass found two problems in it that five reviewers — two `sonnet` seeds and three `opus` resolvers — all missed: it adopts `seam` from `codebase-design` while this repo already uses that word at a different level (`Step-0 seam`, "user-directed seams" in the pipeline `SKILL.md`), and it uses **angle** and **pass** interchangeably for two different things. Both are terms the new prose ships. The rejection stands on mechanism alone; the blind spot the issue was pointing at is real, and is recorded as its own issue rather than closed here.
 
 **`codebase-design` is disqualified on two counts, one structural and one substantive.**
 
@@ -236,20 +238,21 @@ Old lines 39–40 shift by +2 — they sit between the two insertion points — 
 
 Mandatory, not cosmetic: the install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so an edit at an unchanged version is never picked up on re-sync. Minor rather than major — the skill's invocation signature, contract, provenance format, and mode set are unchanged; only seed content changes.
 
-### 5. `CLAUDE.md` — the design-conformance check, as standing policy
+### 5. `CLAUDE.md` — one rule, correctly scoped
 
-Verification step 6 (below) is a mechanical check that the inserted and replaced prose matches this document byte-for-byte. It is the **second** instance of that gap in this repo, and the two instances differ instructively. `gh-10` hit it and solved it *inside its plan* (`Task 5 Step 4b`), where the fix stayed — this design had to rediscover the same need from scratch. `gh-10`'s *other* backstop, the residue grep, was written into `CLAUDE.md` instead, and it propagated: §Verification steps 3 and 4 exist, and are argued for below, because the auto-loaded `CLAUDE.md` asks for them. Same repo, two consecutive changes, one seam that carried and one that did not. The check therefore goes where the next change inherits it rather than reinvents it.
+Verification steps 3, 4 and 6 all exist for a single reason, and `CLAUDE.md` should state it once rather than accrete a bullet per change.
 
-`CLAUDE.md` is the right boundary and `dev-flow`'s own `SKILL.md` is not: this is repo-local contributor guidance about how a change in *this* tree is verified, it ships into no plugin and costs no invocation context, and it is where the sibling residue-grep policy already lives. The rule states the obligation and the technique, not a reusable script — the block-to-file mapping and the shape assertion differ per change (`gh-10`: eight one-line blocks; this change: `[1, 1, 1, 2, 2, 2]`), and turning that into a generic runner would require a machine-readable annotation schema on every design doc, which two instances do not justify.
+`gh-10` added the first version: *"For any hand-mirrored edit, put a residue grep in the change's verification."* **That scope is wrong, and this design is the proof.** This change edits no hand-mirrored file, so the rule is vacuous here — yet steps 3 and 4 apply residue greps anyway, aimed squarely at the *machine-checked* pair. The blind spot was never a property of being hand-mirrored. It is a property of how `check-sync.py` works: it compares the two copies **to each other**, so text mangled identically in both sides passes clean, and so does an edit missed on both.
 
-Insert after the `## Workflow` paragraph (line 15) exactly two lines: one empty line, then this line.
+So instead of appending a second, differently-scoped rule for the design-conformance check, this change **replaces** the first with one rule that states the root cause and names both techniques as instances of it, scoped to any mirrored pair. That edits already-merged adjacent text, which the rubric permits when it reaches the better design — and here it corrects a scoping error rather than merely tidying. It also stops the accretion at two: the next verification technique is another instance of a stated cause, not a third bullet.
+
+Replace the whole of `CLAUDE.md` line 9 — the mirroring bullet, including the residue-grep sentence `gh-10` appended to it — with:
 
 ```
-
-When a change's replacement or inserted text is given as fenced blocks in a design doc, its verification must include a design-conformance check: a short `python3` script that re-reads those blocks from the design file on disk — never retyped — and asserts each appears verbatim in its target file, and for an insertion, directly after its anchor line. `check-sync.py` and the residue/presence greps test line counts, presence, and absence only; text mangled identically in **both** copies of a mirrored pair passes every one of them, and this is the check that catches it.
+- **Some files are mirrored across `dev-flow` and `dev-flow-worktree` and must be edited in both.** `python3 scripts/check-sync.py` enforces what can be enforced mechanically — the `adversarial-review/SKILL.md` pair (line-for-line identical after `dev-flow-worktree` → `dev-flow`, minus declared exceptions) and the `description` duplicated between each `plugin.json` and `.claude-plugin/marketplace.json`. It runs on every PR. The pipeline `SKILL.md` pair and the two `README.md`s are too divergent to check mechanically — mirror those by hand. **`check-sync.py` proves the two copies agree with each other, never that either is correct**: text mangled identically in both sides passes it, and so does an edit missed on both. So any change to a mirrored pair, machine-checked or hand-mirrored, must also verify against something *outside* the pair — grep for the exact phrases the edit removes, expecting no hits; and where the design doc gives replacement or inserted text as fenced blocks, add a short `python3` check that re-reads those blocks from the design on disk, never retyped, asserting each appears verbatim in its target and, for an insertion, directly after its anchor line.
 ```
 
-`CLAUDE.md` goes from 29 to 31 lines. No other line moves content; `check-sync.py` never reads this file (it names it only in error strings), and no plugin ships it.
+`CLAUDE.md` stays at **29 lines** — this is a one-line replacement, not an append. `check-sync.py` never reads this file (it names it only in error strings), and no plugin ships it, so the rule costs no invocation context. A generic runner is deliberately not built: the block-to-file mapping and the shape assertion differ per change (`gh-10`: eight one-line blocks; this change: `[1, 1, 1, 2, 2, 1]`), so factoring it out would need a machine-readable annotation schema on every design doc, which two instances do not justify.
 
 ### Blast radius — verified complete
 
@@ -258,7 +261,7 @@ A repo-wide search of tracked files outside `docs/superpowers/` for `seed pass`,
 - **Both pipeline `SKILL.md` copies** (`plugins/dev-flow/skills/dev-flow/SKILL.md`, `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`). They invoke the review by mode and delegate seed content entirely; neither enumerates or describes a seed pass. This is what keeps the hand-mirrored pair out of the change (see Verification).
 - **Both `README.md` files** — zero hits for `seed`, `angle`, `rubric`, or `checklist`.
 - **`.claude-plugin/marketplace.json`** — no `description` changes anywhere, and Check A does not read `version`.
-- **`scripts/check-sync.py`**, `.github/workflows/`, `docs/agents/*.md` — untouched. **`CLAUDE.md`** gains one paragraph (§5 above) and nothing else; it is repo-local contributor guidance, ships into no plugin, and `check-sync.py` never reads it (it names the file only in error strings).
+- **`scripts/check-sync.py`**, `.github/workflows/`, `docs/agents/*.md` — untouched. **`CLAUDE.md`** has one line replaced (§5 above) and nothing else, staying at 29 lines; it is repo-local contributor guidance, ships into no plugin, and `check-sync.py` never reads it (it names the file only in error strings).
 - **`plugins/better-code-review/`** — exists in this repo but is referenced nowhere by dev-flow (the diff correctness seed pins the *superpowers* `requesting-code-review/code-reviewer.md`), and the issue assigns its backstop to #37 regardless. Out of scope.
 
 ## Sync constraint — how `check-sync.py` still passes
@@ -350,7 +353,7 @@ for line in Path(DESIGN).read_text(encoding="utf-8").split("\n"):
         mode, cur = None, None
     else:
         cur.append(line)
-assert [len(b) for b in blocks] == [1, 1, 1, 2, 2, 2], "design code-block shape changed; stop and re-read the design"
+assert [len(b) for b in blocks] == [1, 1, 1, 2, 2, 1], "design code-block shape changed; stop and re-read the design"
 PAIR = ["plugins/dev-flow/skills/adversarial-review/SKILL.md",
         "plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md"]
 SPEC = [("line 28, diff row",     blocks[0], None,                  PAIR),
@@ -358,7 +361,7 @@ SPEC = [("line 28, diff row",     blocks[0], None,                  PAIR),
         ("line 34, block header", blocks[2], None,                  PAIR),
         ("fifth angle",           blocks[3], "- **Altitude:**",     PAIR),
         ("input-contract pass",   blocks[4], "**Pinned template",   PAIR),
-        ("CLAUDE.md rule",        blocks[5], "Changes land via PR", ["CLAUDE.md"])]
+        ("CLAUDE.md rule",        blocks[5], None,                  ["CLAUDE.md"])]
 bad = []
 for name, want, anchor, targets in SPEC:
     for path in targets:
@@ -378,7 +381,7 @@ echo "exit=$?"
 
    Expect exactly `design-conformance: OK` and `exit=0`. A `MISMATCH` line names the block and the file whose text or position differs — re-paste that block from §Exact change list and re-run from step 1. The shape assertion (`[1, 1, 1, 2, 2, 2]`) fires if this document's plain-fenced blocks are ever added to, removed, or reflowed: that is deliberate, because the blocks are indexed positionally. Every fenced block in this Verification section carries the `sh` info string and is therefore skipped by the `mode == ""` filter, so adding or editing a verification step never disturbs that index — keep it that way.
 
-**On `CLAUDE.md`'s residue-grep policy.** The policy binds "any hand-mirrored edit." This change edits **no** hand-mirrored file — the pipeline `SKILL.md` pair and both `README.md`s are untouched, and the only mirrored pair it touches is the machine-checked one. The policy is therefore vacuously satisfied. Steps 3 and 4 apply the same idea anyway, aimed at the *machine-checked* pair's one real blind spot (an edit missed on both sides), because that blind spot is genuine and the greps are free. Step 6 extends the same reasoning from residue to content, and §5 writes it back into `CLAUDE.md` next to the residue-grep policy it complements, so the next change inherits both.
+**On `CLAUDE.md`'s verification policy.** As merged, the policy binds "any hand-mirrored edit" — and this change edits no hand-mirrored file, so it would be vacuously satisfied. Steps 3, 4 and 6 apply it anyway, aimed at the *machine-checked* pair, because the blind spot the policy exists for is present there too: `check-sync.py` compares the two copies to each other, so an edit missed on both sides, or text mangled identically in both, passes clean. That mismatch between what the rule says and what this change had to do is the evidence §5 acts on — the rule is rescoped to any mirrored pair, and the design-conformance technique joins the residue grep as a second instance of one stated cause rather than a second rule.
 
 ## Assumptions recorded
 
