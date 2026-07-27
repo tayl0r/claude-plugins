@@ -557,7 +557,7 @@ git commit -m "CLAUDE.md: require a residue grep for hand-mirrored edits"
 
 **Depends on:** Tasks 1, 2, 3, and 4 must all be complete and committed.
 
-Run every step from the repo root. **All of them must pass before the change is considered done.** Steps 1–5 are the design's §Verification steps, reproduced in order; Step 4b is this plan's own design-conformance check, and Step 6 its scope check. If any step fails, fix the cause in the owning task's files and re-run **all of them** from the top — a fix for one can break another.
+Run every step from the repo root. **All of them must pass before the change is considered done.** Steps 1–5 reproduce the design's §Verification steps 1–5 in order; Step 4b is this plan's own design-conformance check, and Step 6 its scope check. (The design gained a sixth verification step during PR review, after this plan was executed — see the Addendum.) If any step fails, fix the cause in the owning task's files and re-run **all of them** from the top — a fix for one can break another.
 
 - [x] **Step 1: Mirror and manifest sync**
 
@@ -683,9 +683,27 @@ Expected: `git status --porcelain` prints nothing except, possibly, the untracke
 
 ## Definition of done
 
-- Both `adversarial-review/SKILL.md` copies are 81 lines and carry all five replacements identically (modulo line 69's variant tokens).
+- Both `adversarial-review/SKILL.md` copies are 81 lines and carry all five replacements this plan specifies, identically (modulo line 69's variant tokens) — plus a sixth added during PR review, see the Addendum.
 - Both pipeline `SKILL.md` copies are 277 / 271 lines and carry all three edits.
 - `plugins/dev-flow` is at `2.3.0`; `plugins/dev-flow-worktree` is at `1.5.0`.
 - `CLAUDE.md`'s hand-mirroring bullet ends with the residue-grep sentence.
 - All five of the design's §Verification steps pass, plus the design-conformance check (Task 5 Step 4b) and the scope check.
 - Nothing has been pushed, no PR opened, no merge performed.
+
+---
+
+## Addendum — one edit added after this plan was executed
+
+This plan's five tasks executed and were verified exactly as written above; that record is left intact. The PR review then found one more thing, landed in commit `21099cf`:
+
+**A sixth edit to the `adversarial-review` mirror pair — line 24.** It still named the seed tier inline (`on the seed-reviewer model (`sonnet` — see Model, below)`) while Task 1's line-59 edit had de-restated the resolver mention to a bare Model pointer. That asymmetry falsified the design's own closing claim that the end state leaves "no normative restatements left to silently miss". The phrase is now `on the seed-reviewer model (see Model, below)` in both copies; both files remain 81 lines and `check-sync.py` stays green.
+
+**A sixth design §Verification step** — a residue grep for the removed phrase. It exists because `check-sync.py` structurally cannot cover this edit: the mirror check compares the two copies to *each other*, so an identical miss on **both** sides passes clean. Run it alongside Task 5's steps:
+
+```sh
+git grep -nF 'seed-reviewer model (`sonnet`' -- ':!docs/superpowers'
+```
+
+Expect no output (exit 1).
+
+Task 5's design-conformance script is **unaffected** — the line-24 change is documented in the design as a phrase edit with inline code, not a fenced block, so the design still holds exactly the 8 plain-fenced blocks the script indexes positionally. Re-run it after this addendum and it still reports `OK`.
