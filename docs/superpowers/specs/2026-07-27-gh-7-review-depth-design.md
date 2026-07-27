@@ -134,13 +134,20 @@ The issue suggests invoking or recommending these when a stage introduces new do
 
 ## Context cost, weighed
 
-`plugins/dev-flow/skills/adversarial-review/SKILL.md` is 1,900 words today and ships into every review invocation of both plugins. The two additions total 303 words, plus a net +11 on the angles-block header and ~11 in the two table cells — about **+17%**. That is a real cost and it needs an explicit defence:
+`plugins/dev-flow/skills/adversarial-review/SKILL.md` is 1,900 words today and ships into every review invocation of both plugins. The two additions total 303 words, plus a net +11 on the angles-block header and ~11 in the two table cells — about **+17%** of the file, ~535 tokens.
 
-- **The cost is context tokens, not reasoning.** Both passes lead with their trigger. A diff that adds no definable-by-reference construct, and a design that accepts no new external input, each read one clause and stop. The runtime cost on a non-triggering artifact is a sentence.
-- **The length is load-bearing, and the cheap version is worse.** For Family 2 in particular, the words doing the safety work *are* the trigger clause and the reportability rule. A terse "question where the seam is" would cost a tenth as much and produce exactly the speculative-restructuring reviewer this design exists to avoid. Here, shorter is not simpler — it is a different, worse design.
-- **This section of the file is its payload.** The rest of the skill is contract, working-directory, and model plumbing; Seed passes is where the review's actual content lives. Two evidenced misses closing into that section is what the file is for.
+**That percentage is the wrong number to argue about, and an earlier draft of this section argued about it for three bullets.** Measured against a real review invocation of this very design — two `sonnet` seeds and three `opus` resolvers, 484,005 tokens — the additions cost the orchestrator one whole-file load plus one seed prompt, about **850 tokens, or 0.18%**. The file grows by a sixth; a review grows by a fifth of one percent.
 
-A shorter variant was drafted and rejected on the second point. No other place in the file was shortened to pay for this: trading unrelated precision for room would be a false economy.
+The cost that does matter is on the other side of the trigger. One resolver group — what a single false-positive seam finding buys — measured **86,022 tokens** in that same run: **101× the entire prose addition**, landing on the ~7–9% of PRs the accepted fire rate implies. Any trade that spends prose to reduce false positives is therefore lopsided in prose's favour by two orders of magnitude, and the third reportability clause is exactly that trade: ~60 words that a resolver measured as taking findings from ~15–18% of PRs down to ~7–9%. Cutting it to save 0.02% of a review while roughly doubling an 86,000-token failure is the clearest possible case of the fix being worse than the wart.
+
+Two costs the token count genuinely misses, named rather than waved away:
+
+- **Instruction dilution.** More rules compete for a seed's attention, and that is real, unmeasurable, and the one honest argument for brevity. The mitigation is structural: both passes lead with their trigger, so a diff adding no definable-by-reference construct and a design accepting no new external input each read one clause and stop.
+- **A standing obligation.** Every future tier or protocol change must now keep two more passes coherent. That is the same maintenance surface the `fable` → `opus` swap had to sweep, which is why neither pass restates a tier name.
+
+**Rejected: move the passes to a referenced file** to keep `SKILL.md` lean. `check-sync.py`'s `MIRROR_PAIRS` would take a new pair without modification, so the mechanical objection does not hold — but it saves 0.11% of a review while adding two files, a `MIRROR_PAIRS` entry, and an indirection the orchestrator must follow to build a seed prompt. That indirection is precisely the reachability failure the line-34 header edit exists to close, reintroduced in a worse form. Zooming out is supposed to find the right boundary, not add a layer; the Seed passes section is already the right boundary.
+
+No other place in the file was shortened to pay for this: at 0.18%, there is nothing to pay.
 
 ## Exact change list
 
