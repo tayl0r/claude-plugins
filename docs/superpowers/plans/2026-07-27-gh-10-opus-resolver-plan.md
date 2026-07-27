@@ -77,7 +77,7 @@ Three hard requirements, from the design's §Sync constraint:
 
 For each edit below: run the `grep -n` command to locate the line in **both** files, `Read` each located line in full, use that full line text as the exact `old_string`, and replace it with the single-line `new_string` shown. Do not reflow, do not wrap, do not add a trailing space.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -88,7 +88,7 @@ git grep -nic 'fable' -- ':!docs/superpowers'
 
 Expected: `check-sync: all checks passed` with `mirror pair "adversarial-review" ... OK (81 lines, 1 declared exception)`; `81` for each file; and exactly two `fable` count lines, `5` for each `adversarial-review` copy and no other file. If any of that differs, stop — the tree is not the state this plan was written against.
 
-- [ ] **Step 2: Edit A — Review integrity, family-match clause (line 18 in both files)**
+- [x] **Step 2: Edit A — Review integrity, family-match clause (line 18 in both files)**
 
 Locate:
 
@@ -105,7 +105,7 @@ Expected: one hit per file, at line 18. Replace that entire line, **identically 
 
 What changed, so you can sanity-check the paste: the example moved from `"Fable 5"` / `` `fable` `` to `"Opus 5"` / `` `opus` ``; `honoring the resolver opus-fallback` was replaced by the durable reason family matching is used at all; and the canonicalization no longer restates the alias roster (`(`sonnet`, `fable`, or `opus`)` is gone) — it now maps to "that tier's alias".
 
-- [ ] **Step 3: Edit B — Resolution procedure, step 2 (line 59 in both files)**
+- [x] **Step 3: Edit B — Resolution procedure, step 2 (line 59 in both files)**
 
 Locate:
 
@@ -120,7 +120,7 @@ Expected: one hit per file, at line 59. Replace that entire line, **identically 
 2. Group similar issues together. For each group, spawn one agent, on the resolver model (see Model).
 ```
 
-- [ ] **Step 4: Edit C — Report-back, step 6 (line 69 in both files) — THIS ONE DIFFERS PER COPY**
+- [x] **Step 4: Edit C — Report-back, step 6 (line 69 in both files) — THIS ONE DIFFERS PER COPY**
 
 Locate:
 
@@ -145,7 +145,7 @@ In `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`, replace that 
 
 What changed: the `<tier>` enum drops `fable` (it is now exactly `{`sonnet`, `opus`}`); the example resolver tier becomes `opus`; and the closing claim changes from "genuinely model-diverse" to the fan-out / tier-conformance property the check actually establishes.
 
-- [ ] **Step 5: Edit D — Model, group-resolution agents (line 73 in both files)**
+- [x] **Step 5: Edit D — Model, group-resolution agents (line 73 in both files)**
 
 Locate:
 
@@ -160,7 +160,7 @@ Expected: one hit per file, at line 73. Replace that entire line, **identically 
 **Group-resolution agents** — the tier that determines the best long-term design and adversarially self-checks — run on `opus` (a harness alias, never a dated model id), unconditionally, with no session-model-dependent fallback. Their independence from the artifact's author is **contextual, not cross-family**: a fresh context window with no memory of authoring, an explicitly adversarial prompt, and a spawn that provenance verifies out of band. A session-model-conditional tier would buy back family separation only by making the resolver tier depend on ambient state, which the provenance check could no longer compare against a fixed expectation.
 ```
 
-- [ ] **Step 6: Edit E — Model, seed reviewers (line 75 in both files)**
+- [x] **Step 6: Edit E — Model, seed reviewers (line 75 in both files)**
 
 Locate:
 
@@ -177,7 +177,7 @@ Expected: one hit per file, at line 75. Replace that entire line, **identically 
 
 Line 77 (`**Executors, fixers, and the orchestrator** run on the main session model.`) is **unchanged** — do not touch it.
 
-- [ ] **Step 7: Verify — line counts unchanged and exactly five lines changed per file**
+- [x] **Step 7: Verify — line counts unchanged and exactly five lines changed per file**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -187,7 +187,7 @@ git diff --numstat -- plugins/dev-flow/skills/adversarial-review/SKILL.md plugin
 
 Expected: `81` for each file, and `--numstat` showing exactly `5	5` for each of the two paths. Any other number means an edit was missed, doubled, or split a line — fix it before continuing. **`5	5` is the single clearest signal that all five in-place replacements landed on both sides.**
 
-- [ ] **Step 8: Verify — the mirror check passes**
+- [x] **Step 8: Verify — the mirror check passes**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -204,7 +204,7 @@ check-sync: all checks passed
 
 Exit code 0. **`81 lines, 1 declared exception` is load-bearing** — a different line count, or a stale/missing exception, is a failure even if the word "OK" appears elsewhere. An undeclared-divergence failure naming a line number means that line was edited in one copy and not the other: go back and apply the matching edit.
 
-- [ ] **Step 9: Verify — no `fable` survives in these two files**
+- [x] **Step 9: Verify — no `fable` survives in these two files**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -214,7 +214,7 @@ echo "exit=$?"
 
 Expected: **no output at all**, `exit=1`. (Every `fable` reference in tracked files outside `docs/superpowers` lived on the five lines this task replaced.) Any hit names a line you missed. Do not rewrite this grep with `\b`.
 
-- [ ] **Step 9b: Verify — the five replacement lines match the design byte-for-byte**
+- [x] **Step 9b: Verify — the five replacement lines match the design byte-for-byte**
 
 Steps 7–9 test shape and absence only: an em dash retyped as a hyphen, or a mangled `×` or `∈`, **identically in both copies**, passes all three — and `check-sync.py` canonicalizes the variant tokens away, so it also cannot see the `dev-flow` variant pasted into the worktree copy of line 69. This check is the content backstop. It re-reads the five replacement lines from the design file on disk — never from your own paste — and requires each to appear verbatim in both copies (with the worktree variant derived for line 69). Copy the script exactly; it is deliberately pure ASCII, so a mistyped copy crashes loudly instead of passing.
 
@@ -259,7 +259,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (adversarial-review pair): OK`, `exit=0`. A `MISMATCH` line names the edit and copy whose text differs from the design's literal block — re-do that edit by copying the design's fenced block again (the worktree copy of edit C carries `dev-flow-worktree` where the block says `dev-flow`), then re-run Steps 7–9b.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
