@@ -441,7 +441,7 @@ git commit -m "dev-flow: stop claiming model diversity in the pipeline prose"
 
 **This is not cosmetic cleanup.** The install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so an edit shipped at an unchanged version is **never picked up on re-sync** — Tasks 1 and 2 have no effect on any installed copy until this task lands. Minor bumps per the design's §Assumptions: behavior changes but no interface does (invocation signature, provenance line format, and contract are unchanged).
 
-- [ ] **Step 1: Bump `dev-flow` from `2.2.0` to `2.3.0`**
+- [x] **Step 1: Bump `dev-flow` from `2.2.0` to `2.3.0`**
 
 In `plugins/dev-flow/.claude-plugin/plugin.json`, replace:
 
@@ -457,7 +457,7 @@ with:
 
 Change **only** the `version` field. Do not touch `description` — it is duplicated into `.claude-plugin/marketplace.json` and `check-sync.py` Check A compares them; the marketplace file is out of scope for this change.
 
-- [ ] **Step 2: Bump `dev-flow-worktree` from `1.4.0` to `1.5.0`**
+- [x] **Step 2: Bump `dev-flow-worktree` from `1.4.0` to `1.5.0`**
 
 In `plugins/dev-flow-worktree/.claude-plugin/plugin.json`, replace:
 
@@ -473,7 +473,7 @@ with:
 
 Same constraint: `version` only.
 
-- [ ] **Step 3: Verify — both version strings read back correctly**
+- [x] **Step 3: Verify — both version strings read back correctly**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -482,7 +482,7 @@ rtk proxy grep -n '"version"' plugins/dev-flow/.claude-plugin/plugin.json plugin
 
 Expected: two lines, showing `2.3.0` for `plugins/dev-flow/...` and `1.5.0` for `plugins/dev-flow-worktree/...`. (`rtk proxy` is required here — the bare `grep` is rewritten by the shell hook and elides path components, which makes it impossible to tell which version belongs to which plugin.)
 
-- [ ] **Step 4: Verify — manifests still valid and still in sync**
+- [x] **Step 4: Verify — manifests still valid and still in sync**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -493,7 +493,7 @@ git diff --numstat -- plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-fl
 
 Expected: `check-sync: all checks passed`; `claude plugin validate .` succeeds (**8 missing-author warnings are expected and are not a failure**); and `--numstat` showing exactly `1	1` for each manifest. More than one changed line per manifest means something other than `version` was edited — revert it. `check-sync.py` Check A does not read `version` at all, so it must still pass unchanged.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
