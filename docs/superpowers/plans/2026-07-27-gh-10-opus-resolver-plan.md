@@ -280,7 +280,7 @@ git commit -m "adversarial-review: make opus the unconditional resolver tier"
 
 **Read `§3 & 4` of the design before starting.** These two files are **NOT** a mechanically checked mirror pair — they differ in length (277 vs 271 lines) and `check-sync.py` never reads them. `claude plugin validate .` reads manifests, not skill prose. The `fable` grep is no help either: **none of the three edits below contains the word `fable`.** Two mechanical backstops cover this pair. Step 5's residue grep catches leftover *old* text: each edit removes a distinctive phrase which afterwards must appear nowhere in tracked files outside `docs/superpowers`, so a one-sided miss fails loudly. Step 6's design-conformance check catches a botched *new* paste: it re-reads the design's literal replacement blocks from disk and requires each edited line to match byte-for-byte — including the `dev-flow-worktree` variant tokens, which no other check sees.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -290,7 +290,7 @@ git grep -niE 'model-diverse|diverse reviewers|different from the artifact' -- '
 
 Expected: `277` and `271`; and six hits — three in the pipeline pair per side is the target set, i.e. `dev-flow/skills/dev-flow/SKILL.md` lines 8, 46, 273 and `dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` lines 8, 45, 267. (If Task 1 is already committed, the two `adversarial-review` hits at lines 69 and 73 are gone; if it is not, they will also appear — that is fine, Task 1 removes them.)
 
-- [ ] **Step 2: Edit F — intro paragraph, "the model-diverse review" (line 8 in both files)**
+- [x] **Step 2: Edit F — intro paragraph, "the model-diverse review" (line 8 in both files)**
 
 Locate:
 
@@ -313,7 +313,7 @@ the multi-agent review
 
 Nothing else on the line changes. The sentence's point is that the fan-out survives the flat-topology constraint, which is still exactly true; only the "diverse" adjective is a claim the protocol no longer makes.
 
-- [ ] **Step 3: Edit G — Model Policy (line 46 in `dev-flow`, line 45 in `dev-flow-worktree`)**
+- [x] **Step 3: Edit G — Model Policy (line 46 in `dev-flow`, line 45 in `dev-flow-worktree`)**
 
 Locate:
 
@@ -336,7 +336,7 @@ In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, replace that e
 The orchestrator spawns produce-subagents and executors on the main session model, and does its own bookkeeping (checkbox commits, front-matter) inline. Reviewer-model selection — which tier the orchestrator spawns each of the review's seed/resolver leaves on — is owned by `dev-flow-worktree:adversarial-review` and stated once, in its Model section; that rule travels with the review skill wherever it is invoked, and is deliberately not restated here.
 ```
 
-- [ ] **Step 4: Edit H — Cross-Cutting Concerns, "Review provenance is checked, not assumed" (line 273 in `dev-flow`, line 267 in `dev-flow-worktree`)**
+- [x] **Step 4: Edit H — Cross-Cutting Concerns, "Review provenance is checked, not assumed" (line 273 in `dev-flow`, line 267 in `dev-flow-worktree`)**
 
 Locate:
 
@@ -359,7 +359,7 @@ In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, the same text 
 - **Review provenance is checked, not assumed.** The orchestrator runs each review (Design, Plan, PR — not Execute) in-context, then reads the review's returned provenance line (`seeds: N× <tier>; resolvers: M× <tier>`) directly and halts if it is missing or its tiers violate `dev-flow-worktree:adversarial-review`'s Model section (seeds must be the seed tier, resolvers the resolver tier; a `resolvers: 0` line from a no-findings review passes the resolver check vacuously). The tiers are canonicalized by the review's family match, so this is a direct comparison — a cheap self-check that the review actually fanned out to separate reviewer subagents on the specified tiers, rather than folding into a single inline pass.
 ```
 
-- [ ] **Step 5: Verify — the residue grep (the ONLY mechanical backstop for this pair)**
+- [x] **Step 5: Verify — the residue grep (the ONLY mechanical backstop for this pair)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -369,7 +369,7 @@ echo "exit=$?"
 
 Expected: **no output at all**, `exit=1`. Any hit is an unedited side of the pipeline pair (or an `adversarial-review` line Task 1 missed) — go fix the named file and line. Do not proceed with a non-empty result; nothing downstream will catch it.
 
-- [ ] **Step 6: Verify — line counts unchanged, three lines changed per file, and the new prose matches the design byte-for-byte**
+- [x] **Step 6: Verify — line counts unchanged, three lines changed per file, and the new prose matches the design byte-for-byte**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -421,7 +421,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (pipeline pair): OK`, `exit=0`. A `MISMATCH` line names the edit and copy that differs from the design — re-paste that edit from the design's fenced block (the worktree copy carries the `dev-flow-worktree:adversarial-review` skill reference), then re-run Steps 5 and 6. Line 8's surrounding prose legitimately differs between the copies and is deliberately not whole-line-checked; edit F is verified by the phrase count.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
