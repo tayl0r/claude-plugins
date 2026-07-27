@@ -168,7 +168,7 @@ git commit -m "marketplace: match the dev-flow-worktree description to its plugi
 
 The `description differs` message below is reproduced **byte-for-byte** from design Decision 4 — do not reword it. Copy the other messages exactly as written too — Task 3 asserts several of them byte-for-byte. (Their maintenance contract for future edits outside this plan is only that they keep three elements: the plugin name, the rule, and the file path(s).)
 
-- [ ] **Step 1: Create `scripts/` and write the script**
+- [x] **Step 1: Create `scripts/` and write the script**
 
 Create the directory and write `scripts/check-sync.py` with exactly this content:
 
@@ -350,7 +350,7 @@ if __name__ == "__main__":
     sys.exit(main())
 ```
 
-- [ ] **Step 2: Run it — the tree is green after Task 1**
+- [x] **Step 2: Run it — the tree is green after Task 1**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -366,7 +366,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 3: Verify it runs from any cwd (the script resolves its own repo root)**
+- [x] **Step 3: Verify it runs from any cwd (the script resolves its own repo root)**
 
 ```bash
 cd /
@@ -376,7 +376,7 @@ echo "exit=$?"
 
 Expected: the same two lines and `exit=0`. If this fails, `REPO_ROOT` was not derived from `__file__`.
 
-- [ ] **Step 4: Verify stdlib-only imports and mode 644**
+- [x] **Step 4: Verify stdlib-only imports and mode 644**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -395,7 +395,7 @@ Expected import lines, and nothing else (the line numbers shift to 19–22 in Ta
 
 Expected mode: `-rw-r--r--`. If the file is executable, run `chmod 644 scripts/check-sync.py`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
