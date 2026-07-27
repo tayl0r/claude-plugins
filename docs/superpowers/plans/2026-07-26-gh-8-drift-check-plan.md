@@ -420,7 +420,7 @@ git commit -m "check-sync: add the manifest description/source/registration chec
 
 > **Constraint reminder:** this task creates a directory under `plugins/` (Step 4) and edits `.claude-plugin/marketplace.json` three times. The directory is untracked and is deleted in Step 5; every marketplace edit is undone with `git restore` in the same step that made it. `git status --porcelain` must be empty when the task ends.
 
-- [ ] **Step 1: Revert the Task 1 comma fix and observe the failure**
+- [x] **Step 1: Revert the Task 1 comma fix and observe the failure**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -454,7 +454,7 @@ check-sync: 1 check failed
 exit=1
 ```
 
-- [ ] **Step 2: Restore, and confirm the check goes green again**
+- [x] **Step 2: Restore, and confirm the check goes green again**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -474,7 +474,7 @@ exit=0
 
 and `git status --porcelain` prints **nothing**.
 
-- [ ] **Step 3: Break the `source` format and observe the failure**
+- [x] **Step 3: Break the `source` format and observe the failure**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -506,7 +506,7 @@ exit=1
 
 and `git status --porcelain` prints **nothing** after the restore.
 
-- [ ] **Step 4: Add an unregistered plugin directory and observe the failure**
+- [x] **Step 4: Add an unregistered plugin directory and observe the failure**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -531,7 +531,7 @@ check-sync: 1 check failed
 exit=1
 ```
 
-- [ ] **Step 5: Confirm `claude plugin validate .` is blind to this, then clean up**
+- [x] **Step 5: Confirm `claude plugin validate .` is blind to this, then clean up**
 
 This is the evidence for design Decision 2's claim that Check A is complementary, not redundant.
 
@@ -556,7 +556,7 @@ check exit=0
 
 and `git status --porcelain` prints **nothing**. Verify `plugins/scratch` is gone: `ls plugins/` must list exactly the eight original directories (`address-pr-feedback`, `better-code-review`, `dev-flow`, `dev-flow-worktree`, `justfile`, `react-performance`, `sync-latest-git`, `youtube-upload`).
 
-- [ ] **Step 6: The reverse direction — a marketplace entry with no plugin directory**
+- [x] **Step 6: The reverse direction — a marketplace entry with no plugin directory**
 
 The mirror image of Step 4, and the only Check A direction no other step in this plan covers. `claude plugin validate .` is blind to it as well (verified: exit 0), so this rule has no other enforcement anywhere in the repo.
 
@@ -595,7 +595,7 @@ validate exit=0
 
 and `git status --porcelain` prints **nothing** after the restore. `validate exit=0` is the point: this is a third case where the repo's existing tooling passes a tree that Check A rejects.
 
-- [ ] **Step 7: Commit only if a script fix was needed**
+- [x] **Step 7: Commit only if a script fix was needed**
 
 If Steps 1–6 all matched, there is nothing to commit — `git status --porcelain` is empty and this task ends here. If you had to correct `scripts/check-sync.py`:
 
