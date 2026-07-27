@@ -43,7 +43,7 @@
     {
       "name": "dev-flow-worktree",
       "source": "./plugins/dev-flow-worktree",
-      "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline isolated in a dedicated git worktree, with adversarial review at each artifact boundary"
+      "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline, isolated in a dedicated git worktree, with adversarial review at each artifact boundary"
     }
   ]
 }
