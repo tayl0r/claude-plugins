@@ -1021,7 +1021,7 @@ B = plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md
 >
 > For FAIL steps, the paired structural assertion plus the exit code are the pass/fail signal; the full block documents the expected shape. If real output and this document disagree only inside a `[…]`-elided line, the plan's transcription is the suspect, not the tree — never retype a SKILL.md line or a script message to make it match this document.
 
-- [ ] **Step 1: Undeclared divergence — edit one word in A only (AC 1)**
+- [x] **Step 1: Undeclared divergence — edit one word in A only (AC 1)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1071,7 +1071,7 @@ python3 scripts/check-sync.py | rtk proxy grep -cE '^  line [0-9]+: undeclared d
 
 Expected: `1` and `1`. The second is the load-bearing one: it asserts line 18 is the **only** flagged line. A run that also flagged line 12 — the declared exception — would still satisfy the first grep, and would mean exception matching is broken.
 
-- [ ] **Step 2: Mirror the same edit into B — green again, script untouched (AC 3)**
+- [x] **Step 2: Mirror the same edit into B — green again, script untouched (AC 3)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1100,7 +1100,7 @@ exit=0
 
 The critical part: **`scripts/check-sync.py` is not in that list.** Mirroring an edit correctly costs no change to the checker.
 
-- [ ] **Step 3: Restore both files**
+- [x] **Step 3: Restore both files**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1110,7 +1110,7 @@ git status --porcelain
 
 Expected: **nothing**.
 
-- [ ] **Step 4: Line-count mismatch — two deletions, each must name where the length actually changed (AC 2)**
+- [x] **Step 4: Line-count mismatch — two deletions, each must name where the length actually changed (AC 2)**
 
 This step is **two experiments on the same pair**. Together they prove the line-count scan consults declared exceptions: a scan that ignored them would stop at line 12 — the pair's one declared divergence — and print byte-identical output for both.
 
@@ -1246,7 +1246,7 @@ Expected: **nothing**.
 
 > **What the pair of experiments proves:** both deletions produce the same counts (`81` vs `80`) but **different** reports — line 30 in one, the end-of-file branch naming line 81 in the other. A scan that ignored the declared exception would print "line 12" for both, byte-identically, and the end-of-file branch would be unreachable on this pair. That distinction is the whole point of `declared_at` being the single definition of "declared divergence" (Task 4 Step 4).
 
-- [ ] **Step 5: Trailing newline — strip it from B only, then prove the comparison still continues (AC 6)**
+- [x] **Step 5: Trailing newline — strip it from B only, then prove the comparison still continues (AC 6)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1311,7 +1311,7 @@ git status --porcelain
 
 Expected: **nothing**.
 
-- [ ] **Step 6: Namespacing-only mirrored edit — still green (AC 4)**
+- [x] **Step 6: Namespacing-only mirrored edit — still green (AC 4)**
 
 Append a parenthetical to line 18 of each file, using each variant's own name. After canonicalization the two lines are identical, so this must **not** be flagged.
 
@@ -1345,7 +1345,7 @@ exit=0
 
 and `git status --porcelain` prints **nothing** after the restore.
 
-- [ ] **Step 7: Stale exception — erase the declared divergence (AC 5)**
+- [x] **Step 7: Stale exception — erase the declared divergence (AC 5)**
 
 Copy A's line 12 over B's, making the two files fully identical after canonicalization. The exception no longer describes anything real and must be reported, not silently tolerated.
 
@@ -1407,7 +1407,7 @@ git status --porcelain
 
 Expected: **nothing**.
 
-- [ ] **Step 8: Malformed exception — an entry that can never match**
+- [x] **Step 8: Malformed exception — an entry that can never match**
 
 Design step 6 requires this to be reported as *malformed*, not as *stale*: telling an author staring at two visibly different raw lines that the divergence "no longer appears" would be a lie. Temporarily add a second exception whose two sides are equal after canonicalization.
 
@@ -1474,7 +1474,7 @@ git status --porcelain
 
 Expected: **nothing**.
 
-- [ ] **Step 9: Final cleanliness gate for this task**
+- [x] **Step 9: Final cleanliness gate for this task**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1485,7 +1485,7 @@ echo "exit=$?"
 
 Expected: `git status --porcelain` prints **nothing**, and the check prints the two OK lines with `exit=0`.
 
-- [ ] **Step 10: Commit only if a script fix was needed**
+- [x] **Step 10: Commit only if a script fix was needed**
 
 If Steps 1–9 all matched, there is nothing to commit and this task ends here. If an experiment revealed a defect in `scripts/check-sync.py` and you fixed it:
 
