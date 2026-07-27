@@ -50,7 +50,7 @@ Every task's requirements implicitly include this section.
 | `.claude-plugin/marketplace.json` | The registry. Gains one comma in the `dev-flow-worktree` description so it matches its `plugin.json`. | 1 |
 | `scripts/check-sync.py` | **New.** The whole checker. Check A (derived manifest sync) in Task 2; Check B (`MIRROR_PAIRS`, canonicalization, exceptions) in Task 4. | 2, 4 |
 | `.github/workflows/check-sync.yml` | **New.** The repo's first workflow. One job, one step, `pull_request` + `push: [main]`. | 6 |
-| `CLAUDE.md` | Repo instructions loaded into every session. Gains one bullet in **Changing a plugin**. | 7 |
+| `CLAUDE.md` | Repo instructions loaded into every session. Gains one bullet in **Changing a plugin**, and its opening line's now-false repo description is repaired. | 7 |
 
 No file under `plugins/` is created, modified, or deleted. No file is renamed or removed.
 
@@ -68,7 +68,7 @@ No file under `plugins/` is created, modified, or deleted. No file is renamed or
 
 **Context:** `plugins/dev-flow-worktree/.claude-plugin/plugin.json` says `"... merge pipeline, isolated in a dedicated git worktree, ..."` while `.claude-plugin/marketplace.json` says `"... merge pipeline isolated in a dedicated git worktree, ..."` — one missing comma. CLAUDE.md already requires these to be identical; nothing enforced it. The repair goes on the **marketplace** side (Decision 8): `plugin.json` is the source of truth for Check A rule 4, the `plugin.json` text is the better-punctuated of the two, and editing the plugin side would put a file under `plugins/` in the diff and reopen the version-bump question over a comma.
 
-- [ ] **Step 1: Confirm the drift is still present**
+- [x] **Step 1: Confirm the drift is still present**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -87,7 +87,7 @@ Expected output:
 equal: False
 ```
 
-- [ ] **Step 2: Add the missing comma in `.claude-plugin/marketplace.json`**
+- [x] **Step 2: Add the missing comma in `.claude-plugin/marketplace.json`**
 
 Find this line (line 46, inside the `dev-flow-worktree` entry):
 
@@ -103,7 +103,7 @@ Replace it with (one comma added after `pipeline`):
 
 Change nothing else in the file — not whitespace, not key order, not any other entry.
 
-- [ ] **Step 3: Verify the two descriptions now match, and that only this file changed**
+- [x] **Step 3: Verify the two descriptions now match, and that only this file changed**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -126,7 +126,7 @@ equal: True
 
 Exactly one modified file. If `plugins/...` appears, you edited the wrong side — revert and redo.
 
-- [ ] **Step 4: Verify the marketplace still validates**
+- [x] **Step 4: Verify the marketplace still validates**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -136,7 +136,7 @@ echo "exit=$?"
 
 Expected: `exit=0`. Eight missing-author warnings are expected and are not failures.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
