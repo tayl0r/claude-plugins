@@ -1,11 +1,12 @@
 # claude-plugins
 
-A Claude Code plugin marketplace. `.claude-plugin/marketplace.json` is the registry; each plugin lives at `plugins/<name>/` with `.claude-plugin/plugin.json` plus some of `skills/<skill>/SKILL.md`, `agents/`, `scripts/`. Markdown and one Python script — no build, test, or lint tooling.
+A Claude Code plugin marketplace. `.claude-plugin/marketplace.json` is the registry; each plugin lives at `plugins/<name>/` with `.claude-plugin/plugin.json` plus some of `skills/<skill>/SKILL.md`, `agents/`, `scripts/`. Markdown plus a couple of Python scripts — no build, test, or lint tooling beyond `scripts/check-sync.py`.
 
 ## Changing a plugin
 
 - **Bump `version` in `plugins/<name>/.claude-plugin/plugin.json` on any behavior change.** The install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so an edit at an unchanged version is never picked up on re-sync.
 - **New plugin: add an entry to `.claude-plugin/marketplace.json`** with `"source": "./plugins/<name>"` — the leading `./` is required. `description` is duplicated in both manifests; keep them in sync.
+- **Some files are mirrored across `dev-flow` and `dev-flow-worktree` and must be edited in both.** `python3 scripts/check-sync.py` enforces what can be enforced mechanically — the `adversarial-review/SKILL.md` pair (line-for-line identical after `dev-flow-worktree` → `dev-flow`, minus declared exceptions) and the `description` duplicated between each `plugin.json` and `.claude-plugin/marketplace.json`. It runs on every PR. The pipeline `SKILL.md` pair and the two `README.md`s are too divergent to check mechanically — mirror those by hand.
 - Validate before committing: `claude plugin validate .` — checks the marketplace and every entry. The 8 missing-author warnings are expected.
 - Load local edits: `claude plugin marketplace update taylor-plugins`, then restart.
 
