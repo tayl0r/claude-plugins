@@ -153,7 +153,7 @@ No other place in the file was shortened to pay for this: at 0.18%, there is not
 
 ## Exact change list
 
-Five files. Every wording below is literal.
+Six files. Every wording below is literal.
 
 ### 1 & 2. `plugins/dev-flow/skills/adversarial-review/SKILL.md` and `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`
 
@@ -254,6 +254,33 @@ Replace the whole of `CLAUDE.md` line 9 — the mirroring bullet, including the 
 
 `CLAUDE.md` stays at **29 lines** — this is a one-line replacement, not an append. `check-sync.py` never reads this file (it names it only in error strings), and no plugin ships it, so the rule costs no invocation context. A generic runner is deliberately not built: the block-to-file mapping and the shape assertion differ per change (`gh-10`: eight one-line blocks; this change: `[1, 1, 1, 2, 2, 1]`), so factoring it out would need a machine-readable annotation schema on every design doc, which two instances do not justify.
 
+### 6. `CONTEXT.md` — the glossary entries this change makes true
+
+The repo glossary (`CONTEXT.md`, added after this design was drafted) defines the review protocol's vocabulary. Three of its entries belong to this change and cannot land before it: **seam placement** is not one of the diff quality seed's lenses until §1 & 2 ship it, and **trigger** and **reportability rule** name a gating shape that exists nowhere in the protocol today — nothing on `main` gates a check on a precondition at all.
+
+Those entries were briefly written into `CONTEXT.md` ahead of the behaviour and then removed, because `docs/agents/domain.md` has every skill read the glossary before exploring: an agent would have gone looking for a fifth angle that isn't there. **The glossary changes with the thing it defines**, which is why the entries live here rather than in a follow-up — the same reasoning that put the version bumps in this change instead of after it.
+
+Replace the six-line region beginning `**Angle**:` and ending with the blank line before `**Design rubric**:` with:
+
+```
+**Angle**:
+One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement.
+
+**Pass**:
+A named, self-contained check a seed runs over an artifact, carrying its own trigger and stopping conditions. An angle is a lens *within* a seed's list; a pass is a whole check.
+
+**Trigger**:
+The precondition deciding whether a pass or angle applies to a given artifact at all. A check without one runs on everything and manufactures false positives.
+
+**Reportability rule**:
+The bar a candidate finding must clear before a seed may state it. Where a trigger narrows *which artifacts get asked*, a reportability rule narrows *what may be said*.
+
+```
+
+`CONTEXT.md` goes from 61 to 67 lines. It ships into no plugin and `check-sync.py` never reads it.
+
+**A collision this change must not repeat.** `Trigger` above is a second sense of a word already in shipped prose: every plugin's `SKILL.md` frontmatter uses "Triggers on …" for the phrases that *invoke* a skill. The glossary entry is scoped to the gating sense deliberately, and neither new pass uses the bare word in shipped prose — both say "applies only …" instead. That collision, found in the very glossary built to catch collisions, is filed as its own issue.
+
 ### Blast radius — verified complete
 
 A repo-wide search of tracked files outside `docs/superpowers/` for `seed pass`, `four angles`, `simplify`, `prose-integrity`, and `correctness seed` returns hits **only** in the two `adversarial-review/SKILL.md` copies. Specifically confirmed to need no edit:
@@ -261,7 +288,7 @@ A repo-wide search of tracked files outside `docs/superpowers/` for `seed pass`,
 - **Both pipeline `SKILL.md` copies** (`plugins/dev-flow/skills/dev-flow/SKILL.md`, `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`). They invoke the review by mode and delegate seed content entirely; neither enumerates or describes a seed pass. This is what keeps the hand-mirrored pair out of the change (see Verification).
 - **Both `README.md` files** — zero hits for `seed`, `angle`, `rubric`, or `checklist`.
 - **`.claude-plugin/marketplace.json`** — no `description` changes anywhere, and Check A does not read `version`.
-- **`scripts/check-sync.py`**, `.github/workflows/`, `docs/agents/*.md` — untouched. **`CLAUDE.md`** has one line replaced (§5 above) and nothing else, staying at 29 lines; it is repo-local contributor guidance, ships into no plugin, and `check-sync.py` never reads it (it names the file only in error strings).
+- **`scripts/check-sync.py`**, `.github/workflows/`, `docs/agents/*.md` — untouched. **`CLAUDE.md`** has one line replaced (§5 above) and nothing else, staying at 29 lines; it is repo-local contributor guidance, ships into no plugin, and `check-sync.py` never reads it (it names the file only in error strings). **`CONTEXT.md`** has its `Angle`/`Pass` region replaced (§6 above), 61 → 67 lines; same properties — repo-local, ships nowhere, unread by `check-sync.py`.
 - **`plugins/better-code-review/`** — exists in this repo but is referenced nowhere by dev-flow (the diff correctness seed pins the *superpowers* `requesting-code-review/code-reviewer.md`), and the issue assigns its backstop to #37 regardless. Out of scope.
 
 ## Sync constraint — how `check-sync.py` still passes
@@ -312,10 +339,10 @@ Run every step from the repo root; all must pass.
 3. **Residue grep — the two in-place edits left no old text behind:**
 
    ```sh
-   git grep -nF -e 'four angles, inlined (below)' -e 'untestable success criteria. |' -e '(verbatim):**' -- ':!docs/superpowers'
+   git grep -nF -e 'four angles, inlined (below)' -e 'untestable success criteria. |' -e '(verbatim):**' -e 'A named check a seed runs over an artifact' -- ':!docs/superpowers'
    ```
 
-   Expect **no output** (exit 1). Each of the three in-place replacements removes exactly one of these substrings — two table cells and the angles-block header. `check-sync.py` cannot cover this: it compares the two copies *to each other*, so an edit missed on **both** sides leaves them identical and passes clean. Only a residue grep sees that. `-F` is deliberate — the patterns contain `(`, `)`, and `|`, and a fixed-string match avoids regex interpretation. The pathspec excludes the immutable historical specs and plans; `git grep` reads tracked files only, so the git-ignored `.superpowers/` scratch is excluded automatically.
+   Expect **no output** (exit 1). Each of the four in-place replacements removes exactly one of these substrings — two table cells, the angles-block header, and the `Pass` entry in `CONTEXT.md`. `check-sync.py` cannot cover this: it compares the two copies *to each other*, so an edit missed on **both** sides leaves them identical and passes clean. Only a residue grep sees that. `-F` is deliberate — the patterns contain `(`, `)`, and `|`, and a fixed-string match avoids regex interpretation. The pathspec excludes the immutable historical specs and plans; `git grep` reads tracked files only, so the git-ignored `.superpowers/` scratch is excluded automatically.
 
 4. **Presence grep — the two insertions landed in both copies:**
 
@@ -353,7 +380,7 @@ for line in Path(DESIGN).read_text(encoding="utf-8").split("\n"):
         mode, cur = None, None
     else:
         cur.append(line)
-assert [len(b) for b in blocks] == [1, 1, 1, 2, 2, 1], "design code-block shape changed; stop and re-read the design"
+assert [len(b) for b in blocks] == [1, 1, 1, 2, 2, 1, 12], "design code-block shape changed; stop and re-read the design"
 PAIR = ["plugins/dev-flow/skills/adversarial-review/SKILL.md",
         "plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md"]
 SPEC = [("line 28, diff row",     blocks[0], None,                  PAIR),
@@ -361,7 +388,8 @@ SPEC = [("line 28, diff row",     blocks[0], None,                  PAIR),
         ("line 34, block header", blocks[2], None,                  PAIR),
         ("fifth angle",           blocks[3], "- **Altitude:**",     PAIR),
         ("input-contract pass",   blocks[4], "**Pinned template",   PAIR),
-        ("CLAUDE.md rule",        blocks[5], None,                  ["CLAUDE.md"])]
+        ("CLAUDE.md rule",        blocks[5], None,                  ["CLAUDE.md"]),
+        ("CONTEXT.md glossary",   blocks[6], None,                  ["CONTEXT.md"])]
 bad = []
 for name, want, anchor, targets in SPEC:
     for path in targets:
