@@ -1701,7 +1701,7 @@ git commit -m "CLAUDE.md: document the mirrored files and the check-sync command
 
 > **Constraint reminder:** `probe/` is a throwaway directory at the repo root, deleted in Step 3. Nothing from this task is committed.
 
-- [ ] **Step 1: Enroll a second pair with a single `MIRROR_PAIRS` edit**
+- [x] **Step 1: Enroll a second pair with a single `MIRROR_PAIRS` edit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1757,7 +1757,7 @@ check-sync: 1 check failed
 exit=1
 ```
 
-- [ ] **Step 2: Confirm a missing declared path fails the pair that needed it, not the process**
+- [x] **Step 2: Confirm a missing declared path fails the pair that needed it, not the process**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1775,7 +1775,7 @@ python3 scripts/check-sync.py | rtk proxy grep -c 'cannot read B: \[Errno 2\] No
 
 Expected: `1`.
 
-- [ ] **Step 3: Remove the probe and verify the tree is clean**
+- [x] **Step 3: Remove the probe and verify the tree is clean**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1786,7 +1786,7 @@ git status --porcelain
 
 Expected: **nothing**. If `?? probe/` or ` M scripts/check-sync.py` prints, clean up before continuing.
 
-- [ ] **Step 4: Full green run, offline, with no install step (AC 9)**
+- [x] **Step 4: Full green run, offline, with no install step (AC 9)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1817,7 +1817,7 @@ ls requirements.txt pyproject.toml setup.py 2>&1 | rtk proxy grep -c 'No such fi
 
 Expected: `3`.
 
-- [ ] **Step 5: Confirm no file under `plugins/` was touched (AC 13)**
+- [x] **Step 5: Confirm no file under `plugins/` was touched (AC 13)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1838,7 +1838,7 @@ scripts/check-sync.py
 
 The two `docs/superpowers/` entries are this plan and its design doc, and are expected. Anything under `plugins/` is a scope violation — investigate before proceeding.
 
-- [ ] **Step 6: Confirm no version was bumped (design Decision 8)**
+- [x] **Step 6: Confirm no version was bumped (design Decision 8)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1847,7 +1847,7 @@ git diff --name-only main...HEAD -- '*plugin.json' | rtk proxy grep -c .
 
 Expected: `0` — no `plugin.json` appears in the branch diff at all, so no `version` line can have changed. (`grep -c .` counts non-empty lines; `0` means the diff listed no such file.)
 
-- [ ] **Step 7: Confirm the marketplace still validates**
+- [x] **Step 7: Confirm the marketplace still validates**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -1857,7 +1857,7 @@ echo "exit=$?"
 
 Expected: `exit=0`, with the eight expected missing-author warnings.
 
-- [ ] **Step 8: Final cleanliness gate**
+- [x] **Step 8: Final cleanliness gate**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
