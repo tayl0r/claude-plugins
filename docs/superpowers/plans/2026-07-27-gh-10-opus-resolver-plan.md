@@ -559,7 +559,7 @@ git commit -m "CLAUDE.md: require a residue grep for hand-mirrored edits"
 
 Run every step from the repo root. **All of them must pass before the change is considered done.** Steps 1–5 are the design's §Verification steps, reproduced in order; Step 4b is this plan's own design-conformance check, and Step 6 its scope check. If any step fails, fix the cause in the owning task's files and re-run **all of them** from the top — a fix for one can break another.
 
-- [ ] **Step 1: Mirror and manifest sync**
+- [x] **Step 1: Mirror and manifest sync**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -576,7 +576,7 @@ check-sync: all checks passed
 
 Exit 0. The `81 lines` figure is the same as before the change and is what confirms no line was added or removed in either mirror-pair copy.
 
-- [ ] **Step 2: Marketplace validation**
+- [x] **Step 2: Marketplace validation**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -585,7 +585,7 @@ claude plugin validate .
 
 Expected: success. **8 missing-author warnings are expected and are NOT a failure.** Any error, or a non-zero exit, is.
 
-- [ ] **Step 3: No stale `fable` resolver references survive outside `docs/`**
+- [x] **Step 3: No stale `fable` resolver references survive outside `docs/`**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -595,7 +595,7 @@ echo "exit=$?"
 
 Expected: **no output**, `exit=1`. `git grep` searches tracked files only, so the git-ignored `.superpowers/` scratch tree is excluded automatically; the pathspec excludes the immutable historical specs and plans, which contain `fable` references that are correct as history and must not be edited. **Do not rewrite this as `-E '\bfable\b'`** — `\b` is not honored by git's regex engine here and the command silently matches nothing, which would look like a pass no matter what the tree contains.
 
-- [ ] **Step 4: No one-sided pipeline-pair edit survives**
+- [x] **Step 4: No one-sided pipeline-pair edit survives**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -605,7 +605,7 @@ echo "exit=$?"
 
 Expected: **no output**, `exit=1`. Each of the three hand-mirrored pipeline edits removes one of these phrases; after the change they appear nowhere in tracked files outside the immutable history. Any hit is an unedited side of the pipeline pair — this is the backstop `check-sync.py` structurally cannot provide for that pair. Like step 3, it detects leftover old text, not a botched replacement.
 
-- [ ] **Step 4b: Design-conformance — every replacement landed byte-for-byte in all seven files**
+- [x] **Step 4b: Design-conformance — every replacement landed byte-for-byte in all seven files**
 
 Steps 3 and 4 detect leftover old text; this detects a botched replacement — including the same character mangled identically in both copies of a pair, which every other check in this plan passes. Expected text is read from the design file on disk, never retyped. Copy the script exactly; it is deliberately pure ASCII.
 
@@ -660,7 +660,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (all seven files): OK`, `exit=0`. A `MISMATCH` names the edit and file; fix it in the owning task (Task 1: edits A–E; Task 2: edits F–H; Task 4: the `CLAUDE.md` sentence), then re-run all steps from the top.
 
-- [ ] **Step 5: Spot-check the two version strings**
+- [x] **Step 5: Spot-check the two version strings**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -669,7 +669,7 @@ rtk proxy grep -n '"version"' plugins/dev-flow/.claude-plugin/plugin.json plugin
 
 Expected: `2.3.0` for `plugins/dev-flow` and `1.5.0` for `plugins/dev-flow-worktree`.
 
-- [ ] **Step 6: Confirm the final diff touches exactly seven files and nothing else**
+- [x] **Step 6: Confirm the final diff touches exactly seven files and nothing else**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
