@@ -74,7 +74,7 @@ No file is created, renamed, or deleted.
 
 **Read `§1 & 2` and `§6` of the design before starting.** The two `SKILL.md` files are a declared `check-sync.py` mirror pair: line-for-line identical after substituting `dev-flow-worktree` → `dev-flow`, except one declared exception at line 12 (the `working-dir` bullet), which is above every edit here and untouched.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -84,7 +84,7 @@ wc -l plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-flow-workt
 
 Expected: `check-sync: all checks passed` with `mirror pair "adversarial-review" ... OK (81 lines, 1 declared exception)`; `81`, `81`, and `61` for the three files respectively. If any of that differs, stop — the tree is not the state this plan was written against.
 
-- [ ] **Step 2: Edit A — Seed passes table, `diff` row (line 28 in both `SKILL.md` files)**
+- [x] **Step 2: Edit A — Seed passes table, `diff` row (line 28 in both `SKILL.md` files)**
 
 Locate:
 
@@ -101,7 +101,7 @@ Expected: one hit per file, at line 28. Replace that entire line, **identically 
 
 Only the quality (second) cell changes; the correctness (third) cell is untouched.
 
-- [ ] **Step 3: Edit B — Seed passes table, `design` row (line 29 in both `SKILL.md` files)**
+- [x] **Step 3: Edit B — Seed passes table, `design` row (line 29 in both `SKILL.md` files)**
 
 Locate:
 
@@ -118,7 +118,7 @@ Expected: one hit per file, at line 29. Replace that entire line, **identically 
 
 Only the correctness (third) cell changes. **Do not touch the `plan` row (line 30)** — its "The prose checklist above" reference already carries this addition, per the design.
 
-- [ ] **Step 4: Edit C — the angles-block header (line 34 in both `SKILL.md` files)**
+- [x] **Step 4: Edit C — the angles-block header (line 34 in both `SKILL.md` files)**
 
 Locate:
 
@@ -135,7 +135,7 @@ Expected: one hit per file, at line 34. Replace that entire line, **identically 
 
 Do not touch line 32 or the four bullets themselves (lines 35–38) — the verbatim-transcription claim binds their content, not this header.
 
-- [ ] **Step 5: Edit D — insert the fifth angle after the `Altitude` bullet (currently line 38 in both `SKILL.md` files)**
+- [x] **Step 5: Edit D — insert the fifth angle after the `Altitude` bullet (currently line 38 in both `SKILL.md` files)**
 
 Locate:
 
@@ -157,7 +157,7 @@ Leave that line itself unchanged. Immediately **after** it, insert exactly two n
 **Seam placement:** applies only where the diff adds a construct that cannot be defined without naming another construct plus a qualifier: a near-copy of an existing type with fields loosened, a `raw`/`validated` variant of one concept, a converter between two shapes of one concept, a flag telling a callee which state its input is in, a newly required call ordering. Each spans a transformation, so "is it necessary as things stand?" is the wrong question — the answer is nearly always yes. Ask instead where the diff performs that transformation, and whether performing it at one *specific* other place deletes the construct outright. Then apply the deletion test to what you propose deleting: if the construct is what keeps a wire, stored, or versioned contract decoupled from the domain type, that reason survives the transformation moving and there is no finding; likewise if the diff already performs the transformation at the place you would move it to. Report only when you can name the place, the deletion, and that nothing reappears in the construct's stead — this angle proposes removals, never a restructuring whose payoff is a nicer structure.
 ```
 
-- [ ] **Step 6: Edit E — insert the input-contract pass after the `Pinned template` paragraph (currently line 40 in both `SKILL.md` files)**
+- [x] **Step 6: Edit E — insert the input-contract pass after the `Pinned template` paragraph (currently line 40 in both `SKILL.md` files)**
 
 Locate:
 
@@ -173,7 +173,7 @@ Expected: one hit per file, at line 40 — or at line 42 in **both** copies if S
 **Input-contract completeness — the design *and* plan correctness seed:** applies only to fields the artifact newly accepts from outside the code it describes (an operator, an API client, a file, an upstream service). For each, report the gap between what its declared type permits and what the artifact says the domain allows — empty string, negative, fractional, out of range, `NaN`, duplicate within a collection, absent optional — and what each downstream consumer the artifact names does with a degenerate value. A blanket "validate minimally" or "the type is enough" is the claim this pass tests, per field, never an exemption from it. Findings only: which gaps are worth guarding is the resolvers' call.
 ```
 
-- [ ] **Step 7: Verify — both `SKILL.md` copies are 85 lines and the mirror check passes**
+- [x] **Step 7: Verify — both `SKILL.md` copies are 85 lines and the mirror check passes**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -191,7 +191,7 @@ check-sync: all checks passed
 
 Exit 0. **`85 lines, 1 declared exception` is load-bearing** — a different count is the assertion that an insertion was asymmetric, or a replacement added/removed a line. An undeclared-divergence failure naming a line means that edit landed on one side only — go apply it to the other.
 
-- [ ] **Step 8: Edit F — replace `CONTEXT.md`'s `Angle`/`Pass` region (currently lines 29–34)**
+- [x] **Step 8: Edit F — replace `CONTEXT.md`'s `Angle`/`Pass` region (currently lines 29–34)**
 
 Locate:
 
@@ -230,7 +230,7 @@ The bar a candidate finding must clear before a seed may state it. Where a trigg
 
 Do not touch anything above `**Angle**:` or at/after `**Design rubric**:`.
 
-- [ ] **Step 9: Verify — `CONTEXT.md` is 67 lines**
+- [x] **Step 9: Verify — `CONTEXT.md` is 67 lines**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -239,7 +239,7 @@ wc -l CONTEXT.md
 
 Expected: `67` — 61 pre-change, minus the 6-line region, plus the 12-line block. A different count is the whole signal: `73` means the block was appended instead of replacing the region, `55` means the region was removed without its replacement. Deliberately **no `git diff --numstat` assertion here** — `--numstat` reports git's minimal edit script over the final content, not the region swap, and because `**Angle**:`, `**Pass**:` and the blank lines recur verbatim in both the old and the new text, git matches them as unchanged context: a correctly-applied edit reports `8  2`, never `12  6`. What proves the replacement landed exactly is Step 10 (the old `Pass` sentence is absent) and Step 12 (the 12-line block matches the design byte-for-byte, exactly once).
 
-- [ ] **Step 10: Verify — scoped residue grep (old text is gone from the three files this task touches)**
+- [x] **Step 10: Verify — scoped residue grep (old text is gone from the three files this task touches)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -249,7 +249,7 @@ echo "exit=$?"
 
 Expected: **no output**, `exit=1`. This is a scoped preview of the design's full §Verification step 3 — restricted to the files this task touches, since `CLAUDE.md`'s old phrase (the fifth pattern in the design's full grep) is still present until Task 3. Any hit here means one of Edits A–C or F was not applied, or was applied as an append rather than a replacement.
 
-- [ ] **Step 11: Verify — scoped presence grep (new text landed in both copies, and in `CONTEXT.md`)**
+- [x] **Step 11: Verify — scoped presence grep (new text landed in both copies, and in `CONTEXT.md`)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -259,7 +259,7 @@ git grep -nF -e '**Trigger**:' -e '**Reportability rule**:' -e 'seam placement' 
 
 Expected: the first command prints **exactly six lines** (each of the three phrases once per `SKILL.md` copy); the second prints **exactly three lines** (once each). Fewer lines means an insertion landed in only one copy, or is missing from `CONTEXT.md`.
 
-- [ ] **Step 12: Verify — design-conformance subset (blocks this task owns match the design byte-for-byte, in the right place)**
+- [x] **Step 12: Verify — design-conformance subset (blocks this task owns match the design byte-for-byte, in the right place)**
 
 This is the check that catches what line counts and greps cannot: the same word mangled identically in both mirror copies, or the fifth angle inserted *inside* the four-bullet block instead of after it. It reads the expected text from the design file on disk, never retyped. This is a task-scoped subset of the design's own §Verification step 6 script (it omits the `CLAUDE.md` block, which Task 3 has not landed yet) — Task 4 runs the complete, unmodified script. Copy this exactly; it is deliberately pure ASCII, so a mistyped copy fails loudly instead of passing.
 
@@ -310,7 +310,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (task 1 subset): OK`, `exit=0`. A `MISMATCH` line names the block and file to re-paste from the design's `§Exact change list`, then re-run Steps 7–12.
 
-- [ ] **Step 13: Verify — exactly these three files are modified, nothing else**
+- [x] **Step 13: Verify — exactly these three files are modified, nothing else**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -319,7 +319,7 @@ git status --porcelain
 
 Expected: exactly `plugins/dev-flow/skills/adversarial-review/SKILL.md`, `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`, and `CONTEXT.md` shown as modified (plus, possibly, this plan's own checkbox commits if using subagent-driven-development's per-file progress tracking — no other content file).
 
-- [ ] **Step 14: Commit — all three files together, in one commit**
+- [x] **Step 14: Commit — all three files together, in one commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
