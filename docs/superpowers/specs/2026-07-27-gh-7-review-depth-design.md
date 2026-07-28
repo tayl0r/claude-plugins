@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-7-review-depth
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
