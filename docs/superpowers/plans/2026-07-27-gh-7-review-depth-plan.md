@@ -514,7 +514,7 @@ Run every step from the repo root. **All of them must pass.**
 
 Steps 1–6 are the design's §Verification steps; Step 7 is this plan's scope check. **Copy every command exactly as written below, character for character.** The assertions are the design's; the one place a command's text departs from the design is Step 5, which carries the `rtk proxy` prefix this plan's Global Constraints require and says so in place. Do not substitute a variant of your own.
 
-- [ ] **Step 1: Mirror and manifest sync**
+- [x] **Step 1: Mirror and manifest sync**
 
 ```sh
 python3 scripts/check-sync.py
@@ -522,7 +522,7 @@ python3 scripts/check-sync.py
 
 Expected: `check-sync: all checks passed`, with the mirror pair reporting **`85 lines, 1 declared exception`**.
 
-- [ ] **Step 2: Marketplace validation**
+- [x] **Step 2: Marketplace validation**
 
 ```sh
 claude plugin validate .
@@ -530,7 +530,7 @@ claude plugin validate .
 
 Expected: success. **8 missing-author warnings are expected** and are not a failure.
 
-- [ ] **Step 3: Residue grep — the two in-place edits left no old text behind**
+- [x] **Step 3: Residue grep — the two in-place edits left no old text behind**
 
 ```sh
 git grep -nF -e 'four angles, inlined (below)' -e 'untestable success criteria. |' -e '(verbatim):**' -e 'A named check a seed runs over an artifact' -e 'For any hand-mirrored edit' -- ':!docs/superpowers'
@@ -538,7 +538,7 @@ git grep -nF -e 'four angles, inlined (below)' -e 'untestable success criteria. 
 
 Expect **no output** (exit 1).
 
-- [ ] **Step 4: Presence grep — the two insertions landed in both copies**
+- [x] **Step 4: Presence grep — the two insertions landed in both copies**
 
 ```sh
 git grep -nF -e '**Seam placement:**' -e 'all five apply' -e 'Input-contract completeness' -- ':!docs/superpowers'
@@ -546,7 +546,7 @@ git grep -nF -e '**Seam placement:**' -e 'all five apply' -e 'Input-contract com
 
 Expect **exactly six lines**: each phrase once in `plugins/dev-flow/skills/adversarial-review/SKILL.md` and once in `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`.
 
-- [ ] **Step 5: Version spot-check**
+- [x] **Step 5: Version spot-check**
 
 ```sh
 rtk proxy grep -n '"version"' plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
@@ -556,7 +556,7 @@ Expect exactly two lines: `plugins/dev-flow/.claude-plugin/plugin.json` showing 
 
 **The `rtk proxy` prefix is this plan's one deliberate departure from the design's command text**, per Global Constraints. The design's §Verification step 5 writes the bare `grep` and never mentions this environment's shell hook; run in this checkout, the bare form prints one of the two paths as `plugins/.../.claude-plugin/plugin.json`, eliding the very segment that tells the plugins apart — so a swapped version pair reads as a pass. The assertion is the design's; only the invocation changes. **Do not run the bare form.**
 
-- [ ] **Step 6: Design conformance — every block landed verbatim, in the right place**
+- [x] **Step 6: Design conformance — every block landed verbatim, in the right place**
 
 This is the complete, unmodified script from the design's §Verification step 6 — the load-bearing check that Tasks 1 and 3's subset scripts stood in for. It is the only step that catches a word mangled identically in both mirror copies, an edit applied to one file but skipped in another, or the fifth angle inserted inside the four-bullet block instead of after it. Copy it exactly; it is deliberately pure ASCII, and the fence is deliberately unindented — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -607,7 +607,7 @@ echo "exit=$?"
 
 Expected: exactly `design-conformance: OK` and `exit=0`. A `MISMATCH` line names the block and file whose text or position differs — re-paste that block from the design's `§Exact change list` and re-run from Step 1.
 
-- [ ] **Step 7: Scope check — the final diff touches exactly six files and nothing else**
+- [x] **Step 7: Scope check — the final diff touches exactly six files and nothing else**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
