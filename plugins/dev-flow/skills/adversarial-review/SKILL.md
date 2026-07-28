@@ -25,19 +25,23 @@ Every mode runs the same two-seed shape: a **quality seed** and a **correctness 
 
 | Mode | Quality seed | Correctness seed |
 |---|---|---|
-| **diff** | `/simplify`'s four angles, inlined (below), findings-only, run against `BASE..HEAD`. | The superpowers `code-reviewer.md` template, used as designed (already read-only/findings-only) — see "Pinned template," below. |
-| **design** | The design rubric (below) *is* the lens, applied adversarially to the proposed approach. | A prose-integrity checklist: placeholders/TBDs, internal contradictions, planning-blocking ambiguity, unstated assumptions, missing or untestable success criteria. |
+| **diff** | `/simplify`'s four angles plus this skill's seam-placement angle, inlined (below), findings-only, run against `BASE..HEAD`. | The superpowers `code-reviewer.md` template, used as designed (already read-only/findings-only) — see "Pinned template," below. |
+| **design** | The design rubric (below) *is* the lens, applied adversarially to the proposed approach. | A prose-integrity checklist: placeholders/TBDs, internal contradictions, planning-blocking ambiguity, unstated assumptions, missing or untestable success criteria — plus the input-contract completeness pass (below). |
 | **plan** | The rubric applied to the plan's approach *and* to any embedded code sketches. | The prose checklist above, plus plan-specific checks: task ordering/dependencies, whether each task is executable by a fresh context-free subagent, per-task verification steps, and drift from the design doc. |
 
 Do NOT invoke the `/simplify` skill for the diff-mode quality seed. `/simplify` applies fixes and re-derives its own scope, which breaks both findings-only and the model policy (its agents are not pinned to the seed-reviewer model). It is a harness built-in with no readable file to point a subagent at, so its four angles are transcribed verbatim below instead.
 
-**The four `/simplify` angles (verbatim):**
+**The four `/simplify` angles (verbatim), then a fifth of this skill's own — all five apply:**
 - **Reuse:** does this duplicate an existing utility/abstraction it could call instead? Consolidate the duplication.
 - **Simplification:** can the same behavior be expressed more simply — fewer branches, less indirection, dead code removed, clearer control flow?
 - **Efficiency:** needless work — redundant calls, repeated computation, avoidable queries/allocations, N+1 patterns.
 - **Altitude:** is the change at the right level of abstraction — not hand-rolling what a higher-level seam already handles, not over-abstracting a one-off? Put the logic at the right layer.
 
+**Seam placement:** applies only where the diff adds a construct that cannot be defined without naming another construct plus a qualifier: a near-copy of an existing type with fields loosened, a `raw`/`validated` variant of one concept, a converter between two shapes of one concept, a flag telling a callee which state its input is in, a newly required call ordering. Each spans a transformation, so "is it necessary as things stand?" is the wrong question — the answer is nearly always yes. Ask instead where the diff performs that transformation, and whether performing it at one *specific* other place deletes the construct outright. Then apply the deletion test to what you propose deleting: if the construct is what keeps a wire, stored, or versioned contract decoupled from the domain type, that reason survives the transformation moving and there is no finding; likewise if the diff already performs the transformation at the place you would move it to. Report only when you can name the place, the deletion, and that nothing reappears in the construct's stead — this angle proposes removals, never a restructuring whose payoff is a nicer structure.
+
 **Pinned template for diff / correctness:** use the `code-reviewer.md` found in the superpowers **`requesting-code-review`** skill directory (`.../skills/requesting-code-review/code-reviewer.md`) — it is already read-only/findings-only as designed. Do NOT use any other `code-reviewer.md` (there are others under `feature-dev`, `pr-review-toolkit`, and older superpowers layouts — those are agent templates for a different purpose). Fill its placeholders (`[DESCRIPTION]`, `[PLAN_OR_REQUIREMENTS]`, `[BASE_SHA]`, `[HEAD_SHA]`) from the PR summary, the plan path, and the branch `BASE`/`HEAD`.
+
+**Input-contract completeness — the design *and* plan correctness seed:** applies only to fields the artifact newly accepts from outside the code it describes (an operator, an API client, a file, an upstream service). For each, report the gap between what its declared type permits and what the artifact says the domain allows — empty string, negative, fractional, out of range, `NaN`, duplicate within a collection, absent optional — and what each downstream consumer the artifact names does with a degenerate value. A blanket "validate minimally" or "the type is enough" is the claim this pass tests, per field, never an exemption from it. Findings only: which gaps are worth guarding is the resolvers' call.
 
 ## The design rubric
 
