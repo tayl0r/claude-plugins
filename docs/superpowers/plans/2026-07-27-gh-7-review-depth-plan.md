@@ -412,7 +412,7 @@ git commit -m "dev-flow 2.4.0, dev-flow-worktree 1.6.0"
 
 **This is a line REPLACEMENT, not an append.** Appending the new rule after the old sentence would leave both the superseded residue-grep sentence and the new rule in the file — passing `check-sync.py` (which never reads `CLAUDE.md`) and passing Task 4's presence grep (which only checks the new text is *present*, not that the old text is *absent*). Only the residue grep in Step 3 below (and the design's own §Verification step 3) catches an append-instead-of-replace mistake here.
 
-- [ ] **Step 1: Locate and replace line 9**
+- [x] **Step 1: Locate and replace line 9**
 
 Locate:
 
@@ -433,7 +433,7 @@ Replace that **entire line** (the whole bullet, all one physical line) with:
 - **Some files are mirrored across `dev-flow` and `dev-flow-worktree` and must be edited in both.** `python3 scripts/check-sync.py` enforces what can be enforced mechanically — the `adversarial-review/SKILL.md` pair (line-for-line identical after `dev-flow-worktree` → `dev-flow`, minus declared exceptions) and the `description` duplicated between each `plugin.json` and `.claude-plugin/marketplace.json`. It runs on every PR. The pipeline `SKILL.md` pair and the two `README.md`s are too divergent to check mechanically — mirror those by hand. **`check-sync.py` proves the two copies agree with each other, never that either is correct**: text mangled identically in both sides passes it, and so does an edit missed on both. So any change to a mirrored pair, machine-checked or hand-mirrored, must also verify against something *outside* the pair. **Always:** grep for the exact phrases the edit removes, expecting no hits. **When the change has a design doc** that gives replacement or inserted text as fenced blocks: also add a short `python3` check that re-reads those blocks from the design on disk, never retyped, asserting each appears verbatim in its target and, for an insertion, directly after its anchor line. Write that check per change — the block-to-file mapping differs every time, so there is no shared runner to call.
 ```
 
-- [ ] **Step 2: Verify — line count unchanged, exactly one line changed**
+- [x] **Step 2: Verify — line count unchanged, exactly one line changed**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -443,7 +443,7 @@ git diff --numstat -- CLAUDE.md
 
 Expected: `29` (unchanged — this is a replacement, not an append), and `--numstat` showing exactly `1 1 CLAUDE.md`. `1 0` (pure addition, no removal) means the old sentence was appended to rather than replaced — undo and redo Step 1.
 
-- [ ] **Step 3: Verify — old residue sentence is gone, new rule is present**
+- [x] **Step 3: Verify — old residue sentence is gone, new rule is present**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -454,7 +454,7 @@ git grep -nF 'proves the two copies agree with each other' -- CLAUDE.md
 
 Expected: the first command produces **no output**, `exit=1` — the old sentence `gh-10` appended is gone. The second produces **exactly one line** — the new rule's opening clause is present. This residue check is the load-bearing one the design calls out by name: it is the *only* check in this entire change (scoped or full) that would catch an append-instead-of-replace mistake here, because `check-sync.py` never reads `CLAUDE.md` and a presence-only grep can't tell an append from a replacement.
 
-- [ ] **Step 4: Verify — design-conformance subset (the `CLAUDE.md` block matches the design byte-for-byte)**
+- [x] **Step 4: Verify — design-conformance subset (the `CLAUDE.md` block matches the design byte-for-byte)**
 
 This is a task-scoped subset of the design's own §Verification step 6 script — it checks only the `CLAUDE.md` block, since Task 1's blocks are that task's business and Task 4 runs the complete, unmodified script over all seven. It reads the expected text from the design file on disk, never retyped, which is what catches a word mangled while transcribing §5's replacement bullet: Step 3's greps match only the new rule's opening clause and the whole of the old sentence, so a mangling further into that long line passes both. Copy this exactly; it is deliberately pure ASCII, so a mistyped copy fails loudly instead of passing, and the fence is unindented on purpose — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -492,7 +492,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (CLAUDE.md subset): OK`, `exit=0`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
