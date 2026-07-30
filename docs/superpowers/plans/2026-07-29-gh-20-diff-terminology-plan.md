@@ -109,7 +109,7 @@ The shape assertion every script carries is `[1, 1, 1, 2, 1, 1, 1, 1, 1, 1]`. **
 - **Blocks 5–6** repair the design rubric's two Seam-sense `boundary` bullets to `seam`. **One word each; the bullets are the same length before and after** (54 and 27 words). No obligation, concept or bullet is added — that standard is the design's `§Does the rubric edit violate "nothing lands in the design rubric"?`.
 - **Blocks 7–8** repair `3. Each group-agent:` → `3. Each resolver:` and `**Group-agents never invoke …**` → `**Resolvers never invoke …**`. `group-resolution agent` on pre-change lines 50 and 79 is **deliberately not repaired** — it is not a name any glossary entry rejects. Do not touch it.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -120,7 +120,7 @@ wc -l plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-flow-workt
 
 Expected: branch `tayl0r/gh-20-diff-terminology`; `check-sync: all checks passed` with `mirror pair "adversarial-review" ... OK (87 lines, 1 declared exception)`; and `87`, `87`, `67`. If any of that differs, **stop and report** — the tree is not the state this plan was written against.
 
-- [ ] **Step 2: Pre-flight — the design's block shape and every anchor, before anything is written**
+- [x] **Step 2: Pre-flight — the design's block shape and every anchor, before anything is written**
 
 This probe writes nothing. It fails loudly if the design's fenced blocks moved (which would silently misroute every edit, since blocks are indexed positionally) or if any anchor is missing or duplicated (which would misplace an edit inside a 15 KB file).
 
@@ -165,7 +165,7 @@ echo "exit=$?"
 
 Expected: `block shape: [1, 1, 1, 2, 1, 1, 1, 1, 1, 1]`, then one line per copy reading `[28, 29, 34, 40, 46, 54, 58, 66, 69]`, then `exit=0`. Any `ABORT` line, an `AssertionError`, or a different list of numbers means **stop and report** — do not proceed to Step 3.
 
-- [ ] **Step 3: Apply design blocks 0–8 — all nine edits, both copies, one script**
+- [x] **Step 3: Apply design blocks 0–8 — all nine edits, both copies, one script**
 
 One applier carries all nine edits, and each target file is written **once**, after all nine of its anchors have resolved. A missing or duplicated anchor prints `ABORT`, leaves that file **exactly as it was**, and still exits non-zero after the other file is processed: every edit is computed against an in-memory copy and the write happens only once all nine anchors have resolved, so **no file is ever left carrying part of the change**. Nine separate appliers could not promise that — the second can fail after the first has already written. Each edit re-scans the in-memory list for its own anchor, so the insertion's shift of every later line is absorbed automatically.
 
@@ -243,7 +243,7 @@ replace: block 8, no-recursion clause at line 71 in plugins/dev-flow/skills/adve
 
 — and the same nine lines for `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md`. These are exactly the post-change numbers in the design's `§Resulting file shape` table. **The insertion line reads `41`, not 40:** it is the blank line the inserted block now occupies, not the anchor line it follows. Blocks 4–8 print their *post-insertion* numbers (48, 56, 60, 68, 71) because the two inserted lines shifted them. An `ABORT` line means an anchor is missing or duplicated — stop and report; do not edit by hand.
 
-- [ ] **Step 4: Verify — both copies are 89 lines and the mirror check passes**
+- [x] **Step 4: Verify — both copies are 89 lines and the mirror check passes**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -262,7 +262,7 @@ check-sync: all checks passed
 
 `exit=0`. **`89 lines, 1 declared exception` is load-bearing.** A `LINE_COUNT_FIX` failure means the insertion landed asymmetrically — and the design notes that an asymmetric insertion could not be declared as an exception even deliberately, since the schema declares only same-index, one-line-for-one-line divergences. An undeclared-divergence failure naming a line means a replacement landed on one side only — re-run the applier in Step 3, which fixes exactly the missing side and no-ops the other. `1 declared exception` still reading `1` confirms the line-12 exception did not go stale (it sits above every edit and does not move).
 
-- [ ] **Step 5: Verify — scoped residue grep (all eight replaced strings are gone from both copies)**
+- [x] **Step 5: Verify — scoped residue grep (all eight replaced strings are gone from both copies)**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -280,7 +280,7 @@ echo "exit=$?"
 
 Expected: **no output**, `exit=1`. These are eight of the nine patterns in the design's `§Verification` step 3, scoped to this task's two files; the ninth (`'altitude, seam placement.'`) belongs to Task 2's `CONTEXT.md`. Each is an exact phrase this task's replacements delete, and each returns **2 hits today** (one per copy) — so a surviving hit means one side of the mirror pair was missed, which is the failure `check-sync.py` catches only if the *other* side changed. `-F` is required: the patterns contain `*`, `.` and `-`. The fourth pattern carries a **U+2014 em dash**, not a hyphen; copy the line exactly. The pathspec is required — this plan and the design both quote all eight strings in prose.
 
-- [ ] **Step 6: Verify — design conformance, this task's nine blocks**
+- [x] **Step 6: Verify — design conformance, this task's nine blocks**
 
 This is the check that catches what line counts and greps cannot: text mangled *identically in both* mirror copies, or the angle inserted at the wrong anchor. It reads the expected text from the design file on disk, never retyped — the check `CLAUDE.md` requires for exactly this kind of change. This is a task-scoped subset of the design's `§Verification` step 5 — it omits the `CONTEXT.md` block and that file's length, which Task 2 owns. **Task 4 runs the complete, unmodified script.** Copy this exactly.
 
@@ -342,7 +342,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (task 1 subset): OK`, `exit=0`. A `MISMATCH` line names the block and the file whose text or position differs — re-run the applier in Step 3 and re-run Steps 4–6. Never "fix" a mismatch by editing the target by hand.
 
-- [ ] **Step 7: Verify — the two glossary repairs are complete across the whole repo**
+- [x] **Step 7: Verify — the two glossary repairs are complete across the whole repo**
 
 This is the design's `§Verification` step 4, both halves, and it is deliberately **broader than Step 5's exact strings**: it also fails if a fixer "helpfully" reflows one of the two rubric bullets while keeping the word.
 
@@ -356,7 +356,7 @@ echo "exit=$?"
 
 Expected: the first command prints **no output**, `exit=1` (today it reports 2 hits in each mirror copy). The second prints **exactly one line** — `CONTEXT.md:15:_Avoid_: group agent, judge, arbiter` — and `exit=0`; today it prints **5** (that line plus lines 66 and 69 in both copies). After the repair, every remaining `boundary` in shipped text names a stage transition, and the only `group agent` left is the glossary's own `_Avoid_:` line, which the never-flag clause puts outside every finding. `-i` and the `.` wildcard in the second pattern are load-bearing — they are what the spaced-spelling grep that produced the design's first census lacked. **`group-resolution agent` on lines 50 and 79 does not match this pattern and is deliberately not repaired.**
 
-- [ ] **Step 8: Verify — the three byte-identical duplicated spans**
+- [x] **Step 8: Verify — the three byte-identical duplicated spans**
 
 The design's `§Verification` step 7. Each span is duplicated *inside* one file as well as across the mirror pair, and `check-sync.py` only ever compares the two copies to **each other**, so nothing else covers these.
 
@@ -371,7 +371,7 @@ done
 
 Expected: `4`, `4`, `4` — two passages × two mirror copies. Today they are `2`, `0`, `2`; a `2` after the change means the new passage paraphrases instead of repeating, and a `3` means one mirror copy is short. The first span carries a **U+2014 em dash**; the third's backticks are backslash-escaped because the whole pattern is double-quoted. **The third span deliberately stops short of its delimiters** — the pass parenthesizes it and the angle sets it off with an em dash, so a pattern including either delimiter would return 2 on a correct tree and prove nothing about the other passage.
 
-- [ ] **Step 9: Verify — exactly these two files are modified**
+- [x] **Step 9: Verify — exactly these two files are modified**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -380,7 +380,7 @@ git status --porcelain
 
 Expected: exactly `plugins/dev-flow/skills/adversarial-review/SKILL.md` and `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md` as modified — plus, possibly, this change's own `docs/superpowers/` design and plan artifacts if the surrounding dev-flow run has not committed them yet. No other content file. In particular the design doc must **not** be modified, and `CONTEXT.md` must not appear yet — it is Task 2's.
 
-- [ ] **Step 10: Commit — both copies together, in one commit**
+- [x] **Step 10: Commit — both copies together, in one commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
