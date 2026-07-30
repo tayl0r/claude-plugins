@@ -635,7 +635,7 @@ git commit -m "dev-flow 2.6.0, dev-flow-worktree 1.8.0"
 
 Run every step from the repo root. Steps 1–8 are the design's `§Verification` steps 1–8, unmodified; Step 9 is this plan's scope check. **Copy every command exactly as written.** Where the design states an assertion but supplies no command — steps 6 and 8 — this plan supplies the invocation and says so in place.
 
-- [ ] **Step 1: Mirror and manifest sync**
+- [x] **Step 1: Mirror and manifest sync**
 
 ```sh
 python3 scripts/check-sync.py
@@ -643,7 +643,7 @@ python3 scripts/check-sync.py
 
 Expected: `check-sync: all checks passed`, with the mirror pair reporting **`89 lines, 1 declared exception`**.
 
-- [ ] **Step 2: Marketplace validation**
+- [x] **Step 2: Marketplace validation**
 
 ```sh
 claude plugin validate .
@@ -651,7 +651,7 @@ claude plugin validate .
 
 Expected: success. **8 missing-author warnings are expected** and are not a failure.
 
-- [ ] **Step 3: Residue grep — all nine patterns return no hits**
+- [x] **Step 3: Residue grep — all nine patterns return no hits**
 
 ```sh
 git grep -n -F -e 'seam-placement angle, inlined' \
@@ -667,7 +667,7 @@ git grep -n -F -e 'seam-placement angle, inlined' \
 
 Expect **no output** (exit 1). Every one is text this change deletes: eight are the in-place replacements in the mirror pair (2 hits each today, one per copy), and `'altitude, seam placement.'` is `CONTEXT.md`'s stale five-item enumeration (1 hit today). A surviving hit on any mirror-pair string means one side was missed — the failure `check-sync.py` catches only if the *other* side changed. The pathspec is required: the design and this plan both quote all nine strings in prose, and `docs/superpowers/` must not be searched. The fifth pattern carries a **U+2014 em dash**.
 
-- [ ] **Step 4: The two glossary repairs are complete**
+- [x] **Step 4: The two glossary repairs are complete**
 
 ```sh
 git grep -n -i -e 'shared boundary' -e 'shared-boundary' -e 'right boundary' -- . ':!docs/superpowers/'
@@ -681,7 +681,7 @@ git grep -n -i -e 'group.agent' -- . ':!docs/superpowers/'
 
 Expect **exactly one hit**, `CONTEXT.md:15` — the `_Avoid_:` line, which the never-flag clause puts outside every finding. Today it returns 5. `-i` and the `.` wildcard are load-bearing. `group-resolution agent` does not match this pattern and is deliberately not repaired.
 
-- [ ] **Step 5: Design conformance — all ten blocks landed verbatim, in the right place**
+- [x] **Step 5: Design conformance — all ten blocks landed verbatim, in the right place**
 
 This is the complete, unmodified script from the design's `§Verification` step 5 — the check Tasks 1 and 2's subset scripts stood in for, and the one step Steps 1–4 structurally cannot provide. Step 3's residue grep is tied to the in-place replacements and says nothing about the insertion; `check-sync.py` compares the two mirror copies only to *each other*, so a word mangled identically in both passes it at the correct 89 lines — and it never reads `CONTEXT.md` at all. Copy this exactly; it is deliberately pure ASCII, so a mistyped copy fails loudly instead of passing. **The fence is unindented on purpose** — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -744,7 +744,7 @@ echo "exit=$?"
 
 Expected: exactly `design-conformance: OK` and `exit=0`. A `MISMATCH` line names the block and the file whose text or position differs — report BLOCKED naming that block; the owning task re-runs its applier. The shape assertion fires if the design's plain-fenced blocks are ever added to, removed, reordered, or reflowed: that is deliberate, because the blocks are indexed positionally. Every other fenced block in the design carries an info string (`text`, `sh`) and is therefore skipped by the `mode == ""` filter.
 
-- [ ] **Step 6: Version spot-check**
+- [x] **Step 6: Version spot-check**
 
 ```sh
 git grep -cF '"version": "2.6.0"' -- plugins/dev-flow/.claude-plugin/plugin.json
@@ -755,7 +755,7 @@ Expect each command to print exactly one line — `plugins/dev-flow/.claude-plug
 
 The design's `§Verification` step 6 states this as a bare assertion — *"Both `plugin.json` versions read `2.6.0` and `1.8.0`"* — and supplies no command, so the invocation above is this plan **supplying** one, not departing from one. Each pattern is scoped to the single file it belongs in, so a swapped pair fails with `exit=1` and no output instead of requiring the executor to read two lines correctly.
 
-- [ ] **Step 7: The three duplicated spans are byte-identical, not paraphrased**
+- [x] **Step 7: The three duplicated spans are byte-identical, not paraphrased**
 
 ```sh
 for s in "proceed silently — the glossary's own state is never a finding: never flag it, never propose creating one." \
@@ -767,7 +767,7 @@ done
 
 Expect `4`, `4`, `4` — two passages × two mirror copies. Today they are `2`, `0`, `2`. No mechanical check covers a duplication living twice inside one file; `check-sync.py` only ever compares the two mirror copies to each other. The pathspec is required, because the design quotes all three in prose, and the third span carries **no surrounding parenthesis or dash** on purpose — the pass parenthesizes it and the angle sets it off with an em dash, so a pattern including either delimiter returns 2 on a correct tree and proves nothing about the other passage.
 
-- [ ] **Step 8: Behavioural check — the acceptance bar is tracked on #23, not run here**
+- [x] **Step 8: Behavioural check — the acceptance bar is tracked on #23, not run here**
 
 The design's `§Verification` step 8 is a **post-installation** check, not a shell command: "the running review loads the *installed* skill, not the branch's copy, so this step is meaningful only after `claude plugin marketplace update taylor-plugins` and a restart — during this change's own pipeline run the reviews still execute the pre-change text." **Do not run the marketplace update and do not restart anything from this task.**
 
@@ -788,7 +788,7 @@ Expect **two lines from each command** — one per `adversarial-review/SKILL.md`
 
 There is nothing to fix here at implementation time, and nothing here is a gate: **do not** run the marketplace update, restart, merge, or launch a review to satisfy the bar. Part 1's two greps plus naming #23 is the whole of this step.
 
-- [ ] **Step 9: Scope check — the final diff touches exactly five files and nothing else**
+- [x] **Step 9: Scope check — the final diff touches exactly five files and nothing else**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
