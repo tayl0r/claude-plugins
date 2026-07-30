@@ -406,7 +406,7 @@ git commit -m "adversarial-review: glossary-conformance angle, terminology drift
 
 **Exactly one line changes, and everything else in the file is deliberate.** The **Seam** entry and its `_Avoid_: boundary` line stay byte-identical — the design's whole `§Does CONTEXT.md's _Avoid_: boundary entry survive a check that enforces it?` argues that this entry is correct and the *shipped text* was wrong. The **Resolver** entry's `_Avoid_: group agent, judge, arbiter` line stays byte-identical for the same reason, and Task 1's Step 7 expects it to still be there as the single surviving `group agent` hit. The **Pass** entry is not edited (it defines the shape, not the instances), the **Design rubric** entry still reads "nine-bullet" (still true), and **no new entry is added**. `CONTEXT.md` ships into no plugin and `check-sync.py` never reads it — this file has **no** mechanical mirror check behind it, which is why the residue grep and the conformance script in Steps 4 and 5 are the only things standing behind this edit.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -417,7 +417,7 @@ git grep -n -F '**Angle**:' -- CONTEXT.md
 
 Expected: `67`; **exactly one hit** at `CONTEXT.md:30` for the stale enumeration (its line ends `… efficiency, altitude, seam placement.`); and **exactly one hit** at `CONTEXT.md:29` for the anchor. Zero hits on the enumeration means the edit already landed; two hits on either means the file is not the one this plan was written against — either way, stop and report rather than improvising.
 
-- [ ] **Step 2: Apply design block 9 — the **Angle** definition line**
+- [x] **Step 2: Apply design block 9 — the **Angle** definition line**
 
 The applier replaces the line **directly after** the `**Angle**:` term line — the same anchor relationship the design's conformance script asserts. For orientation only, the replacement begins `One lens in the diff-mode quality seed's list: reuse, simplification, …` — **do not type it; the script below copies it.**
 
@@ -461,7 +461,7 @@ echo "exit=$?"
 
 Expected: `replace: block 9, Angle entry at line 30 in CONTEXT.md`, then `exit=0`. An `ABORT` means the anchor is missing or duplicated — stop and report.
 
-- [ ] **Step 3: Verify — still 67 lines, exactly one line changed**
+- [x] **Step 3: Verify — still 67 lines, exactly one line changed**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -471,7 +471,7 @@ git diff --numstat -- CONTEXT.md
 
 Expected: `67`, and `1	1	CONTEXT.md`. **This is a replacement, not an append** — a 68-line file means the block was inserted instead of replacing, and `2	1` or more means something besides the **Angle** definition was touched. Either way, `git checkout -- CONTEXT.md` and re-run Step 2.
 
-- [ ] **Step 4: Verify — residue grep, the stale five-item enumeration is gone**
+- [x] **Step 4: Verify — residue grep, the stale five-item enumeration is gone**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -482,7 +482,7 @@ git grep -c -F 'altitude, seam placement, glossary conformance.' -- CONTEXT.md
 
 Expected: the first command prints **no output**, `exit=1` — this is the ninth pattern from the design's `§Verification` step 3, the one Task 1's scoped grep left out, and it has exactly 1 hit today. The second prints `CONTEXT.md:1`, confirming the six-item enumeration is present. Two separate greps on purpose: a hit-count assertion and an absence assertion cannot share a command.
 
-- [ ] **Step 5: Verify — design conformance, this task's one block**
+- [x] **Step 5: Verify — design conformance, this task's one block**
 
 A task-scoped subset of the design's `§Verification` step 5. It re-reads block 9 from the design on disk and demands a byte-for-byte line match at the right anchor — the check that catches a word mangled inside a 120-character line, which every grep above would sail past. Copy this exactly.
 
@@ -528,7 +528,7 @@ echo "exit=$?"
 
 Expected: `design-conformance (task 2 subset): OK`, `exit=0`.
 
-- [ ] **Step 6: Verify — nothing else moved, and `check-sync.py` is unaffected**
+- [x] **Step 6: Verify — nothing else moved, and `check-sync.py` is unaffected**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -538,7 +538,7 @@ git status --porcelain
 
 Expected: `check-sync: all checks passed` with `mirror pair "adversarial-review" ... OK (89 lines, 1 declared exception)` — unchanged by this task, since neither check reads `CONTEXT.md`; and `CONTEXT.md` as the only modified content file (plus this run's own uncommitted `docs/superpowers/` artifacts, if any).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
