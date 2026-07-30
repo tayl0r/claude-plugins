@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-20-diff-terminology
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
