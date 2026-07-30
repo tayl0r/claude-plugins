@@ -560,7 +560,7 @@ git commit -m "CONTEXT.md: name glossary conformance in the Angle entry"
 
 **This is not cosmetic cleanup.** The install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so Task 1's edits are never picked up on re-sync until this task lands. **Minor rather than major** per the design's `§4 & 5`: the invocation signature, the contract, the provenance format, the mode set and the model policy are all unchanged — only seed content changes. Same bump shape as gh-7 and gh-16.
 
-- [ ] **Step 1: Bump `dev-flow` from `2.5.0` to `2.6.0`**
+- [x] **Step 1: Bump `dev-flow` from `2.5.0` to `2.6.0`**
 
 In `plugins/dev-flow/.claude-plugin/plugin.json`, replace the line:
 
@@ -576,7 +576,7 @@ with:
 
 Change **only** the `version` field. Do **not** touch `description` — it is duplicated into `.claude-plugin/marketplace.json` and `check-sync.py` Check A compares them; that file is out of scope for this change.
 
-- [ ] **Step 2: Bump `dev-flow-worktree` from `1.7.0` to `1.8.0`**
+- [x] **Step 2: Bump `dev-flow-worktree` from `1.7.0` to `1.8.0`**
 
 In `plugins/dev-flow-worktree/.claude-plugin/plugin.json`, replace the line:
 
@@ -592,7 +592,7 @@ with:
 
 Same constraint: `version` only.
 
-- [ ] **Step 3: Verify — both version strings read back correctly**
+- [x] **Step 3: Verify — both version strings read back correctly**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -602,7 +602,7 @@ git grep -cF '"version": "1.8.0"' -- plugins/dev-flow-worktree/.claude-plugin/pl
 
 Expected: each command prints exactly one line — `plugins/dev-flow/.claude-plugin/plugin.json:1` and `plugins/dev-flow-worktree/.claude-plugin/plugin.json:1` — with `exit=0`. Each pattern is scoped to the single file it belongs in, so a swapped pair produces no output and `exit=1` from both rather than something an executor has to eyeball. `git grep` rather than a bare `grep`, per Global Constraints — a bare `grep` here returns `rtk grep --help`, not an answer.
 
-- [ ] **Step 4: Verify — manifests still valid and in sync, exactly one line changed per file**
+- [x] **Step 4: Verify — manifests still valid and in sync, exactly one line changed per file**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
@@ -613,7 +613,7 @@ git diff --numstat -- plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-fl
 
 Expected: `check-sync: all checks passed` (Check A is unaffected — it compares `name`, `source`, and `description`, and does not read `version`, which is why `.claude-plugin/marketplace.json` is not touched by this change); `claude plugin validate .` succeeds (**8 missing-author warnings are expected, NOT a failure**); `--numstat` showing exactly `1	1` for each manifest. More than one changed line means something besides `version` was touched — revert it.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins
