@@ -53,7 +53,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 
 - Best long-term design over short-term tradeoffs; we care about codebase quality and maintainability, not effort or severity.
 - OK to change adjacent code if it gets us to the better design.
-- Before fixing at the point of failure, zoom out one level: if the thing touched is one of a known family (connectors, handlers, jobs…), put the fix at the shared seam so current and future members inherit it — a per-instance fix the next person must remember to repeat is a latent regression.
+- Before fixing at the point of failure, zoom out one level: if the thing touched is one of a known kind (connectors, handlers, jobs…), put the fix at the shared seam so current and future members inherit it — a per-instance fix the next person must remember to repeat is a latent regression.
 - Prefer correct-by-default seams over designs where each caller must remember a flag, ordering, or manual step.
 - When reusing shared infrastructure, question whether each inherited behavior belongs in the new context — inherited-but-irrelevant behavior is a wart even when harmless.
 - Judge findings together, not in isolation — the best design often only appears when several concerns plus known upcoming work are held at once.

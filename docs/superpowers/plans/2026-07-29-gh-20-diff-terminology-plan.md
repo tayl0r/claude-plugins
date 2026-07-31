@@ -84,7 +84,7 @@ The shape assertion every script carries is `[1, 1, 1, 2, 1, 1, 1, 1, 1, 1]`. **
 
 **Task 3 (version bumps) follows Tasks 1 and 2.** Disjoint files, so this is sequencing rather than isolation — and, per the note above, not a shipping guarantee: no ordering of these commits can put a bump in front of the behavior on `main`. What it buys is that the bump is a claim about Tasks 1 and 2, written only once they are true, so a run that halts partway never leaves the branch advertising a version whose behavior is not in it. `dev-flow` 2.6.0 covers copy A, `dev-flow-worktree` 1.8.0 covers copy B; `CONTEXT.md` ships into no plugin and is not gated by either.
 
-**Task 4 runs the design's full `§Verification` steps 1–8 plus a scope check**, and depends on Tasks 1–3 all being complete and committed — the version grep, the full nine-pattern residue grep, and the complete conformance script (which asserts all three file lengths and all ten blocks at once) are only meaningful once every file has landed.
+**Task 4 runs the design's full `§Verification` steps 1–8 plus a scope check**, and depends on Tasks 1–3 all being complete and committed — the version grep, the full ten-pattern residue grep, and the complete conformance script (which asserts all three file lengths and all ten blocks at once) are only meaningful once every file has landed.
 
 ---
 
@@ -272,6 +272,7 @@ git grep -n -F -e 'seam-placement angle, inlined' \
                -e '**Terminology collision — the design' \
                -e 'put the fix at the shared boundary' \
                -e 'finds the right boundary' \
+               -e 'one of a known family' \
                -e 'Each group-agent:' \
                -e 'Group-agents never invoke' \
                -- plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md
@@ -661,6 +662,7 @@ git grep -n -F -e 'seam-placement angle, inlined' \
                -e '**Terminology collision — the design' \
                -e 'put the fix at the shared boundary' \
                -e 'finds the right boundary' \
+               -e 'one of a known family' \
                -e 'Each group-agent:' \
                -e 'Group-agents never invoke' -- plugins/ CONTEXT.md
 ```
@@ -806,6 +808,6 @@ Expected: `git status --porcelain` prints nothing — or `ok`, `rtk`'s empty-out
 - `CONTEXT.md` is still **67 lines** and carries design block 9 directly after `**Angle**:`; its **Seam** and **Resolver** entries are byte-identical to `main`.
 - `plugins/dev-flow` is at `2.6.0`; `plugins/dev-flow-worktree` is at `1.8.0`.
 - `python3 scripts/check-sync.py` reports `mirror pair "adversarial-review" ... OK (89 lines, 1 declared exception)` and `all checks passed`; `claude plugin validate .` succeeds with the expected 8 warnings.
-- The design's `§Verification` steps 1–8 all pass, including `design-conformance: OK`, the nine-pattern residue grep with no hits, the two repair greps (`shared/right boundary` empty, `group.agent` exactly `CONTEXT.md:15`), and the three span counts at `4`, `4`, `4` — plus the scope check.
+- The design's `§Verification` steps 1–8 all pass, including `design-conformance: OK`, the ten-pattern residue grep with no hits, the two repair greps (`shared/right boundary` empty, `group.agent` exactly `CONTEXT.md:15`), and the three span counts at `4`, `4`, `4` — plus the scope check.
 - Step 8's behavioural acceptance bar is **recorded on #23, not discharged** — it is unrunnable until the PR merges and the marketplace is updated and restarted, and #23 is what owns it afterwards.
 - Nothing has been pushed, no PR opened, no merge performed. When the surrounding dev-flow run does open the PR, its body closes **#20** and **#22** (design `§PR`).

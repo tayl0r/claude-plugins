@@ -173,7 +173,7 @@ They split three ways, and the split is not close:
 
 **Those 4 are not false positives. They are correct findings, and the evidence is not opinion:**
 
-1. **Seam** is *"a place where behaviour can be altered without editing in that place."* The shared place of a known family, where one fix lands so "current and future members inherit it", is that place by definition.
+1. **Seam** is *"a place where behaviour can be altered without editing in that place."* The shared place of a known kind, where one fix lands so "current and future members inherit it", is that place by definition.
 2. **The rubric already calls it a seam, one bullet later.** `SKILL.md:55` reads *"Prefer correct-by-default **seams** over designs where each caller must remember a flag, ordering, or manual step."* One concept, two names, in adjacent bullets of the same nine-bullet list — the textbook shape of drift, in shipped text, in the file this change edits.
 3. **gh-7 read `:58` that way itself.** Its design declined to add a seam bullet to the rubric on the grounds that *"the rubric already carries 'zooming out finds the right boundary'"* — treating that line as the rubric's existing statement about seams — and then named the angle it shipped **seam placement**.
 
@@ -190,7 +190,7 @@ After both repairs, no shipped text in this repo names a glossary concept by a n
 - **7 of the 8** design docs already committed to `docs/superpowers/specs/` contain at least one Seam-sense `boundary` — **16** occurrences, out of 33 uses of the word. The figure has a mechanical floor: 14 of the 16 are literal echoes of the two rubric bullets, which `git grep -c -i -e 'shared boundary' -e 'shared-boundary' -e 'right boundary'` returns across the eight; the other 2 say the same thing in the author's own words (gh-6's *"Redefined at the boundary means every call site reads the new rule"*, gh-8's *"the same defect — two copies of one fact, kept in sync by memory — at the same boundary"*). The sole exception is `2026-07-22-dev-flow-flatten-design.md`, whose one `boundary` is a stage transition. This document is not in the count: every `boundary` in it quotes the text under repair, quotes the `_Avoid_:` entry, or names a stage transition — see *Applying the pass to this document*.
 - **4 of 7** plans do — 5 occurrences, out of 22.
 
-The rule these two figures use, stated so a later document re-derives them instead of copying them: an occurrence counts only where `boundary` names the **Seam** concept — the shared place of a known family where one fix lands so current and future members inherit it. Stage transitions (*"at each artifact boundary"*, *"every stage boundary"*, *"the stop boundaries"*), scope or ownership boundaries (*"issue #7's own stated boundary"*), ordinary wire/storage/version boundary types (*"an ordinary boundary type"*), task boundaries, and diff mechanics (*"hunk boundaries"*) do not count — and they are the majority: 34 of the word's 55 uses across these 15 records. Almost every one that does count is an echo of the rubric's phrasing: "at the shared boundary", "the right boundary", "redefined once, at the shared boundary". The drift clause runs on every design and every plan review. Without the repair it fires, correctly, on essentially every future dev-flow artifact this repo produces, at one resolver group each, forever. Repairing the two lines the authors are copying from dries the recurrence at its source; the clause then catches the residue instead of the pattern.
+The rule these two figures use, stated so a later document re-derives them instead of copying them: an occurrence counts only where `boundary` names the **Seam** concept — the shared place of a known kind where one fix lands so current and future members inherit it. Stage transitions (*"at each artifact boundary"*, *"every stage boundary"*, *"the stop boundaries"*), scope or ownership boundaries (*"issue #7's own stated boundary"*), ordinary wire/storage/version boundary types (*"an ordinary boundary type"*), task boundaries, and diff mechanics (*"hunk boundaries"*) do not count — and they are the majority: 34 of the word's 55 uses across these 15 records. Almost every one that does count is an echo of the rubric's phrasing: "at the shared boundary", "the right boundary", "redefined once, at the shared boundary". The drift clause runs on every design and every plan review. Without the repair it fires, correctly, on essentially every future dev-flow artifact this repo produces, at one resolver group each, forever. Repairing the two lines the authors are copying from dries the recurrence at its source; the clause then catches the residue instead of the pattern.
 
 **Why the entry is not narrowed instead.** Two narrowings were considered and both are worse:
 
@@ -419,10 +419,14 @@ Every sentence #16 shipped survives; the glossary read moves to the front so bot
 
 #### Line 54 — design rubric, bullet 3
 
-One word: `boundary` → `seam`. Replace the whole line with:
+Two words: `boundary` → `seam`, and `family` → `kind`. Word count is 54 before and after, so the standard above is met for both.
+
+The second repair closes a collision **#16's own pass already reported**. Its design records it (`2026-07-28-gh-16-terminology-collision-design.md:111`): *"**`family`** — **fired.** The repo already carries two senses: `CONTEXT.md`'s model product line, and the design rubric's 'one of a known family (connectors, handlers, jobs…)'."* #16 reworded only the third sense its own draft had introduced — to *"the shared boundary"*, which is the drift this change repairs one clause away in this same sentence — and left the rubric's second sense standing. So this is not a new judgment: it is the unclosed half of a finding this repo already made, and closing only the instance that makes the rubric self-consistent while knowingly leaving the other is what would make the circularity objection land.
+
+`kind` is chosen mechanically, not by taste: of the plausible substitutes it is the only one that collides with nothing. `git grep -oiw` over shipped prose returns **0** hits for `kind`, against 16 for `type` (which *Seam placement* uses for "an existing type" and "the domain type") and 17 for `group` (which the Resolution procedure uses for "Group similar issues together" and "group-resolution agent") — either of those would move the collision rather than remove it. `variety` also returns 0 but reads stiffly. Replace the whole line with:
 
 ```
-- Before fixing at the point of failure, zoom out one level: if the thing touched is one of a known family (connectors, handlers, jobs…), put the fix at the shared seam so current and future members inherit it — a per-instance fix the next person must remember to repeat is a latent regression.
+- Before fixing at the point of failure, zoom out one level: if the thing touched is one of a known kind (connectors, handlers, jobs…), put the fix at the shared seam so current and future members inherit it — a per-instance fix the next person must remember to repeat is a latent regression.
 ```
 
 #### Line 58 — design rubric, bullet 7
@@ -559,7 +563,7 @@ Specifically confirmed:
 
 1. `python3 scripts/check-sync.py` — passes. Expect `mirror pair "adversarial-review" ... OK (89 lines, 1 declared exception)`.
 2. `claude plugin validate .` — passes; the 8 missing-author warnings are expected.
-3. **Residue grep (always, per `CLAUDE.md`).** All nine return **no hits**:
+3. **Residue grep (always, per `CLAUDE.md`).** All ten return **no hits**:
 
    ```sh
    git grep -n -F -e 'seam-placement angle, inlined' \
@@ -569,11 +573,12 @@ Specifically confirmed:
                   -e '**Terminology collision — the design' \
                   -e 'put the fix at the shared boundary' \
                   -e 'finds the right boundary' \
+                  -e 'one of a known family' \
                   -e 'Each group-agent:' \
                   -e 'Group-agents never invoke' -- plugins/ CONTEXT.md
    ```
 
-   Every one is text this change deletes: eight are the in-place replacements in the mirror pair (2 hits each today, one per copy), the third is `CONTEXT.md`'s stale five-item enumeration (1 hit today). A surviving hit on any mirror-pair string means one side was missed — the failure `check-sync.py` catches only if the *other* side changed. The pathspec is required: this design quotes all nine strings in prose, and `docs/superpowers/` must not be searched.
+   Every one is text this change deletes: nine are the in-place replacements in the mirror pair (2 hits each today, one per copy), and `altitude, seam placement.` is `CONTEXT.md`'s stale five-item enumeration (1 hit today). A surviving hit on any mirror-pair string means one side was missed — the failure `check-sync.py` catches only if the *other* side changed. The pathspec is required: this design quotes all ten strings in prose, and `docs/superpowers/` must not be searched.
 4. **The Seam-sense repair is complete.** The mechanical form of the glossary decision — after this change no shipped text names the **Seam** concept by the name `CONTEXT.md` rejects. Expect **no hits**:
 
    ```sh
