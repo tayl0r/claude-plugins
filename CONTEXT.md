@@ -27,7 +27,7 @@ The check that a reviewer's self-reported model belongs to the family its reques
 The line a review returns stating how many reviewers it actually spawned per tier. Evidence of fan-out and tier conformance — never of model diversity.
 
 **Angle**:
-One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement.
+One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement, glossary conformance.
 
 **Pass**:
 A named, self-contained check a seed runs over an artifact, carrying its own trigger and stopping conditions. An angle is a lens *within* a seed's list; a pass is a whole check.
