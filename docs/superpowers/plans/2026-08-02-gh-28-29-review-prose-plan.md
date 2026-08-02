@@ -26,14 +26,14 @@ Every task's requirements implicitly include this section.
   - the `"version"` field of `plugins/dev-flow-worktree/.claude-plugin/plugin.json`
   - `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this file — checkbox ticks only)
 - **Explicitly forbidden — touching any of these is a HALT, not a judgment call:** `CLAUDE.md`, `CONTEXT.md`, anything under `scripts/` (including `check-sync.py` — a concurrent agent owns that file), `docs/adr/`, `docs/agents/`, `.claude-plugin/marketplace.json`, either `README.md`, either pipeline `SKILL.md`, and **every pre-existing file under `docs/superpowers/`** — meaning the *prior records*: every `docs/superpowers/` file other than this change's own design doc and this plan. Those two are already committed by the time Task 1 starts, and they are governed by the two bullets above rather than by this one — the design is read-only, this plan takes checkbox ticks only.
-- **The design doc is read-only input.** `docs/superpowers/specs/2026-08-02-gh-28-29-review-prose-design.md` must end this work byte-identical to how it started. Its three fenced blocks in *The edit* must not be modified. Expected blob hash, unchanged throughout: `3f0b75ab7e602ee78ffbe77dcf4fa2b4de7ee1bf` (`git -C <root> hash-object <design path>`). If it differs at Task 1 Step 1, **halt and report** — do not proceed and do not "fix" the design.
+- **The design doc is read-only input.** `docs/superpowers/specs/2026-08-02-gh-28-29-review-prose-design.md` must end this work byte-identical to how it started. Its three fenced blocks in *The edit* must not be modified. Expected blob hash (`git -C <root> hash-object <design path>`): `736716447cc075513769bfd66f8870feea5cfa89`. If it differs at Task 1 Step 1, **halt and report** — do not proceed and do not "fix" the design. **Re-pinned once, after execution completed**, when the design was amended to re-target the version bumps past a concurrently-merged bump (see *Version bumps* in the design). The hash that gated the original execution was `3f0b75ab7e602ee78ffbe77dcf4fa2b4de7ee1bf`; that amendment touched only the *Version bumps* section and success criterion 7, and left the three fenced blocks in *The edit* byte-identical — which is why criterion 6 still passes unchanged against the already-applied edit.
 - **Never retype the replacement text.** Per `CLAUDE.md`, any change to this mirrored pair whose design doc gives replacement text as fenced blocks must add a check that **re-reads those blocks from the design on disk, never retyped**, asserting each appears verbatim in its target. That mandate is on the *check*: Task 1 Step 4 and Task 3 Step 4 are it. The edit itself satisfies the same property structurally rather than by citation — Step 3 replaces only the three short spans that change, so no byte of lines 52, 71 or 81 outside those spans is ever transcribed. Do not paste a whole line 52/71/81 into a shell command, an `Edit` call, or a commit message; the only literals typed anywhere are the three fragments in Step 3's table, each quoted from the design.
 - **Nothing ships for issue #29.** Its ruling is NO CHANGE. `SKILL.md:42` and `:48` must be unchanged in both copies. This is not left to restraint — criterion 8(b) asserts the changed-line set is exactly `{52, 71, 81}`.
 - **Never stage with `git add -A`, `git add .`, or `git commit -a`.** Every commit stages the exact paths named in its step.
 - **Never match `--stat` output literally.** Where a step gives an expected `git … --stat` result it states the per-file insertion/deletion counts in prose, and git's rendering deliberately does not echo those numbers back: `--stat`'s leading integer is insertions *plus* deletions (3 + 3 renders `6 +++---`), the integer's column and the `+/-` graph scale with terminal width, and long paths are elided to `.../<tail>`. Compare the file *set* and the counts; never the bar. A step that needs a literal, byte-comparable expected block uses `--name-only` instead.
 - **`claude plugin validate .` exiting 0 with exactly 8 `No author information provided` warnings is a PASS** (design **A4**, `CLAUDE.md`). Warnings are not failures. Do not add author fields to silence them.
 - **No new files anywhere, including temp files inside the repo.** Every Python snippet below is run as a heredoc piped to `python3 -`, so nothing is written to disk.
-- **`BASE` is always computed, never hardcoded:** `BASE=$(git -C <root> merge-base origin/main HEAD)`. It resolves to `c8b2182a4fa140d53d2162486ef725ce79e82739` today, but merge-base stays correct if `main` advances or the branch is rebased.
+- **`BASE` is always computed, never hardcoded:** `BASE=$(git -C <root> merge-base origin/main HEAD)`. It resolved to `c8b2182a4fa140d53d2162486ef725ce79e82739` when this plan was written and to `963a66c1949dc38d82077bab6701e17147f8e5d3` after `origin/main` advanced and was merged in — which is exactly why it is computed rather than hardcoded, and why every criterion keyed to it stayed correct across that move.
 
 ---
 
@@ -43,8 +43,8 @@ Every task's requirements implicitly include this section.
 |---|---|
 | `plugins/dev-flow/skills/adversarial-review/SKILL.md` | Lines 52, 71, 81 replaced. Still 89 lines. |
 | `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md` | Same three lines, same replacement bytes (the two copies are byte-identical on these lines today). Still 89 lines. |
-| `plugins/dev-flow/.claude-plugin/plugin.json` | `"version": "2.6.0"` → `"2.7.0"` |
-| `plugins/dev-flow-worktree/.claude-plugin/plugin.json` | `"version": "1.8.0"` → `"1.9.0"` |
+| `plugins/dev-flow/.claude-plugin/plugin.json` | `"version": "2.7.0"` → `"2.8.0"` |
+| `plugins/dev-flow-worktree/.claude-plugin/plugin.json` | `"version": "1.9.0"` → `"1.10.0"` |
 
 No file is created. No file is deleted. No `check-sync.py` exception is added (design **A2**: all three edits are identical on both sides, so the pair stays in sync with its one existing declared exception).
 
@@ -80,7 +80,7 @@ wc -l /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b
 ```
 
 Expected:
-- hash-object prints `3f0b75ab7e602ee78ffbe77dcf4fa2b4de7ee1bf`. **Any other value → HALT and report "design doc modified".**
+- hash-object prints `736716447cc075513769bfd66f8870feea5cfa89`. **Any other value → HALT and report "design doc modified".**
 - `status --porcelain` prints nothing except, possibly, a modified `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this plan's own checkbox ticks — an authorized modification, and the same allowance Task 3 Step 1 makes). Any other modified or untracked path → **HALT and report**: the tree is not in the state this plan was written against.
 - `wc -l` prints `89` for each file.
 
@@ -268,6 +268,8 @@ Expected: the commit succeeds and `show --stat` lists **exactly two** files, bot
 - Consumes: nothing from Task 1. Independent; either order.
 - Produces: the two bumped versions Task 3's criterion 7 asserts.
 
+**Base moved after this plan first executed.** The original targets were `2.7.0`/`1.9.0`, chosen against base `c8b2182`. PRs #35 and #36 merged while this change was in flight and took exactly those numbers. Merging `origin/main` in **auto-resolved the version lines with no conflict** — both sides had changed `2.6.0` → `2.7.0` — which would have shipped this change's `SKILL.md` text at an already-published version, defeating the version-keyed cache. Targets re-derived: `2.7.0` → `2.8.0` and `1.9.0` → `1.10.0`. Step 3 now also asserts each version is strictly ahead of `origin/main`, which is the check the original criteria lacked.
+
 **Why:** the text in `adversarial-review/SKILL.md` ships into every model invocation, so a wording change is a behavior change under `CLAUDE.md`'s bump rule, and the install cache is version-keyed — an edit at an unchanged version is never picked up on re-sync. Minor rather than patch is the design's ruling: no version either plugin has ever shipped has a nonzero patch segment, and adopting a minor-vs-patch convention is a `CLAUDE.md`-level decision this change is scoped out of.
 
 - [x] **Step 1: Confirm the current versions**
@@ -280,13 +282,13 @@ grep -n '"version"' /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae5
 Expected — the first command (`dev-flow`) prints:
 
 ```
-3:  "version": "2.6.0",
+3:  "version": "2.7.0",
 ```
 
 and the second (`dev-flow-worktree`) prints:
 
 ```
-3:  "version": "1.8.0",
+3:  "version": "1.9.0",
 ```
 
 Anything else → **HALT and report**; do not guess the next number.
@@ -295,8 +297,8 @@ Anything else → **HALT and report**; do not guess the next number.
 
 Use the `Edit` tool (or an equivalent exact-string replacement) on each file — one edit per file, replacing only the version string:
 
-- `plugins/dev-flow/.claude-plugin/plugin.json`: `"version": "2.6.0",` → `"version": "2.7.0",`
-- `plugins/dev-flow-worktree/.claude-plugin/plugin.json`: `"version": "1.8.0",` → `"version": "1.9.0",`
+- `plugins/dev-flow/.claude-plugin/plugin.json`: `"version": "2.7.0",` → `"version": "2.8.0",`
+- `plugins/dev-flow-worktree/.claude-plugin/plugin.json`: `"version": "1.9.0",` → `"version": "1.10.0",`
 
 Do not reformat, reorder keys, or touch `name` or `description` — `description` is duplicated into `.claude-plugin/marketplace.json` and `check-sync.py` enforces the pair.
 
@@ -306,8 +308,8 @@ Do not reformat, reorder keys, or touch `name` or `description` — `description
 python3 - <<'PY'
 import json
 ROOT = "/Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b"
-for rel, want in (("plugins/dev-flow/.claude-plugin/plugin.json", "2.7.0"),
-                  ("plugins/dev-flow-worktree/.claude-plugin/plugin.json", "1.9.0")):
+for rel, want in (("plugins/dev-flow/.claude-plugin/plugin.json", "2.8.0"),
+                  ("plugins/dev-flow-worktree/.claude-plugin/plugin.json", "1.10.0")):
     data = json.loads(open(f"{ROOT}/{rel}", encoding="utf-8").read())
     assert data["version"] == want, (rel, data["version"], want)
     print(f"  OK {rel} -> {data['version']}")
@@ -373,7 +375,7 @@ check-sync: all checks passed
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b add plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
-git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b commit -m "dev-flow 2.7.0, dev-flow-worktree 1.9.0"
+git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b commit -m "dev-flow 2.8.0, dev-flow-worktree 1.10.0"
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b show --stat --format=%s HEAD
 ```
 
@@ -398,7 +400,7 @@ git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b hash-object docs/superpowers/specs/2026-08-02-gh-28-29-review-prose-design.md
 ```
 
-Expected: `status --porcelain` prints nothing except, possibly, a modified `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this plan's own checkbox ticks). `hash-object` prints `3f0b75ab7e602ee78ffbe77dcf4fa2b4de7ee1bf` — **any other value means the implementation modified the design doc → HALT and report.**
+Expected: `status --porcelain` prints nothing except, possibly, a modified `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this plan's own checkbox ticks). `hash-object` prints `736716447cc075513769bfd66f8870feea5cfa89` — **any other value means the implementation modified the design doc → HALT and report.**
 
 - [x] **Step 2: Criteria 1 and 2 — `check-sync.py` and `claude plugin validate .`**
 
@@ -520,7 +522,7 @@ All eight criteria must be green:
 | 4 | `git grep -in 'group-resolution' -- plugins/` → no output, exit 1 | Task 3 Step 3 |
 | 5 | `git grep -c -i 'group' -- 'plugins/*/skills/adversarial-review/SKILL.md'` → `3` each | Task 3 Step 3 |
 | 6 | Design's three fenced blocks appear verbatim at lines 52/71/81 in both copies | Task 3 Step 4 |
-| 7 | Versions are `2.7.0` and `1.9.0` | Task 3 Step 5 |
+| 7 | Versions are `2.8.0` and `1.10.0`, both ahead of `origin/main` | Task 3 Step 5 |
 | 8a | Branch diff touches only the four files plus `docs/superpowers/` | Task 3 Step 6 |
 | 8b | Changed-line sets are exactly `{52, 71, 81}` / one `"version"` line | Task 3 Step 7 |
 
