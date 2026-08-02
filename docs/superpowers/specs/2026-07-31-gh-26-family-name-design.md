@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-26-family-name
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
