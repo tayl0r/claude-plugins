@@ -18,7 +18,7 @@ _Avoid_: group agent, judge, arbiter
 The model class a reviewer is spawned on — `sonnet` for seeds, `opus` for resolvers. Distinct from *family*.
 
 **Family**:
-A model's product line (Opus, Sonnet, Fable), independent of any dated version within it.
+A model's product line (Opus, Sonnet, Fable), independent of any dated version within it. A plugin's product line likewise: `dev-flow` is the family name its two variants share, independent of either variant's own version. A set of merely related constructs (connectors, handlers, jobs…) is not a family — the word for that is *kind*.
 
 **Family match**:
 The check that a reviewer's self-reported model belongs to the family its requested tier names. Preferred over matching a dated model id, which drifts.
