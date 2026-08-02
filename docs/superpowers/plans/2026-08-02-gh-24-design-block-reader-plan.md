@@ -240,7 +240,7 @@ Leave both new files in the working tree. The pipeline commits. Report that Task
 
 **What is being replaced, and why whole-line.** `CLAUDE.md` line 9 is the mirror-pair bullet. Only its **final sentence** differs between the old and new text; the design nonetheless gives the **complete new line** as block 1, and this task replaces the whole line. That is what gh-7 did for this same line (`docs/superpowers/plans/2026-07-27-gh-7-review-depth-plan.md`, Step 4) and it is the stronger check: an exact whole-line match at a known index cannot be satisfied by a fragment landing in the wrong bullet. The phrase the edit removes, for the residue grep, is `the block-to-file mapping differs every time` — pure ASCII and unique.
 
-- [ ] **Step 1: Run the design-conformance check and watch it FAIL (red)**
+- [x] **Step 1: Run the design-conformance check and watch it FAIL (red)**
 
 Run this **before** touching `CLAUDE.md`. It is the design's Verification step 5 verbatim, with B0/B1/B2 substituted. Run from the repo root. **The fence is unindented on purpose** — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -295,7 +295,7 @@ exit=1
 
 This is measured, not predicted. Note what is **absent**: no `scripts/design_blocks.py` mismatch, no `.gitignore` mismatch, no line-count mismatch — Task 1 landed both files and the whole-line replacement leaves the count at 29. If you see any of those extra lines, **STOP and report** — the tree is not in the state this task requires, and this task modifies `CLAUDE.md` line 9 and nothing else, so it cannot repair `scripts/design_blocks.py` or `.gitignore`. A `scripts/design_blocks.py` mismatch in particular means the applier in Step 2 would import a reader that does not match the design. If you see `design-conformance: OK` here, `CLAUDE.md` was edited before this step ran — **STOP and report**, the check has not been shown to discriminate. If the script exits with `design code-block shape is ...`, **STOP and report**: the design was edited after this plan captured its shape.
 
-- [ ] **Step 2: Apply the edit, re-reading block 1 from the design**
+- [x] **Step 2: Apply the edit, re-reading block 1 from the design**
 
 The replacement text is **never retyped**. This applier reads block 1 through `read_blocks`, asserts the target line is where and what it expects, and writes it. Run from the repo root. **The fence is unindented on purpose.**
 
@@ -334,7 +334,7 @@ exit=0
 
 The applier is deliberately single-shot: run it twice and the second run exits 1 with `the clause to replace is at 0-based lines [], want exactly [8] (line 9)`, because the phrase it anchors on is gone. That is correct behaviour, not a bug — if you see it, the edit already landed; go to Step 3 rather than re-applying. `split("\n")` / `"\n".join` round-trips the trailing newline exactly, so the file keeps its final newline and its 29 lines.
 
-- [ ] **Step 3: Re-run the design-conformance check and watch it PASS (green)**
+- [x] **Step 3: Re-run the design-conformance check and watch it PASS (green)**
 
 Run **the identical script from Step 1 again** — same text, unchanged. Do not edit it.
 
@@ -347,7 +347,7 @@ exit=0
 
 Red in Step 1, green here, with nothing between them but the applier: the check is now demonstrated to discriminate. If any `MISMATCH:` line survives, do not edit the check — fix `CLAUDE.md` by re-running Step 2's applier against a `CLAUDE.md` restored to its base state (`git checkout c8b2182 -- CLAUDE.md`).
 
-- [ ] **Step 4: Residue — the removed phrase is gone from shipped text**
+- [x] **Step 4: Residue — the removed phrase is gone from shipped text**
 
 ```sh
 git grep -n -F 'the block-to-file mapping differs every time' -- . ':!docs/superpowers/'
@@ -355,7 +355,7 @@ git grep -n -F 'the block-to-file mapping differs every time' -- . ':!docs/super
 
 Expected: **no output**, non-zero exit. The `':!docs/superpowers/'` pathspec is required — the design quotes the phrase, legitimately, and this plan quotes it too.
 
-- [ ] **Step 5: Presence — `CLAUDE.md` names the helper**
+- [x] **Step 5: Presence — `CLAUDE.md` names the helper**
 
 ```sh
 git grep -c -F 'scripts/design_blocks.py' -- CLAUDE.md
@@ -364,7 +364,7 @@ git grep -c -F 'read_blocks(<design>, <shape>)' -- CLAUDE.md
 
 Expected: each prints exactly `CLAUDE.md:1`.
 
-- [ ] **Step 6: One line changed, and only in `CLAUDE.md`**
+- [x] **Step 6: One line changed, and only in `CLAUDE.md`**
 
 ```sh
 git diff --stat c8b2182 -- CLAUDE.md
@@ -373,7 +373,7 @@ git diff --quiet c8b2182 -- plugins/ .claude-plugin/ CONTEXT.md docs/adr/ script
 
 Expected: the first prints a row reading ` CLAUDE.md | 2 +-` (one insertion, one deletion) and the summary `1 file changed, 1 insertion(+), 1 deletion(-)`. Read the numbers, not the bar widths, which git scales. The second prints `out-of-scope untouched: OK`.
 
-- [ ] **Step 7: Do not commit**
+- [x] **Step 7: Do not commit**
 
 Leave the change in the working tree. Report that Task 2 is complete, quoting the red output from Step 1 and the green output from Step 3.
 
