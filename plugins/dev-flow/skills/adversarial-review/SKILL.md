@@ -49,7 +49,7 @@ Do NOT invoke the `/simplify` skill for the diff-mode quality seed. `/simplify` 
 
 ## The design rubric
 
-Every group-resolution agent (see Resolution procedure, below) applies this rubric, unchanged, as its judgment of what "best long-term design" means:
+Every resolver (see Resolution procedure, below) applies this rubric, unchanged, as its judgment of what "best long-term design" means:
 
 - Best long-term design over short-term tradeoffs; we care about codebase quality and maintainability, not effort or severity.
 - OK to change adjacent code if it gets us to the better design.
@@ -68,7 +68,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 3. Each resolver:
    - First researches every issue it was assigned.
    - For each issue, determines the **best long-term design** by applying the rubric above, judging the group's findings together rather than in isolation.
-   - Performs an **inline** adversarial self-check within its own context — it tries to break its own conclusion (counterexamples, simpler alternatives, hidden coupling) before concluding. **Resolvers never invoke `adversarial-review` or spawn further reviewer agents** — the protocol has exactly two tiers (seed reviewers, group resolvers), and recursion is forbidden.
+   - Performs an **inline** adversarial self-check within its own context — it tries to break its own conclusion (counterexamples, simpler alternatives, hidden coupling) before concluding. **Resolvers never invoke `adversarial-review` or spawn further reviewer agents** — the protocol has exactly two tiers (seed reviewers, resolvers), and recursion is forbidden.
    - If the best design isn't obvious, or the agent isn't confident, it asks itself: *"what additional research do I need, or what questions do I need answered, to determine the best long-term design?"* — then does that research. If it's still unclear, it files a new issue (see "Where new issues are filed," below) and moves on.
 4. Apply each resolved fix — regardless of severity — only if it earns its place (fixer agents, on the main model). Skip a fix that is worse than the wart it addresses, or that is a complicated, hacky, or over-engineered fix for a super-rare edge case or race condition. Leave the artifact better than you found it; nothing more.
 5. Commit the improved artifact — this skill owns the commit in every mode. Do not push or merge — those integration steps are the caller's.
@@ -78,7 +78,7 @@ Every group-resolution agent (see Resolution procedure, below) applies this rubr
 
 ## Model
 
-**Group-resolution agents** — the tier that determines the best long-term design and adversarially self-checks — run on `opus` (a harness alias, never a dated model id), unconditionally, with no session-model-dependent fallback. Their independence from the artifact's author is **contextual, not cross-family**: a fresh context window with no memory of authoring, an explicitly adversarial prompt, and a spawn that provenance verifies out of band. A session-model-conditional tier would buy back family separation only by making the resolver tier depend on ambient state, which the provenance check could no longer compare against a fixed expectation.
+**Resolvers** — the tier that determines the best long-term design and adversarially self-checks — run on `opus` (a harness alias, never a dated model id), unconditionally, with no session-model-dependent fallback. Their independence from the artifact's author is **contextual, not cross-family**: a fresh context window with no memory of authoring, an explicitly adversarial prompt, and a spawn that provenance verifies out of band. A session-model-conditional tier would buy back family separation only by making the resolver tier depend on ambient state, which the provenance check could no longer compare against a fixed expectation.
 
 **Seed reviewers** — the findings-only quality and correctness passes — run on `sonnet`: cheaper than `opus`, and in the common case a different family from the author, which is a bonus on what gets *noticed* rather than a guarantee this protocol enforces. They only surface findings; the resolvers do the judgment, so the resolver tier's cost isn't warranted here.
 
