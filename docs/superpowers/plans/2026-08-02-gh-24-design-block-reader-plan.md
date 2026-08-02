@@ -389,7 +389,7 @@ Leave the change in the working tree. Report that Task 2 is complete, quoting th
 
 This is the design's Verification section, steps 0–10, with **B0 = 101, B1 = 1, B2 = 3** substituted throughout. Every command runs from the repo root. Base commit for every diff is `c8b2182`. **Run all eleven verification steps — 0 through 10 — and report each one's actual output**; do not stop at the first green. Step 11 is this task's own hand-off.
 
-- [ ] **Step 0: Derive the design's own block shape and confirm it still matches this plan**
+- [x] **Step 0: Derive the design's own block shape and confirm it still matches this plan**
 
 ```sh
 python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-24-design-block-reader-design.md
@@ -406,7 +406,7 @@ shape: [101, 1, 3]
 
 The three entries are B0, B1 and B2 in order. **If the shape has other than three entries, or any entry differs, STOP and report** — the design was edited after this plan captured its numbers, and every substituted literal in this plan is stale.
 
-- [ ] **Step 1: Exactly three files changed, none of them a plugin file**
+- [x] **Step 1: Exactly three files changed, none of them a plugin file**
 
 ```sh
 git add -N .gitignore scripts/design_blocks.py
@@ -430,7 +430,7 @@ Read the numbers, not the bar widths, which git scales; the column alignment als
 
 The `':!docs/superpowers/'` pathspec is required: this run's front-matter sets `docs: commit`, so this design and this plan are committed on this branch and an unfiltered diff necessarily reports them.
 
-- [ ] **Step 2: The helper reproduces the readers it replaces, on five real inputs**
+- [x] **Step 2: The helper reproduces the readers it replaces, on five real inputs**
 
 Each expected shape was asserted by that design's own merged plan, before this change existed. Five real inputs, four distinct shapes.
 
@@ -454,7 +454,7 @@ shape: [1]
 
 Any deviation means the copy of block 0 that Task 1 installed is not block 0 — the Step 2 slice was wrong, or the design moved after `bc72fac`. **STOP and report** — do not edit these expectations, which are historical records from merged plans.
 
-- [ ] **Step 3: The guard fires, and both fence refusals fire**
+- [x] **Step 3: The guard fires, and both fence refusals fire**
 
 First the shape guard. **The fence is unindented on purpose** — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -513,7 +513,7 @@ Expected — the temp path varies, the rest is exact:
 exit=1
 ```
 
-- [ ] **Step 4: The CLI rejects a wrong argument count**
+- [x] **Step 4: The CLI rejects a wrong argument count**
 
 ```sh
 python3 scripts/design_blocks.py; echo "exit=$?"
@@ -526,7 +526,7 @@ usage: python3 scripts/design_blocks.py <design-path>
 exit=1
 ```
 
-- [ ] **Step 5: Design conformance — all three blocks landed verbatim, in the right place, through the new reader**
+- [x] **Step 5: Design conformance — all three blocks landed verbatim, in the right place, through the new reader**
 
 This is the check `CLAUDE.md` requires, and it is also the helper's first end-to-end use. It re-reads all three blocks from the design on disk — never retyped — and requires block 0 to be `scripts/design_blocks.py` byte for byte, block 1 to be `CLAUDE.md` line 9 exactly and uniquely, and block 2 to be `.gitignore` byte for byte. `CLAUDE.md`'s expected length is **computed** from block 1's actual length, so a block-1 edit cannot leave it stale; `BASE_LINES = 29` is a frozen fact about `c8b2182`, not about any block. The script is pure ASCII on purpose; the non-ASCII lives only in the blocks it reads.
 
@@ -590,7 +590,7 @@ exit=1
 
 Both red and green were run against a scratch copy of the post-change tree while the design was written, so both expectations are measured, not predicted. If the shape guard trips instead (`design code-block shape is ...`), **STOP and report**: the design was edited after this plan captured its shape. Re-read the changed block before touching any number — the blocks are what every assertion in this plan indexes, so a moved shape can mean more than a moved count.
 
-- [ ] **Step 6: Residue — the phrase this edit removes is gone from shipped text**
+- [x] **Step 6: Residue — the phrase this edit removes is gone from shipped text**
 
 ```sh
 git grep -n -F 'the block-to-file mapping differs every time' -- . ':!docs/superpowers/'
@@ -598,7 +598,7 @@ git grep -n -F 'the block-to-file mapping differs every time' -- . ':!docs/super
 
 Expected: **no output**, non-zero exit. The pathspec is required — the design quotes the phrase, and so does this plan.
 
-- [ ] **Step 7: Presence — `CLAUDE.md` names the helper**
+- [x] **Step 7: Presence — `CLAUDE.md` names the helper**
 
 ```sh
 git grep -c -F 'scripts/design_blocks.py' -- CLAUDE.md
@@ -607,7 +607,7 @@ git grep -c -F 'read_blocks(<design>, <shape>)' -- CLAUDE.md
 
 Expected: each prints exactly `CLAUDE.md:1`.
 
-- [ ] **Step 8: No 24th copy, and the 9 historical documents are byte-identical to `c8b2182`**
+- [x] **Step 8: No 24th copy, and the 9 historical documents are byte-identical to `c8b2182`**
 
 ```sh
 git grep -c 'for line in Path(DESIGN)\.read_text' -- 'docs/superpowers/*' ':!docs/superpowers/*gh-24-design-block-reader*'
@@ -640,7 +640,7 @@ git diff --quiet c8b2182 -- docs/superpowers/plans/2026-07-27-gh-10-opus-resolve
 
 Expected: `records untouched: OK`. The 23 existing copies are deliberately left exactly as they are — they are records of what was executed, and rewriting them to import a file that did not exist at the time would make them claim a check was run in a form that could not have been run.
 
-- [ ] **Step 9: `check-sync.py` passes, with output identical to before the change**
+- [x] **Step 9: `check-sync.py` passes, with output identical to before the change**
 
 ```sh
 python3 scripts/check-sync.py; echo "exit=$?"
@@ -657,7 +657,7 @@ exit=0
 
 It reads none of the changed files: `CLAUDE.md` is enrolled in no mirror pair, and `check-sync.py` globs only `plugins/*/.claude-plugin/plugin.json`.
 
-- [ ] **Step 10: `claude plugin validate .` passes, and no version moved**
+- [x] **Step 10: `claude plugin validate .` passes, and no version moved**
 
 ```sh
 claude plugin validate .
@@ -676,7 +676,7 @@ plugins/dev-flow-worktree/.claude-plugin/plugin.json:  "version": "1.8.0",
 plugins/dev-flow/.claude-plugin/plugin.json:  "version": "2.6.0",
 ```
 
-- [ ] **Step 11: Report, do not commit**
+- [x] **Step 11: Report, do not commit**
 
 Leave everything in the working tree. The pipeline commits, pushes and opens the PR. Report:
 - the derived shape from Step 0 (`[101, 1, 3]`),
