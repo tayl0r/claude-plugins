@@ -88,7 +88,7 @@ Three properties are deliberate and load-bearing: the **model sentence stays fir
 - Consumes: nothing from an earlier task.
 - Produces: a `CONTEXT.md` that is 67 lines long and whose line directly after `**Family**:` is byte-identical to the design's sole plain-fenced block. Steps 7–13 depend on exactly that.
 
-- [ ] **Step 1: Read the design's change list, and read the target region**
+- [x] **Step 1: Read the design's change list, and read the target region**
 
 Read `/Users/taylor/dev/claude-plugins/docs/superpowers/specs/2026-07-31-gh-26-family-name-design.md` §`Exact change list` (the section headed `## Exact change list`) and confirm it contains one plain fenced block — a fence line that is exactly three backticks with nothing after it. Then look at the target:
 
@@ -99,7 +99,7 @@ wc -l CONTEXT.md
 
 Expected: line 20 is `**Family**:`, line 21 is `A model's product line (Opus, Sonnet, Fable), independent of any dated version within it.`, and `67 CONTEXT.md`.
 
-- [ ] **Step 2: Run the design-conformance check and watch it FAIL (red)**
+- [x] **Step 2: Run the design-conformance check and watch it FAIL (red)**
 
 This is the design's Verification step 4, run before the edit so you can see it discriminate. **The fence below is unindented on purpose** — an indented `python3` heredoc is an `IndentationError`. Copy it character for character.
 
@@ -160,7 +160,7 @@ exit=1
 
 If instead you see `design-conformance: OK`, the edit is already applied — skip to Step 5. If the `assert` on the fence shape trips (`design plain-fence shape changed`), **stop and report**: the design has been edited and this plan's block index is stale.
 
-- [ ] **Step 3: Apply the replacement with the applier script**
+- [x] **Step 3: Apply the replacement with the applier script**
 
 Reads block 0 from the design on disk and writes it into `CONTEXT.md`, matching the old line by content and requiring the `**Family**:` anchor immediately above it. Idempotent. **Unindented fence, pure ASCII — copy exactly.**
 
@@ -205,7 +205,7 @@ echo "exit=$?"
 
 Expected: `applied: Family definition, at line 21 of CONTEXT.md` and `exit=0` (or the `already applied:` line if re-run). Any `AssertionError` is a **stop and report**.
 
-- [ ] **Step 4: Residue check — the pre-change one-sentence form is gone as a whole line**
+- [x] **Step 4: Residue check — the pre-change one-sentence form is gone as a whole line**
 
 This is the design's Verification step 3. This edit deletes no text (it extends a line), so the usual removed-phrase grep degenerates to one assertion: the old form must no longer occur as a *complete* line. `git grep` has no `-x`, so this is deliberately a plain `grep`.
 
@@ -215,7 +215,7 @@ grep -x -F "A model's product line (Opus, Sonnet, Fable), independent of any dat
 
 Expected: **no output**, then `exit=1`. (`exit=1` is the pass here — `grep` exits 1 on no match.) One file, one exact-line match, no ordering — this behaves identically under a plain `grep` and under an aliased one. Step 5's script re-asserts the same thing from Python; the two are independent implementations of one assertion, and if they ever disagree, **stop and report** rather than picking a winner.
 
-- [ ] **Step 5: Run the design-conformance check and watch it PASS (green)**
+- [x] **Step 5: Run the design-conformance check and watch it PASS (green)**
 
 Re-run **the exact script from Step 2 above** — same characters, no edits; re-read this task's text if you need it. It is deliberately not duplicated here: one copy is the check, two copies are two things to keep in step. It re-reads the replacement from the design on disk and demands a byte-for-byte line match in `CONTEXT.md` directly after the `**Family**:` anchor. The anchor matters on its own: the same line pasted under **Family match** or **Tier** would satisfy a bare containment check and be wrong. The final branch is the one protecting **Family match** — it fails if the model sentence is no longer first.
 
@@ -228,7 +228,7 @@ exit=0
 
 Any `MISMATCH:` line is a **stop and report** — do not hand-patch `CONTEXT.md` to satisfy it. Re-run Step 3 instead.
 
-- [ ] **Step 6: Confirm the edit is a one-line replacement, not an append**
+- [x] **Step 6: Confirm the edit is a one-line replacement, not an append**
 
 ```sh
 wc -l CONTEXT.md
@@ -240,7 +240,7 @@ Expected: `67 CONTEXT.md`; then `1	1	CONTEXT.md` (one insertion, one deletion �
 
 **Steps 7–13 make no edits; their deliverable is the recorded evidence that the ruling of "no finding" shipped without collateral. If any check here fails, stop and report — do not repair by editing the files the check names.**
 
-- [ ] **Step 7: Exactly one source file changed, and it is not a plugin file** (design Verification step 1)
+- [x] **Step 7: Exactly one source file changed, and it is not a plugin file** (design Verification step 1)
 
 ```sh
 git diff --stat 0c05098 -- . ':!docs/superpowers/'
@@ -253,7 +253,7 @@ The `':!docs/superpowers/'` pathspec is the design's own, verbatim: the design's
 
 The second command is the strongest form of the check `CLAUDE.md` requires for a hand-mirrored pair: rather than proving a mirrored edit landed on both sides, it proves **neither side was touched**, measured against the base commit rather than against the pair's other half. Note `git diff --quiet` exits 1 when differences exist, so a missing `plugins/ untouched: OK` line is the failure signal.
 
-- [ ] **Step 8: The three sites named in #26 read exactly as they did** (design Verification step 2)
+- [x] **Step 8: The three sites named in #26 read exactly as they did** (design Verification step 2)
 
 ```sh
 git grep -c -F '(`dev-flow` is the family name they share)' -- plugins/
@@ -271,7 +271,7 @@ Expected from the second: one hit, `plugins/dev-flow-worktree/README.md:89:repo,
 
 These three sites staying untouched **is the ruling**. A missing or altered hit means someone "fixed" prose the design found correct.
 
-- [ ] **Step 9: Commit `0c05098`'s repair is not silently undone** (design Verification step 5)
+- [x] **Step 9: Commit `0c05098`'s repair is not silently undone** (design Verification step 5)
 
 The widened entry must not re-admit the grab-bag sense that commit removed.
 
@@ -281,7 +281,7 @@ git grep -n -i 'known family' -- . ':!docs/superpowers/'; echo "exit=$?"
 
 Expected: **no output**, then `exit=1`. The pathspec is required — the design quotes that string, and so does nothing else in shipped text.
 
-- [ ] **Step 10: Versions did not move** (design Verification step 6)
+- [x] **Step 10: Versions did not move** (design Verification step 6)
 
 ```sh
 git grep '"version"' -- plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
@@ -296,7 +296,7 @@ plugins/dev-flow/.claude-plugin/plugin.json:  "version": "2.6.0",
 
 `git grep` rather than `grep -h`, because the assertion is *which plugin is at which version* and `-h` strips exactly the labels that carry it: under Claude Code's Bash tool bare `grep` is a ugrep-backed shell function whose multi-file output order is not stable between runs, so with `-h` the two values become indistinguishable. `git grep` labels each hit and sorts by path, so this output is deterministic. `CONTEXT.md` ships into no version-keyed plugin cache, so `CLAUDE.md`'s bump rule does not apply here. **If you bumped either version, revert the bump.**
 
-- [ ] **Step 11: `check-sync.py` passes, unchanged** (design Verification step 7)
+- [x] **Step 11: `check-sync.py` passes, unchanged** (design Verification step 7)
 
 ```sh
 python3 scripts/check-sync.py; echo "exit=$?"
@@ -313,7 +313,7 @@ exit=0
 
 Unchanged from before this task, since no file it reads is touched — it never reads `CONTEXT.md`, and `.claude-plugin/marketplace.json` carries no `description` change.
 
-- [ ] **Step 12: `claude plugin validate .` passes** (design Verification step 8)
+- [x] **Step 12: `claude plugin validate .` passes** (design Verification step 8)
 
 ```sh
 claude plugin validate .; echo "exit=$?"
@@ -321,12 +321,12 @@ claude plugin validate .; echo "exit=$?"
 
 Expected: `✔ Validation passed with warnings`, `exit=0`, and **8** `No author information provided` warnings. **Those 8 warnings are expected and are not a failure.** A non-zero exit, an error, or a warning count other than 8 is a failure.
 
-- [ ] **Step 13: Record the behavioural observation for #23 — take no action** (design Verification step 9)
+- [x] **Step 13: Record the behavioural observation for #23 — take no action** (design Verification step 9)
 
 **Do not invoke `adversarial-review` or any other review skill.** The pipeline runs its own reviews and owns that stage. Your job is only to carry this note into your report so it can be recorded on issue #23:
 
 > The installed `dev-flow` is already `2.6.0` at `gitCommitSha 0c050989`, so this change's own reviews exercise the glossary-conformance angle and the drift clause. Correct outcomes: **no finding** on `family` in `design` and `plan` mode on this run's artifacts, and **no finding** in `diff` mode on this branch — the one added shipped line is `CONTEXT.md`'s own **Family** entry, which by construction names what its entry defines. A finding that quotes **Family**'s model sentence against this change's plugin use is evidence the *"in the sense the repo already has"* exclusion is too weak, which is the false positive this change exists to foreclose. Record the outcome on #23; **do not change the design because of it.**
 
-- [ ] **Step 14: Report, do not commit**
+- [x] **Step 14: Report, do not commit**
 
 Report each of Steps 1–13 as pass or fail with the actual output you saw. Leave the edit in the working tree. **Do not run `git commit`, `git push`, `gh pr create`, or any review skill** — the pipeline owns all of them.
