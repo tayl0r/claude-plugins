@@ -270,7 +270,7 @@ Expected: the commit succeeds and `show --stat` lists **exactly two** files, bot
 
 **Why:** the text in `adversarial-review/SKILL.md` ships into every model invocation, so a wording change is a behavior change under `CLAUDE.md`'s bump rule, and the install cache is version-keyed — an edit at an unchanged version is never picked up on re-sync. Minor rather than patch is the design's ruling: no version either plugin has ever shipped has a nonzero patch segment, and adopting a minor-vs-patch convention is a `CLAUDE.md`-level decision this change is scoped out of.
 
-- [ ] **Step 1: Confirm the current versions**
+- [x] **Step 1: Confirm the current versions**
 
 ```bash
 grep -n '"version"' /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b/plugins/dev-flow/.claude-plugin/plugin.json
@@ -291,7 +291,7 @@ and the second (`dev-flow-worktree`) prints:
 
 Anything else → **HALT and report**; do not guess the next number.
 
-- [ ] **Step 2: Apply both bumps**
+- [x] **Step 2: Apply both bumps**
 
 Use the `Edit` tool (or an equivalent exact-string replacement) on each file — one edit per file, replacing only the version string:
 
@@ -300,7 +300,7 @@ Use the `Edit` tool (or an equivalent exact-string replacement) on each file —
 
 Do not reformat, reorder keys, or touch `name` or `description` — `description` is duplicated into `.claude-plugin/marketplace.json` and `check-sync.py` enforces the pair.
 
-- [ ] **Step 3: Verify the versions and that the JSON still parses — success criterion 7**
+- [x] **Step 3: Verify the versions and that the JSON still parses — success criterion 7**
 
 ```bash
 python3 - <<'PY'
@@ -317,7 +317,7 @@ PY
 
 Expected: two `OK` lines then `criterion 7: PASS`, exit 0.
 
-- [ ] **Step 4: Verify only the version line moved — success criterion 8(b), `plugin.json` half**
+- [x] **Step 4: Verify only the version line moved — success criterion 8(b), `plugin.json` half**
 
 The line *number* is deliberately not pinned — line position is not a stable property of a JSON file. What is asserted is that exactly one line differs and that it is the `"version"` line.
 
@@ -355,7 +355,7 @@ PY
 
 Expected: the `BASE =` line, two `OK` lines each showing a single line number and the new `"version"` text, then `criterion 8(b) [plugin.json]: PASS`, exit 0.
 
-- [ ] **Step 5: Verify `check-sync.py` still passes — the `description` pair is untouched**
+- [x] **Step 5: Verify `check-sync.py` still passes — the `description` pair is untouched**
 
 ```bash
 python3 /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b/scripts/check-sync.py ; echo "exit=$?"
@@ -369,7 +369,7 @@ check-sync: mirror pair "adversarial-review" ... OK (89 lines, 1 declared except
 check-sync: all checks passed
 ```
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b add plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
