@@ -62,7 +62,7 @@ dev-flow: {slug: gh-30-flat-topology, spec: docs/superpowers/specs/2026-08-02-gh
 
 Context: line 266 of the `dev-flow` copy and line 261 of the `dev-flow-worktree` copy are each the first bullet under `## Environment Assumptions`, beginning `- **Flat topology — the orchestrator is the only spawner.**`. Each contains the false clause `**Claude Code 2.1.218 does not grant spawned subagents the ...` and a trailing parenthetical about 2.1.217 / 1.2.0. Each whole line is replaced by the design's matching block, which keeps the normative `This is required, not a preference:` clause but re-anchors it to a version-independent reason. The ADR body deliberately *does* contain `2.1.217` / `2.1.218` / `2.1.220` and quotes `adversarial-review`'s Review-integrity clause — that is dated evidence, correct and intended, and it is why every residue grep in this plan is scoped to `plugins/`. `plugins/*/skills/adversarial-review/SKILL.md` is quoted but **must not be edited**.
 
-- [ ] **Step 1: Confirm the pre-change state of all three targets**
+- [x] **Step 1: Confirm the pre-change state of all three targets**
 
 Run:
 
@@ -74,7 +74,7 @@ ls docs/adr/
 
 Expected: in each `SKILL.md`, `## Environment Assumptions`, then a blank line, then the flat-topology bullet containing the substring `does not grant spawned subagents` — at lines 264–266 with a line count of `277` for `dev-flow`, and at lines 259–261 with a line count of `271` for `dev-flow-worktree`; then `docs/adr/` holding exactly `0001-duplicate-the-two-dev-flow-variants.md` and `0002-opus-resolvers-and-the-end-of-adversary-not-author.md`. If any of that differs — including a `0003-…` already present — STOP and report; the design's line numbers no longer describe the files.
 
-- [ ] **Step 2: Apply all three edits by copying the payload blocks out of the design on disk**
+- [x] **Step 2: Apply all three edits by copying the payload blocks out of the design on disk**
 
 Run this exactly. Do **not** retype any payload text, and do **not** derive the second bullet by search-and-replacing the first — every byte comes from the design file. (The fence is unindented on purpose — an indented `python3` heredoc is an `IndentationError`.)
 
@@ -143,7 +143,7 @@ wrote docs/adr/0003-flat-topology-for-the-dev-flow-pipelines.md 30 lines
 
 Any `AssertionError` traceback means STOP and report — a target or the design is not in the state this plan assumes, and **nothing was written**: the script validates all three targets before writing any of them. That includes a re-run after a successful apply, which fails on the first bullet — a completed apply is not re-appliable, so report it rather than editing anything by hand.
 
-- [ ] **Step 3: Verify — both bullets in place, both files still their original length, the ADR present, and the removed phrases gone from `plugins/`**
+- [x] **Step 3: Verify — both bullets in place, both files still their original length, the ADR present, and the removed phrases gone from `plugins/`**
 
 Run:
 
@@ -168,7 +168,7 @@ plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md:1
 
 then **no output** from the residue grep followed by `residue-exit=1`.
 
-- [ ] **Step 4: Verify against the design — the conformance check must pass clean**
+- [x] **Step 4: Verify against the design — the conformance check must pass clean**
 
 This is the `CLAUDE.md` per-change check: it re-reads all three payload blocks from the design on disk and asserts each landed byte-for-byte in its target. It is reproduced in full here and again in **Task 3 Step 3**, because each task is dispatched with only its own text — that duplication is deliberate, and neither copy may be replaced by a pointer to the other. (Whether this repo should grow a shared runner for it is **#24**, which owns `CLAUDE.md` and `scripts/`; both are forbidden here.)
 
