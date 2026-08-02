@@ -110,9 +110,9 @@ whose stripped form opens with three backticks, an empty info string for a
 plain block. Three-backtick fences are the only ones parsed, so the two inputs
 that would otherwise shift every block index unnoticed are refused rather than
 guessed at: a longer fence, and a fence that is never closed. It follows that
-a plain block cannot hold a line that is exactly three backticks -- that line
-closes it -- so a design must give text containing fences as a tagged block,
-or build the fence in code the way this file does.
+no block of either kind can hold a line that is exactly three backticks: that
+line closes it, tagged or not, and the resulting mis-pairing can be silent. A
+design must build any fence it quotes in code, the way this file does.
 
 Design: docs/superpowers/specs/2026-08-02-gh-24-design-block-reader-design.md
 """
