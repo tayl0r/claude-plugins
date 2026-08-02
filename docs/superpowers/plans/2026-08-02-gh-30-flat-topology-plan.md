@@ -291,7 +291,7 @@ Any `MISMATCH:` line means STOP and report which one. This is the check that cat
 
 Why **minor**, not patch: the replacement clause carries an instruction the bullet did not previously carry (*observing that it currently works is not permission to nest*), which is a behavior change on `CLAUDE.md`'s terms; and this repo has never used a non-zero patch segment, so introducing one would establish a convention as a side effect. Decided in the design — do not re-decide it. Do **not** touch `description` in either file and do **not** touch `.claude-plugin/marketplace.json`.
 
-- [ ] **Step 1: Confirm the current versions**
+- [x] **Step 1: Confirm the current versions**
 
 Run:
 
@@ -308,15 +308,15 @@ plugins/dev-flow/.claude-plugin/plugin.json:  "version": "2.6.0",
 
 If either differs, STOP and report. (The design's recorded default for a colliding bump from another change is *rebase and take the next minor above whatever `main` then holds* — but that changes the target numbers this plan and its verification state, so it is a report-and-confirm, not a silent adjustment.)
 
-- [ ] **Step 2: Edit `plugins/dev-flow/.claude-plugin/plugin.json`**
+- [x] **Step 2: Edit `plugins/dev-flow/.claude-plugin/plugin.json`**
 
 Replace the single line `  "version": "2.6.0",` with `  "version": "2.7.0",`. Change nothing else in the file — same indentation, same trailing comma.
 
-- [ ] **Step 3: Edit `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
+- [x] **Step 3: Edit `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
 
 Replace the single line `  "version": "1.8.0",` with `  "version": "1.9.0",`. Change nothing else in the file.
 
-- [ ] **Step 4: Verify — both versions moved, both files still valid JSON, nothing else changed**
+- [x] **Step 4: Verify — both versions moved, both files still valid JSON, nothing else changed**
 
 Run:
 
