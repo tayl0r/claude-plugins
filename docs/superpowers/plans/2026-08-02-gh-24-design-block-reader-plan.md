@@ -69,7 +69,7 @@ Everything below the shape guard — which block goes to which file, the anchors
   - `python3 scripts/design_blocks.py <design-path>` — prints `shape: [...]` then one `  [i] len=N: <first 70 chars of the block's first line>` line per block. Exit 1 with a usage line if the argument count is not exactly 1.
   - Refusals, both exit 1 with one line on stderr: a fence longer than three backticks (`<path> line <N>: this reader parses three-backtick fences only; a longer one mis-indexes every block after it`) and a fence that is never closed (`<path>: the fence opened at line <N> is never closed; a plain block cannot contain a three-backtick line`).
 
-- [ ] **Step 1: Locate the two blocks in the design**
+- [x] **Step 1: Locate the two blocks in the design**
 
 Open `docs/superpowers/specs/2026-08-02-gh-24-design-block-reader-design.md` and find its **plain fenced blocks** — the fences whose opening line is exactly three backticks with **no** info string after them. There are exactly three. You need the first (block 0) and the third (block 2).
 
@@ -95,7 +95,7 @@ __pycache__/
 
 Those line numbers are the coordinates Steps 2 and 3 slice on, and they are safe to slice on because they are read off the design **as committed at `bc72fac`**, which `git show` reproduces byte for byte forever. **The enclosing fence lines are not part of the block** — each slice starts one line after the opening fence and ends one line before the closing one. Measured on `bc72fac`: no line anywhere in `77–177` or in `217–219` is a fence — there is no line in either range whose stripped form starts with three backticks — so neither slice can straddle one. You do not have to take that on trust: Step 4 refuses to run a file that carries a stray fence line, and Step 5 compares both slices, line by line, against the blocks the *fences* delimit in the design **on disk**. If Step 4 or Step 5 disagrees with these numbers, **STOP and report** — the design moved after this plan captured it and every substituted literal here is suspect. **Do not re-slice on adjusted coordinates**, which would silently absorb the change instead of surfacing it.
 
-- [ ] **Step 2: Extract `scripts/design_blocks.py` from the design — do not type it**
+- [x] **Step 2: Extract `scripts/design_blocks.py` from the design — do not type it**
 
 Run this exactly, from the repo root. `scripts/` already exists (it holds `check-sync.py`).
 
@@ -110,7 +110,7 @@ wc -l scripts/design_blocks.py
 
 `git show <sha>:<path>` is used rather than reading the design out of the working tree on purpose, and it is the reason Step 5 means something. It pins the bytes to the commit this plan measured, so if the design has moved since `bc72fac` this step still writes what the plan reviewed, and Step 5 — which reads the design **on disk** — reports the divergence. The shape guard alone would not: an edit that leaves block 0 at 101 lines is invisible to it. Slicing the working-tree copy would absorb such an edit silently and go green.
 
-- [ ] **Step 3: Extract `.gitignore` from the design — do not type it**
+- [x] **Step 3: Extract `.gitignore` from the design — do not type it**
 
 Same mechanism, same commit, the other block. Run from the repo root:
 
@@ -129,7 +129,7 @@ __pycache__/
 
 Empty or short output means the extraction failed — **STOP and report**, and do not type the lines in by hand. This is the repo's first `.gitignore`; do not add anything to it. In particular do **not** add `.claude/worktrees/` or `.claude/dev-flow.local.md` — dev-flow puts those in `.git/info/exclude` itself, and duplicating them here would add a second owner for a question that already has one.
 
-- [ ] **Step 4: Run the new CLI against the design — the extraction's first, loudest check**
+- [x] **Step 4: Run the new CLI against the design — the extraction's first, loudest check**
 
 ```sh
 python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-24-design-block-reader-design.md
@@ -146,7 +146,7 @@ shape: [101, 1, 3]
 
 A `SyntaxError` or `IndentationError` pointing at a line that is three backticks means the Step 2 slice swallowed a fence line — the Step 1 coordinates are off by one. **No output at all with `exit=0`** means the file is empty and Step 2's `wc -l` was not read. Any other traceback, or any other shape, means the file is not design block 0. In every case: re-run Step 2's command once, verbatim, to rule out a truncated write; if the same failure repeats, **STOP and report** — the extraction is deterministic, so a repeat means the design moved after `bc72fac`. **Do not adjust this expected output, do not edit the design, and do not hand-correct `scripts/design_blocks.py`.**
 
-- [ ] **Step 5: Prove both files byte-for-byte against the design, using the file just written**
+- [x] **Step 5: Prove both files byte-for-byte against the design, using the file just written**
 
 This is the bootstrap closing on itself: the helper reads the design **on disk** and hands back the very blocks the two new files were sliced from. It is not a tautology, because the two sides are derived differently — Steps 2 and 3 sliced the design *as committed at `bc72fac`* on fixed line coordinates, and this step checks that against the blocks the *fences* delimit in the design as it stands now. It therefore discriminates on three independent things: a slice whose coordinates were wrong but which still parsed as Python (dropping the shebang does exactly that, and Step 4 passes it), a design that moved after `bc72fac` without changing any block's length, and a reader whose fence parsing disagrees with the fences a human read — which is this helper's first end-to-end exercise (design, *Question 1*). Run from the repo root. **The fence is unindented on purpose** — a `python3` heredoc indented under a list item is an `IndentationError`.
 
@@ -192,7 +192,7 @@ exit=0
 
 Any `MISMATCH:` line names the file, the block and the first differing line. Because Steps 2 and 3 are deterministic, re-running them cannot change the result, so a mismatch here means one of two things: the Step 1 coordinates are wrong, or the design on disk is no longer the design at `bc72fac`. **STOP and report**, quoting the `first difference at ...` line — do not hand-edit either file to make this pass, and do not re-slice on adjusted coordinates. Same if the script exits with `design code-block shape is ...`: the design's block shape moved and this plan's indices are stale.
 
-- [ ] **Step 6: Prove the `.gitignore` actually suppresses the bytecode**
+- [x] **Step 6: Prove the `.gitignore` actually suppresses the bytecode**
 
 Step 5 imported `design_blocks`, so CPython has just written `scripts/__pycache__/design_blocks.cpython-3XX.pyc` into the working tree. That artifact is the entire reason `.gitignore` exists: untracked, it never reaches `git diff --stat`, it trips dev-flow's dirty-checkout gate on every later run, and it is one broad `git add` away from an unrelated PR.
 
@@ -213,7 +213,7 @@ Expected:
   (the separator is a tab). `.gitignore` line 2 is `__pycache__/`. A **non-zero exit with no output** means the artifact is *not* ignored — the `.gitignore` did not land, or landed with the wrong content. **STOP and report.**
 - `git status --porcelain --untracked-files=all -- scripts/` shows a line for `scripts/design_blocks.py` and **no line mentioning `__pycache__` or `.pyc`**. A `__pycache__` line here is the same failure. **STOP and report.**
 
-- [ ] **Step 7: Confirm nothing else in the tree changed**
+- [x] **Step 7: Confirm nothing else in the tree changed**
 
 ```sh
 git status --porcelain -- CLAUDE.md
@@ -222,7 +222,7 @@ git diff --quiet c8b2182 -- plugins/ .claude-plugin/ && echo "plugins/ untouched
 
 Expected: the first command prints **nothing** — Task 1 does not touch `CLAUDE.md`; that is Task 2's job. The second prints `plugins/ untouched: OK`.
 
-- [ ] **Step 8: Do not commit**
+- [x] **Step 8: Do not commit**
 
 Leave both new files in the working tree. The pipeline commits. Report that Task 1 is complete, that the CLI printed `shape: [101, 1, 3]`, and that `bootstrap-conformance: OK`.
 
