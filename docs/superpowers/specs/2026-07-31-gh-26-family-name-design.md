@@ -128,12 +128,14 @@ The widened entry makes `family` harder to flag, and that cuts both ways: a genu
 
 ## Verification
 
-1. **Exactly one file changed, and it is not a plugin file.** Expect `CONTEXT.md | 2 +-` and nothing else, then `plugins/ untouched: OK`:
+1. **Exactly one file changed, and it is not a plugin file.** Expect ` CONTEXT.md | 2 +-` then ` 1 file changed, 1 insertion(+), 1 deletion(-)` and nothing else, then `plugins/ untouched: OK`:
 
    ```sh
-   git diff --stat 0c05098 -- .
+   git diff --stat 0c05098 -- . ':!docs/superpowers/'
    git diff --quiet 0c05098 -- plugins/ .claude-plugin/ && echo "plugins/ untouched: OK"
    ```
+
+   The `':!docs/superpowers/'` pathspec is required, for the same reason step 5's is: this design's front-matter sets `docs: commit`, so this run's own design and plan docs are themselves committed on this branch, and an unfiltered diff against the base necessarily reports them — *"and nothing else"* would be unsatisfiable by construction. Any path outside `CONTEXT.md` and `docs/superpowers/` is a failure.
 
    The second command is the check `CLAUDE.md` requires for a hand-mirrored pair and the one this change can make strongest: rather than proving a mirrored edit landed on both sides, it proves neither side was touched, against the base commit rather than against the pair's other half.
 
@@ -208,11 +210,13 @@ echo "exit=$?"
 
    The pathspec is required: this design quotes the string.
 
-6. **Versions did not move.** Expect `2.6.0` and `1.8.0`:
+6. **Versions did not move.** Expect `dev-flow-worktree` at `1.8.0` and `dev-flow` at `2.6.0`, each on a line naming its own file:
 
    ```sh
-   grep -h '"version"' plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
+   git grep '"version"' -- plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
    ```
+
+   `git grep`, not `grep -h`: the assertion is *which plugin is at which version*, and `-h` strips exactly the labels that carry it — under Claude Code's Bash tool bare `grep` is a ugrep-backed shell function whose multi-file output order is not stable between runs (measured: both orders occur), so with `-h` the two values become indistinguishable. `git grep` labels each hit with its path and sorts by path, so the output is deterministic and self-describing.
 
 7. `python3 scripts/check-sync.py` — passes. Expect `mirror pair "adversarial-review" ... OK (89 lines, 1 declared exception)`, unchanged, since no file it reads is touched.
 
