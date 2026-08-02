@@ -4,7 +4,7 @@ dev-flow: {slug: gh-30-flat-topology, spec: docs/superpowers/specs/2026-08-02-gh
 
 # gh-30 Flat-Topology Re-Anchor Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use markdown task-list checkboxes for tracking. (This sentence deliberately does not spell an empty checkbox: dev-flow's Artifact Contract reads "zero unchecked boxes remain at branch tip" as the execution-complete signal, and a literal one here would keep that predicate false forever.)
 
 **Goal:** Rewrite the flat-topology bullet in both pipeline `SKILL.md`s so it names no harness version and no tool name, record the topology decision in a new ADR, and bump both plugin versions.
 
@@ -348,7 +348,7 @@ then a `git diff --stat` whose summary line is exactly `2 files changed, 2 inser
 
 This is the design's Verification section run end to end. Steps 1–3 are the `CLAUDE.md` hand-mirrored-pair procedure — residue greps plus the per-change design-conformance check — and they are the only things anchored **outside** the pair. `check-sync.py` (step 6) does **not** read these two files at all.
 
-- [ ] **Step 1: Residue — the removed phrases are gone from shipped text**
+- [x] **Step 1: Residue — the removed phrases are gone from shipped text**
 
 Run:
 
@@ -362,7 +362,7 @@ grep -rn -E '2\.1\.2' plugins/; echo "exit=$?"
 
 Expected: **no output** from any of the five greps, and `exit=1` after each. Scoped to `plugins/` deliberately — this design doc and ADR-0003 both quote these strings and are correct places for them to appear.
 
-- [ ] **Step 2: The normative clause survives in both copies and only there**
+- [x] **Step 2: The normative clause survives in both copies and only there**
 
 Run:
 
@@ -379,7 +379,7 @@ plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md:1
 
 Any third line, or a count other than `1`, means STOP and report.
 
-- [ ] **Step 3: Design conformance — both bullets and the ADR landed verbatim, in the right place**
+- [x] **Step 3: Design conformance — both bullets and the ADR landed verbatim, in the right place**
 
 Run (the fence is unindented on purpose — an indented `python3` heredoc is an `IndentationError`). This is the same block as **Task 1 Step 4**, reproduced in full because each task is dispatched with only its own text:
 
@@ -486,7 +486,7 @@ exit=0
 
 This is the check that catches a paraphrase, a one-sided edit, a length change, or a bullet moved out from under `## Environment Assumptions`. Nothing else in the repository catches any of those.
 
-- [ ] **Step 4: Versions moved, and by one minor**
+- [x] **Step 4: Versions moved, and by one minor**
 
 Run:
 
@@ -503,7 +503,7 @@ plugins/dev-flow/.claude-plugin/plugin.json:  "version": "2.7.0",
 
 `git grep` rather than bare `grep`: the assertion is *which plugin is at which version*, and only `git grep`'s path-labelled, path-sorted output makes that deterministic.
 
-- [ ] **Step 5: Forbidden files untouched**
+- [x] **Step 5: Forbidden files untouched**
 
 Run:
 
@@ -513,7 +513,7 @@ git diff --name-only main -- CLAUDE.md CONTEXT.md scripts/ 'plugins/*/skills/adv
 
 Expected: **no output.** Any path printed here is a scope violation — STOP and report it rather than reverting silently.
 
-- [ ] **Step 6: `check-sync.py` still passes**
+- [x] **Step 6: `check-sync.py` still passes**
 
 Run:
 
@@ -531,7 +531,7 @@ check-sync: all checks passed
 
 Note what this does **not** cover: the pipeline `SKILL.md` pair is not enrolled, so a one-sided edit passes it silently. Step 3 is the check that catches that.
 
-- [ ] **Step 7: `claude plugin validate .` passes**
+- [x] **Step 7: `claude plugin validate .` passes**
 
 Run:
 
@@ -541,7 +541,7 @@ claude plugin validate .; echo "exit=$?"
 
 Expected: validation succeeds with **exactly 8** `No author information provided` warnings and `exit=0`. Those 8 warnings are the expected steady state of this repo, **not a failure** — do not attempt to fix them, and do not add author fields.
 
-- [ ] **Step 8: Confirm the working tree holds only the expected changes, uncommitted**
+- [x] **Step 8: Confirm the working tree holds only the expected changes, uncommitted**
 
 Run:
 
