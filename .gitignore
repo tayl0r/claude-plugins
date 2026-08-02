@@ -1,0 +1,3 @@
+# Bytecode from importing scripts/design_blocks.py in design-conformance checks.
+__pycache__/
+*.pyc
