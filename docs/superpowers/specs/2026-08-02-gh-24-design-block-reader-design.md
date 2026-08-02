@@ -132,13 +132,13 @@ def _blocks(design_path):
     blocks, cur, mode, opened = [], None, None, 0
     for n, line in enumerate(text.split("\n"), 1):
         s = line.strip()
+        if s.startswith(FENCE + FENCE[0]):
+            raise SystemExit("%s line %d: this reader parses three-backtick"
+                             " fences only; a longer one mis-indexes every"
+                             " block after it" % (design_path, n))
         if mode is None:
             if s.startswith(FENCE):
                 mode, cur, opened = s[3:], [], n
-                if mode.startswith(FENCE[0]):
-                    raise SystemExit("%s line %d: this reader parses three-backtick"
-                                     " fences only; a longer one mis-indexes every"
-                                     " block after it" % (design_path, n))
         elif s == FENCE:
             if mode == "":
                 blocks.append(cur)
