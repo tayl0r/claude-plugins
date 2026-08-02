@@ -70,7 +70,7 @@ No file is created. No file is deleted. No `check-sync.py` exception is added (d
 
 **What changes:** three short spans, one per line, listed in Step 3's table. Nothing else on those lines moves.
 
-- [ ] **Step 1: Confirm the starting state and that the design doc is intact**
+- [x] **Step 1: Confirm the starting state and that the design doc is intact**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b
@@ -84,7 +84,7 @@ Expected:
 - `status --porcelain` prints nothing except, possibly, a modified `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this plan's own checkbox ticks — an authorized modification, and the same allowance Task 3 Step 1 makes). Any other modified or untracked path → **HALT and report**: the tree is not in the state this plan was written against.
 - `wc -l` prints `89` for each file.
 
-- [ ] **Step 2: Record the pre-edit grep baseline**
+- [x] **Step 2: Record the pre-edit grep baseline**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b grep -c -i 'group' -- 'plugins/*/skills/adversarial-review/SKILL.md'
@@ -99,7 +99,7 @@ plugins/dev-flow/skills/adversarial-review/SKILL.md:6
 
 `6` is the pre-edit count; criterion 5 requires `3` after the edit. If it is not `6`, the files are not in the state the design measured → **HALT and report**.
 
-- [ ] **Step 3: Apply the three substitutions in both copies**
+- [x] **Step 3: Apply the three substitutions in both copies**
 
 Six exact-string replacements — three per file — with the `Edit` tool (or an equivalent exact-string replacement). This is design **A1** applied literally: `Edit` locates its target by **text**, never by line number, and refuses when the string is absent or not unique, so a file that is not in the state the design measured cannot be edited by accident. Each `old_string` below is quoted verbatim in the design doc and occurs **exactly once** per file at `BASE` (verified). Each replacement substitutes only the named span, so every other byte of lines 52, 71 and 81 — line 71's three leading spaces and its em dashes included — is carried over by the tool rather than transcribed.
 
@@ -117,7 +117,7 @@ If an `Edit` reports its string is absent or not unique, **HALT and report** —
 
 Nothing downstream trusts this step. Step 4 re-reads the design's three fenced blocks **from disk** and proves they landed byte-for-byte at 52/71/81 in both copies; Step 6 proves the pair is still in sync; Step 7 proves no other line moved. All three run before Step 8 commits.
 
-- [ ] **Step 4: Verify the three blocks landed verbatim — success criterion 6**
+- [x] **Step 4: Verify the three blocks landed verbatim — success criterion 6**
 
 This is the `CLAUDE.md`-mandated check: it re-reads the three blocks **from the design on disk** and asserts each appears verbatim at its stated line index in both copies. It shares `split_lines` / `block_after` with Step 3 by design — it is a *separate* read-only run, not the same process.
 
@@ -169,7 +169,7 @@ PY
 
 Expected: six `OK` lines then `criterion 6: PASS`, exit 0.
 
-- [ ] **Step 5: Verify the removed phrases are gone — success criteria 3, 4, 5**
+- [x] **Step 5: Verify the removed phrases are gone — success criteria 3, 4, 5**
 
 Scope every grep to `plugins/`. Repo-wide these phrases still hit, **correctly and by design**, in `docs/adr/0002-…` (an immutable dated record) and in `docs/superpowers/` (prior records plus the design doc, which quotes the removed text). Neither is to be "also fixed" (design *Out of scope*, **A3**).
 
@@ -191,7 +191,7 @@ plugins/dev-flow/skills/adversarial-review/SKILL.md:3
 
 The three surviving `group` hits per copy are `:3` (front-matter `description`, out of scope, enforced against `marketplace.json` by `check-sync.py`), `:67` ("**Group** similar issues together…"), and `:70` ("judging the group's findings together") — all the grouping *operation*, none a tier name.
 
-- [ ] **Step 6: Verify the mirror pair is still in sync — success criterion 1**
+- [x] **Step 6: Verify the mirror pair is still in sync — success criterion 1**
 
 ```bash
 python3 /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b/scripts/check-sync.py ; echo "exit=$?"
@@ -207,7 +207,7 @@ check-sync: all checks passed
 
 If it reports a divergence, the edit landed in only one copy (design **A2**) — apply Step 3's three edits to the copy that missed them; **do not add a declared exception**, and **do not edit `scripts/check-sync.py` for any reason** (out of scope, concurrently owned).
 
-- [ ] **Step 7: Verify only lines 52, 71, 81 moved — success criterion 8(b), `SKILL.md` half**
+- [x] **Step 7: Verify only lines 52, 71, 81 moved — success criterion 8(b), `SKILL.md` half**
 
 This reads the working tree, so it runs before the commit exists. It closes the gap `CLAUDE.md` names — `check-sync.py` passes text that was mangled identically on both sides. It is also what makes issue #29's NO CHANGE ruling mechanical: `:42` and `:48` are unchanged because *nothing* outside `{52, 71, 81}` is.
 
@@ -243,7 +243,7 @@ PY
 
 Expected: the `BASE =` line, two `OK` lines each showing `[52, 71, 81]`, then `criterion 8(b) [SKILL.md]: PASS`, exit 0. A stray added or deleted line trips the `len(old) == len(new)` assert rather than silently shifting the set.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Stage the two files by exact path — never `git add -A`.
 
