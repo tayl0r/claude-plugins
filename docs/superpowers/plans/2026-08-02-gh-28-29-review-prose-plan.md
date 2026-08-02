@@ -391,7 +391,7 @@ Expected: the commit succeeds and `show --stat` lists **exactly two** files, bot
 - Consumes: the committed result of Tasks 1 and 2.
 - Produces: a pass/fail verdict on all eight of the design's success criteria.
 
-- [ ] **Step 1: Confirm the tree is clean and the design doc is still intact**
+- [x] **Step 1: Confirm the tree is clean and the design doc is still intact**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b status --porcelain
@@ -400,7 +400,7 @@ git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728
 
 Expected: `status --porcelain` prints nothing except, possibly, a modified `docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md` (this plan's own checkbox ticks). `hash-object` prints `3f0b75ab7e602ee78ffbe77dcf4fa2b4de7ee1bf` — **any other value means the implementation modified the design doc → HALT and report.**
 
-- [ ] **Step 2: Criteria 1 and 2 — `check-sync.py` and `claude plugin validate .`**
+- [x] **Step 2: Criteria 1 and 2 — `check-sync.py` and `claude plugin validate .`**
 
 ```bash
 python3 /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b/scripts/check-sync.py ; echo "exit=$?"
@@ -415,7 +415,7 @@ claude plugin validate . ; echo "exit=$?"
 
 Expected — `exit=0`, `⚠ Found 8 warnings:`, eight `author: No author information provided…` lines, and `✔ Validation passed with warnings`. **This is a PASS** (design **A4**). Zero errors is the requirement; the 8 warnings are expected and must not be "fixed".
 
-- [ ] **Step 3: Criteria 3, 4, 5 — the removed phrases and the surviving `group`**
+- [x] **Step 3: Criteria 3, 4, 5 — the removed phrases and the surviving `group`**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b grep -n 'group resolvers' -- plugins/ ; echo "exit=$?"
@@ -425,19 +425,19 @@ git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728
 
 Expected: no output and `exit=1` for the first two; `:3` for each of the two files on the third.
 
-- [ ] **Step 4: Criterion 6 — the design-sourced fenced-block check**
+- [x] **Step 4: Criterion 6 — the design-sourced fenced-block check**
 
 Read `/Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b/docs/superpowers/plans/2026-08-02-gh-28-29-review-prose-plan.md`, find **Task 1 → Step 4**, and re-run its `python3` heredoc verbatim. It is read-only and idempotent, so re-running it here is safe. Do not retype it and do not substitute an equivalent of your own — this is the `CLAUDE.md`-mandated design-sourced check, and its whole point is that it reads the design from disk. (`subagent-driven-development` briefs one task at a time, so Task 1's text is not in this context; read it from the plan file rather than reconstructing it.)
 
 Expected: six `OK` lines then `criterion 6: PASS`, exit 0.
 
-- [ ] **Step 5: Criterion 7 — the versions**
+- [x] **Step 5: Criterion 7 — the versions**
 
 Same pointer discipline as Step 4: read the plan file, find **Task 2 → Step 3**, and re-run its `python3` heredoc verbatim.
 
 Expected: two `OK` lines then `criterion 7: PASS`, exit 0.
 
-- [ ] **Step 6: Criterion 8(a) — file scope of the branch diff**
+- [x] **Step 6: Criterion 8(a) — file scope of the branch diff**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b diff --name-only "$(git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728b merge-base origin/main HEAD)"..HEAD
@@ -464,7 +464,7 @@ git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ae55cefd286cb728
 
 Expected: no output, `exit=1`. Any printed path is a scope violation → **HALT and report the path.**
 
-- [ ] **Step 7: Criterion 8(b) — line scope, all four non-doc files in one run**
+- [x] **Step 7: Criterion 8(b) — line scope, all four non-doc files in one run**
 
 ```bash
 python3 - <<'PY'
@@ -508,7 +508,7 @@ Expected: the `BASE =` line, four `OK` lines, then `criterion 8(b): PASS`, exit 
 
 Together with criterion 6 this pins both `SKILL.md` files completely: every one of the 89 lines is either byte-identical to `BASE` or one of the three blocks quoted in the design. Two things follow as corollaries and need no separate check — both files are still 89 lines, and `:42` and `:48` (the *Glossary conformance* and *Terminology collision and drift* passages) are unchanged in both copies, which is issue #29's NO CHANGE ruling holding mechanically.
 
-- [ ] **Step 8: Record the verdict**
+- [x] **Step 8: Record the verdict**
 
 All eight criteria must be green:
 
