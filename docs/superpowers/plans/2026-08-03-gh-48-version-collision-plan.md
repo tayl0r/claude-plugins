@@ -452,7 +452,7 @@ git commit -m "Add scripts/check-version-bump.py: every touched plugin ahead of 
 
 **Why there is less to assert here than in Task 1:** the workflow's real verification is GitHub's — the design states that no YAML parser is available on this machine (`python3 -c 'import yaml'` fails), so *"the file is well-formed"* is asserted by the workflow appearing in the PR's checks at all (criterion 7), and *"it evaluated the PR's own tip"* by reading the run's log (criterion 11). What Step 2 asserts locally is everything that does not need a PR: block equality, the referenced script path existing, `check-sync.yml` untouched, and scope.
 
-- [ ] **Step 1: Create the file from block 1**
+- [x] **Step 1: Create the file from block 1**
 
 The program reads block 1 from the design on disk and refuses to write if the target already exists. **Do not type the workflow's contents.** Run:
 
@@ -480,7 +480,7 @@ echo "exit=$?"
 
 Expected: `created .github/workflows/check-version-bump.yml, 18 lines, first line 'name: check-version-bump'` and `exit=0`.
 
-- [ ] **Step 2: Verify the workflow is its design block, names a script that exists, leaves `check-sync.yml` byte-identical, and is the only new change**
+- [x] **Step 2: Verify the workflow is its design block, names a script that exists, leaves `check-sync.yml` byte-identical, and is the only new change**
 
 Run:
 
@@ -560,7 +560,7 @@ echo "exit=$?"
 
 Expected: a `base:` line, `.github/workflows/check-version-bump.yml: 18 lines`, `lines of block 1 naming scripts/check-version-bump.py: 1`, an `in scope:` line listing exactly the script and the workflow, then `task 2 file: OK` and `exit=0`. Run before Step 1 it prints a `does not exist on disk` mismatch and a scope mismatch and exits 1.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```sh
 git add .github/workflows/check-version-bump.yml
