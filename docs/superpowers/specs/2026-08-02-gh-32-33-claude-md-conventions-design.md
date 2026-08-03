@@ -207,7 +207,7 @@ So both additions are net new length. Each is justified against the stated bar �
 - **A7.** Text assertions use `git grep`, not bare `grep` — under Claude Code's Bash tool bare `grep` is a ugrep-backed shell function whose output layout is not reliable for per-file assertions. Whole-line and index assertions are made in `python3`, where they are exact.
 - **A8.** This change is **not itself a mirrored-pair change** — `CLAUDE.md` is enrolled in no pair — so its own new `Always:` clause does not bind it. *Verification* steps 2 and 5 apply it anyway, as the rule's first exercise; that is voluntary, and stated so nobody reads it as the rule's scope widening to every file.
 - **A9.** This design's own plain fenced blocks are blocks 0 and 1, shape `[1, 1]`. No *Verification* expectation is a function of a block's *length* except that shape, so a review that rewrites either block's text leaves every check below runnable as written; a review that splits one into two lines trips step 0, which halts. *Length budget*'s word counts are the one exception — they are measured from the blocks with `len(block.split())` and must be re-measured whenever a block's text changes.
-- **A10.** This change's design review filed three issues, all of which already exist and none of which is part of this implementation or touches a file in the authorized set: **#39**, *"CLAUDE.md: the verification rules live in the mirror-pair bullet but are applied to every change"* (the placement question recorded under *Rejected alternatives for #32* (e)); **#40**, *"dev-flow: Command discipline binds the pipeline's own git commands but not the Verification blocks designs emit"* (why *Verification* captures and quotes `BASE`); and **#41**, *"dev-flow: designs hand-type measurements of their own text, and the spec self-review certifies them unchecked"* (why A9 now names *Length budget*'s counts as the one measured thing).
+- **A10.** This change's design review filed three issues, all of which already exist and none of which is part of this implementation or touches a file in the authorized set: **#39**, *"CLAUDE.md: the verification rules live in the mirror-pair bullet but are applied to every change"* (the placement question recorded under *Rejected alternatives for #32* (e)); **#40**, *"dev-flow: Command discipline binds the pipeline's own git commands but not the Verification blocks designs emit"* (why every base-consuming step here runs its `git` calls through `python3` `argv` rather than a shell chain); and **#41**, *"dev-flow: designs hand-type measurements of their own text, and the spec self-review certifies them unchecked"* (why A9 now names *Length budget*'s counts as the one measured thing).
 
 ## Out of scope
 
@@ -224,7 +224,7 @@ Hard-excluded. A proposal touching any of these is a blocker, not a design.
 
 ## Verification
 
-Every command runs from the repo root. `BASE` = `git merge-base origin/main HEAD` — never a hardcoded SHA, so it stays correct if `main` advances or the branch is rebased. It resolves to `b4b5d1c` today. Steps run after the edit unless stated. Every use of `BASE` captures it into a variable and quotes it. `git merge-base` prints nothing to stdout on failure — exit 128 for an unresolvable ref, exit 1 and no message whatsoever when the histories share no ancestor — so an unquoted `$(…)` silently degrades a base comparison into a working-tree-vs-index one, which in a repo that commits per task passes.
+Every command runs from the repo root. The base is `git merge-base origin/main HEAD` — never a hardcoded SHA, so it stays correct if `main` advances or the branch is rebased. It resolves to `b4b5d1c` today. Steps run after the edit unless stated. Every step that consumes the base — 1, 2 and 5 — computes it inside `python3` and passes it to `git` as an `argv` element, never through a shell. That is deliberate: `git merge-base` prints nothing to stdout on failure — exit 128 for an unresolvable ref, exit 1 and no message whatsoever when the histories share no ancestor — so in a shell an unquoted `$(…)` silently degrades a base comparison into a working-tree-vs-index one, which in a repo that commits per task passes. `argv` has no word-splitting to exploit, so the hazard is gone by construction rather than by remembering to quote; step 1 works the reasoning out in full.
 
 **0. Block shape.** Expect `shape: [1, 1]`, with block 0 previewing the bump bullet and block 1 the mirrored-pair bullet. Anything other than two entries means this design was edited after the plan captured its shape — **stop and report**:
 
@@ -232,14 +232,36 @@ Every command runs from the repo root. `BASE` = `git merge-base origin/main HEAD
 python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md
 ```
 
-**1. File scope — exactly one file, and it is not a plugin file.** Expect a `base:` line carrying a 40-character SHA (`b4b5d1c…` today), a single stat row ` CLAUDE.md | 4 ++--` with the summary `1 file changed, 2 insertions(+), 2 deletions(-)` and no other row, then `file scope: OK` and `untouched: OK`. `BASE` is captured once and quoted, per dev-flow's own **Command discipline** — *"capture, validate non-empty, and quote any command output a later command consumes"* — because `git merge-base` writes nothing to stdout when it fails: exit 128 for an unresolvable `origin/main`, and exit **1 with no message at all** for histories sharing no ancestor. An unquoted substitution then vanishes by word-splitting and both commands degrade into working-tree-vs-index comparisons, which in a repo that commits per task are empty — printing `untouched: OK` on an arbitrarily broken branch. Capturing makes a failed producer short-circuit the chain; printing the base makes the comparison's baseline a visible fact rather than an assumption. The `--name-only` equality is the machine-checked form of this step's headline claim: `--stat` is for reading (its column widths shift when a second file appears, so its text is not a safe assertion), and `--quiet` is kept deliberately redundant because it names the specific reflex *Out of scope* worries about — bumping a version — and fails with the offending path rather than a generic set mismatch:
+**1. File scope — exactly one file, and it is not a plugin file.** Expect a `base:` line carrying a 40-character SHA (`b4b5d1c…` today), a single stat row ` CLAUDE.md | 4 ++--` with the summary `1 file changed, 2 insertions(+), 2 deletions(-)` and no other row, then `file scope: OK` and `exit=0`. This step is a `python3` heredoc rather than a shell `&&` chain, and that is the substance of the step rather than a style choice. `git merge-base` writes nothing to stdout when it fails — exit 128 for an unresolvable `origin/main`, and exit **1 with no message at all** for histories sharing no ancestor — so in a shell an unquoted `$(…)` vanishes by word-splitting and degrades both comparisons into working-tree-vs-index ones, which in a repo that commits per task are empty: measured, that form prints a pass token and exits 0 on an arbitrarily broken branch. dev-flow's **Command discipline** answers this by asking every caller to *"capture, validate non-empty, and quote any command output a later command consumes"* — a rule each caller must remember. Passing the base as an `argv` element retires the hazard **by construction** instead: there is no shell, so nothing can word-split, and an empty base is `fatal: bad revision ''` rather than a different valid command. The shell form also carries an environment-level failure the `python3` form does not — a chain that captures a ref and reuses it across `&&`-joined `git` commands is **refused unrun** by Claude Code's Bash tool under worktree isolation (*"too complex to verify that it stays inside the worktree"*), and this repo's runs happen in linked worktrees, so a check written that way may never execute at all. Steps 2 and 5 already run their base-consuming `git` calls through `argv`, and A7 already rules that exact assertions belong in `python3`; this step was the one holdout, and the `argv` form is now uniform across all three. The `--name-only` equality is the machine-checked form of this step's headline claim, and it prints the set it actually found, so a failure names the offending path; `--stat` is for reading, since its column widths shift when a second file appears and its text is therefore not a safe assertion. There is deliberately **no separate `--quiet` assertion** over `plugins/`, `.claude-plugin/`, `scripts/`, `CONTEXT.md`, `docs/adr/` and `.gitignore`: all six lie inside `. ':!docs/superpowers/'`, so the equality already implies every one of them is untouched — checked against all six — and `--quiet` prints nothing whatever, on success or on failure, so it can neither name a path nor add a detection. In an `&&` chain it was also unreachable on the very reflex it was kept for: a version bump fails the equality one line earlier and short-circuits it. The local `git` wrapper raises with the failing command, its exit status and git's own message, so a broken base fails in one quotable line; steps 2 and 5 keep `check=True`, where the documented red output is a `MISMATCH:` line and a producer failure is only the escape hatch, while here the producer failure *is* a documented red case and a traceback carries machine-specific paths no expectation could quote:
 
 ```sh
-BASE=$(git merge-base origin/main HEAD) && echo "base: $BASE" &&
-git diff --stat "$BASE" -- . ':!docs/superpowers/' &&
-[ "$(git diff --name-only "$BASE" -- . ':!docs/superpowers/')" = "CLAUDE.md" ] && echo "file scope: OK" &&
-git diff --quiet "$BASE" -- plugins/ .claude-plugin/ scripts/ CONTEXT.md docs/adr/ .gitignore &&
-echo "untouched: OK"
+python3 - <<'PY'
+import subprocess, sys
+SCOPE = ["--", ".", ":!docs/superpowers/"]
+WANT = ["CLAUDE.md"]
+def git(*args):
+    r = subprocess.run(("git",) + args, capture_output=True, text=True)
+    if r.returncode != 0:
+        raise SystemExit("FAILED: git %s -- exit %d, %s"
+                         % (" ".join(args), r.returncode, r.stderr.strip() or "(no message)"))
+    return r.stdout
+base = git("merge-base", "origin/main", "HEAD").strip()
+print("base:", base)
+print(git("diff", "--stat", base, *SCOPE), end="")
+changed = [p for p in git("diff", "--name-only", base, *SCOPE).split("\n") if p]
+if changed != WANT:
+    print("file scope: FAIL -- changed %s, want %s" % (changed, WANT))
+    sys.exit(1)
+print("file scope: OK")
+PY
+echo "exit=$?"
+```
+
+Run it once **before** the edit to watch it discriminate; the red output is `file scope: FAIL -- changed [], want ['CLAUDE.md']` and `exit=1`. A base that cannot be computed fails as a single line naming the command, its exit status and git's message — for histories sharing no ancestor, where git itself says nothing, that line reads:
+
+```text
+FAILED: git merge-base origin/main HEAD -- exit 1, (no message)
+exit=1
 ```
 
 The `':!docs/superpowers/'` pathspec is required: this design's front-matter sets `docs: commit`, so this run's own design and plan are committed on this branch and an unfiltered diff necessarily reports them.
