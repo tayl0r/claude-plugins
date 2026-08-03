@@ -629,7 +629,7 @@ The seven commands below are the design's `## Verification` steps 0 through 6a, 
 
 They are not a re-statement of the per-task checks. Step 1 is the only place the **six-file scope equality** is asserted over the finished tree. Step 2 is the only place all four markdown files are reconstructed **in one program over the finished tree** — which is not what Tasks 1 and 2 proved: each ran before the next task's edits, and `git diff --name-only` equality catches a *seventh path*, never a second edit to one of the six. Only step 2 can still see a markdown file that was correct when its own task verified it and has moved since. Run them in order and read each expected output before moving on.
 
-- [ ] **Step 0 — Block shape, asserted rather than reported**
+- [x] **Step 0 — Block shape, asserted rather than reported**
 
 `design_blocks.py`'s CLI is a shape *reporter*: it prints the shape and unconditionally returns 0, so running it can never fail on a mismatch. The **guard** is `read_blocks`, where the shape is a required argument and a mismatch is a `SystemExit`. This step calls the guard.
 
@@ -648,7 +648,7 @@ echo "exit=$?"
 
 Expected: three preview lines — block 0 the `| **design** |` table row, block 1 the *Command discipline* bullet, block 2 the *Measurements* bullet — then `shape guard: OK` and `exit=0`. Anything else, in particular `design code-block shape is …`, means the design was edited after this plan captured its shape: **stop and report**.
 
-- [ ] **Step 1 — File scope: exactly six files, and no seventh**
+- [x] **Step 1 — File scope: exactly six files, and no seventh**
 
 The `--name-only` set is compared for *equality* against the authorized list, so a stray edit to `CLAUDE.md`, `CONTEXT.md`, `scripts/`, `.github/`, a `README.md` or `marketplace.json` fails the step **and names the offending path**. There is deliberately no `--stat` line and no `--quiet` companion.
 
@@ -683,7 +683,7 @@ echo "exit=$?"
 
 Expected: a `base:` line carrying a 40-character SHA, then `file scope: OK` and `exit=0`. A base that cannot be computed fails as one quotable line naming the command, its exit status and git's message.
 
-- [ ] **Step 2 — Reconstruction and design conformance**
+- [x] **Step 2 — Reconstruction and design conformance**
 
 Four assertion families: each edited line is the block read from the design on disk; each target file is byte-for-byte its merge-base blob with exactly the intended edit applied; the two hand-mirrored files' edited passages are exact substitution images of one another, after the edit *and* at the base; and the one measurement the design states about its own replacement text is re-derived here rather than trusted.
 
@@ -765,7 +765,7 @@ echo "exit=$?"
 
 Expected: `dev-flow occurrences per block: [0, 0, 0]`, then `reconstruction: OK` and `exit=0`. If the shape guard trips instead, **stop and report**.
 
-- [ ] **Step 3 — Residue: the split junction is gone from shipped text**
+- [x] **Step 3 — Residue: the split junction is gone from shipped text**
 
 Expect no output and a non-zero exit. The pathspec is required: four prior records under `docs/superpowers/`, and the design itself, legitimately contain the phrase.
 
@@ -773,7 +773,7 @@ Expect no output and a non-zero exit. The pathspec is required: four prior recor
 git grep -n -F 'success criteria — plus the input-contract' -- . ':!docs/superpowers/'
 ```
 
-- [ ] **Step 4 — Mirror-pair sync**
+- [x] **Step 4 — Mirror-pair sync**
 
 ```sh
 python3 scripts/check-sync.py
@@ -789,7 +789,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 5 — `claude plugin validate .`: exit 0 *and* exactly 8 author warnings**
+- [x] **Step 5 — `claude plugin validate .`: exit 0 *and* exactly 8 author warnings**
 
 ```sh
 python3 - <<'PY'
@@ -823,7 +823,7 @@ validate: OK
 exit=0
 ```
 
-- [ ] **Step 6a — Versions strictly greater than published, at implementation**
+- [x] **Step 6a — Versions strictly greater than published, at implementation**
 
 ```sh
 python3 - <<'PY'
@@ -858,7 +858,7 @@ echo "exit=$?"
 
 Expected: two `mine … origin/main …` lines, then `versions: OK` and `exit=0`.
 
-- [ ] **Step 7 — Confirm nothing is uncommitted outside `docs/superpowers/`**
+- [x] **Step 7 — Confirm nothing is uncommitted outside `docs/superpowers/`**
 
 Tasks 1–3 each committed their own files; the design and this plan are the pipeline's to commit. Run:
 
@@ -869,7 +869,7 @@ echo "exit=$?"
 
 Expected: **no output** and `exit=0`. Any line printed here is an uncommitted or untracked file inside the change's scope — report it rather than committing it, since the six authorized files are already committed.
 
-- [ ] **Step 8 — Hand the `pre-merge` version re-check to the orchestrator**
+- [x] **Step 8 — Hand the `pre-merge` version re-check to the orchestrator**
 
 This is the last checkbox in the plan. Do **not** attempt step 6b yourself — it cannot run yet, because it must run after an integration that has not happened. Report to the orchestrator, in the Execute-stage completion report, the whole of the *After the last task* section below, and say plainly that it is outstanding.
 
