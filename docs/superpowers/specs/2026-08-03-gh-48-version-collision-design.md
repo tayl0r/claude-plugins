@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-48-version-collision
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
