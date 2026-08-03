@@ -29,7 +29,7 @@ The check that a reviewer's self-reported model is the dated id its tier pins, i
 _Avoid_: family match (the name from when tiers were named by alias)
 
 **Provenance**:
-The line a review returns stating how many reviewers it actually spawned per tier, and the model each one self-reported. Evidence of fan-out and tier conformance — never of model diversity.
+The line a review returns stating how many reviewers it actually spawned per tier, and the normalized dated id each one matched to. Evidence of fan-out and tier conformance — never of model diversity.
 
 **Angle**:
 One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement, glossary conformance.

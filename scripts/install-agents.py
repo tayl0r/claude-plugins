@@ -14,7 +14,12 @@ registering them. This script copies them to `~/.claude/agents/` so they
 register today.
 
     python3 scripts/install-agents.py            # install / update
-    python3 scripts/install-agents.py --check    # report drift, exit 1 if any
+    python3 scripts/install-agents.py --check    # exit 1 if a shipped agent differs
+
+`--check` compares in one direction only: every agent this repo ships against its
+installed copy. It cannot flag an installed agent the repo no longer ships, because
+`~/.claude/agents/` also holds agents from elsewhere and nothing here marks which
+copies came from this repo.
 
 Copies rather than symlinks on purpose: a symlink into a git worktree under
 `.claude/worktrees/` dangles the moment that worktree is removed, and a
@@ -131,4 +136,12 @@ def main():
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except OSError as exc:
+        # One handler for every filesystem failure — an unreadable source, an
+        # unwritable ~/.claude/agents, a destination that is a directory. Kept at
+        # the top level rather than around individual reads and writes, so no one
+        # path is guarded more tightly than the others.
+        print(f"install-agents: {exc}", file=sys.stderr)
+        sys.exit(1)
