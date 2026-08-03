@@ -812,40 +812,60 @@ echo "exit=$?"
 
 Expect a `base … head … merge-base` line, then `check-version-bump: no plugin directory touched ... OK` and `exit=0`. The word *vacuously* is the point (A5), which is why criteria 3 and 5 exist.
 
-**7. The workflow is valid, wired up, and green on this PR.** No YAML parser is available (`python3 -c 'import yaml'` fails on this machine), so the assertion that the file is well-formed is GitHub's: a workflow that does not parse never appears in the PR's checks. That case — *no checks reported* — is one `gh pr checks` signals by exiting **1**, the same code it uses for a check that failed, which is why this step takes its verdict from the JSON and never from the exit code; this repo's own pipeline `SKILL.md` states the conflation (*"distinguish failure from no-checks by output text, not exit code (both exit 1; pending exits 8)"*). Run after Stage 4 has opened the PR.
+**7. The workflow is valid, wired up, and green on this PR.** No YAML parser is available (`python3 -c 'import yaml'` fails on this machine), so the assertion that the file is well-formed is GitHub's: a workflow that does not parse never appears in the PR's checks. **A check that has not finished is not a check that failed**, and this step never conflates them — it waits, bounded, and ends in one of three states: `OK` (exit 0), `FAIL` (exit 1, a defect), `NOT READY` (exit 2, CI is unfinished — run the step again and change nothing). Four things carry that:
+
+- **The verdict comes from the JSON, never from the exit code.** Under `--json`, `gh pr checks` writes the rows and returns *before* it maps counts to a status, so it exits **0** for pass, fail and pending alike — measured, a PR carrying a `fail` bucket and one carrying a `pending` bucket both exited 0 — and **1** only when there are no checks at all, where stdout is empty and the message is on stderr. The exit code therefore separates nothing this step asks. The `1`/`8` conflation this repo's pipeline `SKILL.md` records (*"distinguish failure from no-checks by output text, not exit code (both exit 1; pending exits 8)"*) is the **human** form's, which the merge gate reads; `ok=(0, 1, 8)` tolerates it here for free, in case the `--json` path ever adopts the same mapping.
+- **`bucket`, not a state list retyped here.** `--json` exports gh's own categorisation of `state` into `pass`, `fail`, `pending`, `skipping` and `cancel` (`gh pr checks --help`). The `state` vocabulary beneath it is the union of three GitHub enums — `SUCCESS`, `FAILURE`, `ERROR`, `TIMED_OUT`, `ACTION_REQUIRED`, `CANCELLED`, `NEUTRAL`, `SKIPPED`, `STALE`, `STARTUP_FAILURE`, `EXPECTED`, `QUEUED`, `IN_PROGRESS`, `PENDING`, `WAITING`, `REQUESTED` — so `state != "SUCCESS"` calls a queued check a failure. Reading `bucket` keeps that table where gh maintains it.
+- **A poll loop, not `--watch`.** gh refuses the combination outright (*"cannot use `--watch` with `--json` flag"*), and the verdict has to come from the JSON. `--watch` also cannot wait for a check to *appear*: it takes the current check set as given, and moments after Stage 4 opens the PR that set can still be empty. The loop polls every 10 s — gh's own watch interval — under a 300 s cap, twenty times the 7–16 s this repo's runs take end to end (`gh run list --json createdAt,updatedAt`) and comfortably under the Bash tool's 600 s ceiling, so the cap that fires is the program's own and the orchestrator reads its message rather than a harness kill.
+- **Absence that survives the cap is a defect; unfinished is not.** Five minutes after the PR is open, a workflow that parsed has registered its check — so `check-version-bump` still missing is the *did not parse, or did not run* verdict this criterion exists to deliver, and it is a `FAIL`. `check-version-bump` present but unfinished is CI being slow, and it is `NOT READY`.
+
+Run after Stage 4 has opened the PR, with a Bash-tool timeout above the cap (`timeout: 330000`).
 
 ```sh
 python3 - <<'PY'
-import json, subprocess, sys
+import json, subprocess, sys, time
 BRANCH = "tayl0r/gh-48-version-collision"
 WANT = "check-version-bump"
-def sh(*a, ok=(0,)):
-    r = subprocess.run(a, capture_output=True, text=True)
+CAP, INTERVAL = 300, 10   # gh's own watch interval, under a cap the Bash tool can outlive
+def gh(*a, ok=(0,)):
+    r = subprocess.run(("gh",) + a, capture_output=True, text=True)
     if r.returncode not in ok:
-        raise SystemExit("FAILED: %s -- exit %d, %s" % (" ".join(a), r.returncode,
-                                                        r.stderr.strip() or "(no message)"))
-    if r.returncode != 0:              # tolerated, but never silently
-        print("note: %s exited %d -- %s" % (" ".join(a), r.returncode,
-                                            r.stderr.strip() or "(no message)"))
-    return r.stdout
-prs = json.loads(sh("gh", "pr", "list", "--head", BRANCH, "--state", "all", "--json", "number"))
+        raise SystemExit("FAILED: gh %s -- exit %d, %s" % (" ".join(a), r.returncode,
+                                                           r.stderr.strip() or "(no message)"))
+    return r
+prs = json.loads(gh("pr", "list", "--head", BRANCH, "--state", "all", "--json", "number").stdout)
 if not prs:
-    raise SystemExit("FAILED: no PR for %s" % BRANCH)
+    raise SystemExit("FAILED: no PR for %s -- Stage 4 has not opened it yet" % BRANCH)
 pr = str(max(p["number"] for p in prs))
-# gh pr checks exits 1 for a failing check *and* for no checks at all, and 8 while
-# they are pending -- the three outcomes this step exists to report, not crash on.
-# The JSON is the verdict, never the exit code; on the no-checks path stdout is empty.
-checks = json.loads(sh("gh", "pr", "checks", pr, "--json", "name,state",
-                       ok=(0, 1, 8)).strip() or "[]")
-print("checks on PR #%s: %s" % (pr, sorted(c["name"] for c in checks)))
+# Under --json, gh pr checks writes the rows and returns before it maps counts to a
+# status: it exits 0 for pass, fail and pending alike, and 1 only when there are no
+# checks at all, where stdout is empty. The JSON is the verdict, never the exit code.
+# bucket is gh's own categorisation of state -- pass/fail/pending/skipping/cancel --
+# so "has not finished" is read from gh's table rather than a state list retyped here.
+deadline = time.monotonic() + CAP
+while True:
+    r = gh("pr", "checks", pr, "--json", "name,state,bucket", ok=(0, 1, 8))
+    checks = json.loads(r.stdout.strip() or "[]")
+    print("PR #%s (gh exit %d): %s" % (pr, r.returncode,
+          sorted("%s=%s" % (c["name"], c["state"]) for c in checks) or "no checks reported"))
+    rows = [c for c in checks if c["name"] == WANT]
+    if rows and not [c for c in rows if c["bucket"] == "pending"]:
+        break                    # WANT reached a terminal state -- judge it
+    left = deadline - time.monotonic()
+    if left <= 0:
+        break                    # at the cap: absence is a defect, unfinished is not
+    time.sleep(min(INTERVAL, left))
+if [c for c in rows if c["bucket"] == "pending"]:
+    print("pr checks: NOT READY -- %s is %s after %ds; a run that has not finished is "
+          "not a defect. Run this step again." % (WANT, rows[0]["state"], CAP))
+    sys.exit(2)
 bad = []
-rows = [c for c in checks if c["name"] == WANT]
 if not rows:
-    bad.append("%r is not among the PR's checks; the workflow did not parse or did not run"
-               % WANT)
+    bad.append("%r is not among the PR's checks after %ds; the workflow did not parse "
+               "or did not run" % (WANT, CAP))
 for c in rows:
-    if c["state"] != "SUCCESS":
-        bad.append("%s is %s, want SUCCESS" % (c["name"], c["state"]))
+    if c["bucket"] != "pass":
+        bad.append("%s is %s (bucket %s), want SUCCESS" % (c["name"], c["state"], c["bucket"]))
 if not [c for c in checks if c["name"] == "check-sync"]:
     bad.append("check-sync is missing; the new workflow must not disturb the existing one")
 for why in bad:
@@ -856,7 +876,7 @@ PY
 echo "exit=$?"
 ```
 
-Expect a checks list containing both `check-sync` and `check-version-bump`, then `pr checks: OK` and `exit=0`.
+Expect one or more poll lines, the last showing `check-sync` and `check-version-bump` both at `SUCCESS`, then `pr checks: OK` and `exit=0`. `pr checks: NOT READY` at `exit=2` is not a red result and never a reason to touch the workflow — it is this step declining to judge a run that has not finished.
 
 **8. `python3 scripts/check-sync.py` — passes, with output identical to before the change.** It reads none of the changed files; this is a regression guard, not a claim about the edit.
 
@@ -947,13 +967,13 @@ echo "exit=$?"
 
 Expect three rows at `exit=1`, then `hidden paths: OK` and `exit=0`. Run against block 0 without the two flags it printed three rows at `exit=0` and `hidden paths: FAIL`, which is the red form.
 
-**11. CI evaluated the PR's own tip, not a merge commit.** Criterion 7 proves the workflow ran and was green — and would prove exactly that with the checkout unpinned, because it reads only check names and states. This reads the run's log and asserts the head the script printed is the PR's head sha (A11, *Block 1*). Run after criterion 7.
+**11. CI evaluated the PR's own tip, not a merge commit.** Criterion 7 proves the workflow ran and was green — and would prove exactly that with the checkout unpinned, because it reads the check list and never the revision the run evaluated. This reads the run's log and asserts the head the script printed is the PR's head sha (A11, *Block 1*). The run is selected **by that sha**, never by recency: `--status completed --limit 1` would read the previous head's run on a branch that has been pushed twice — the ordinary shape of a dev-flow branch — and report a correctly pinned checkout as unpinned. `--branch` and `--commit` are plain filters, where `--workflow` is a lookup that 404s until the file is on the default branch, which it is not until this PR merges; the workflow is matched on `workflowName` instead. With no completed run for the current head this step reports `NOT READY` at exit **2** — the same not-a-defect state criterion 7 uses. Run after criterion 7.
 
 ```sh
 python3 - <<'PY'
 import json, subprocess, sys
 BRANCH = "tayl0r/gh-48-version-collision"
-WORKFLOW = "check-version-bump.yml"
+WORKFLOW = "check-version-bump"        # block 1's name:, not the file name
 def sh(*a):
     r = subprocess.run(a, capture_output=True, text=True)
     if r.returncode != 0:
@@ -961,11 +981,20 @@ def sh(*a):
                          % (" ".join(a), r.returncode, r.stderr.strip() or "(no message)"))
     return r.stdout
 head = json.loads(sh("gh", "pr", "view", BRANCH, "--json", "headRefOid"))["headRefOid"]
-runs = json.loads(sh("gh", "run", "list", "--workflow", WORKFLOW, "--branch", BRANCH,
-                     "--status", "completed", "--limit", "1",
-                     "--json", "databaseId,conclusion"))
+# Selected by the head sha, never by recency: a completed run for an *earlier* head --
+# the ordinary state of a branch that has been pushed twice -- is not this criterion's
+# subject, and reading one would report a pinned checkout as unpinned. --branch and
+# --commit are plain filters; --workflow is a lookup that 404s until the file is on the
+# default branch, which it is not until this PR merges.
+runs = [r for r in json.loads(sh("gh", "run", "list", "--branch", BRANCH, "--commit", head,
+                                 "--status", "completed", "--limit", "20",
+                                 "--json", "databaseId,conclusion,workflowName"))
+        if r["workflowName"] == WORKFLOW]
 if not runs:
-    raise SystemExit("FAILED: no completed %s run on %s" % (WORKFLOW, BRANCH))
+    print("ci head: NOT READY -- no completed %s run for %s at %s; a run that has not "
+          "finished is not a defect. Run criterion 7, then this step, again."
+          % (WORKFLOW, BRANCH, head[:9]))
+    sys.exit(2)
 run = runs[0]
 log = sh("gh", "run", "view", str(run["databaseId"]), "--log")
 needle = "head %s," % head[:9]
@@ -986,7 +1015,7 @@ PY
 echo "exit=$?"
 ```
 
-Expect a `PR head … run … concluded success` line, then `ci head: OK` and `exit=0`.
+Expect a `PR head … run … concluded success` line, then `ci head: OK` and `exit=0`. `ci head: NOT READY` at `exit=2` means the run for this head has not finished — run criterion 7, then this step, again.
 
 ## Files the plan will touch
 
