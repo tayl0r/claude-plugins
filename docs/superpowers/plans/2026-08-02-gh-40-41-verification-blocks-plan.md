@@ -309,7 +309,7 @@ git commit -m "adversarial-review: a criterion that cannot fail is untestable, a
 
 **Why there is no removed-phrase grep here:** block 1 is a **pure append** — every byte of the base bullet is carried over unchanged — and block 2 is entirely new, so this edit removes no phrase. Step 4 makes the stronger assertion in its place: that the base line is a *strict prefix* of block 1.
 
-- [ ] **Step 1: Confirm the design's block shape**
+- [x] **Step 1: Confirm the design's block shape**
 
 Run:
 
@@ -319,7 +319,7 @@ python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-40-41-veri
 
 Expected: `shape: [1, 1, 1]` and the three preview lines. **Anything else: stop and report.**
 
-- [ ] **Step 2: Apply block 1 and insert block 2 in both files**
+- [x] **Step 2: Apply block 1 and insert block 2 in both files**
 
 Run:
 
@@ -369,7 +369,7 @@ echo "exit=$?"
 
 Expected: a `base:` line, then `applied block 1 at plugins/dev-flow/skills/dev-flow/SKILL.md line 276, inserted block 2 as line 277` and the matching `… line 270, inserted block 2 as line 271`, and `exit=0`.
 
-- [ ] **Step 3: Verify reconstruction, strict-prefix, hand-mirror and scope**
+- [x] **Step 3: Verify reconstruction, strict-prefix, hand-mirror and scope**
 
 Four families of assertion, all mismatches collected before exit. Run:
 
@@ -453,7 +453,7 @@ echo "exit=$?"
 
 Expected: `'dev-flow' occurrences in blocks 1 and 2: [0, 0]`, then `plugins/dev-flow/skills/dev-flow/SKILL.md: 278 lines` and `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md: 272 lines`, a `changed:` line listing the four markdown paths, then `task 2: OK` and `exit=0`. Run before Step 2 it prints reconstruction, `holds block 2 0 times` and line-count mismatches for both files, plus a scope mismatch, and exits 1.
 
-- [ ] **Step 4: Verify the machine-checked pair is still clean**
+- [x] **Step 4: Verify the machine-checked pair is still clean**
 
 Task 1's pair is untouched here, so this must still pass — and it fails if a stray edit landed in either `adversarial-review` copy. Run:
 
@@ -464,7 +464,7 @@ echo "exit=$?"
 
 Expected: `check-sync: mirror pair "adversarial-review" ... OK (89 lines, 1 declared exception)`, then `check-sync: all checks passed` and `exit=0`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```sh
 git add plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md
