@@ -585,7 +585,7 @@ git commit -m "Run check-version-bump on every pull request (#48)"
 
 **Do not renumber, reflow, or reformat anything else in `CLAUDE.md`.** The edit is a single whole-line replacement.
 
-- [ ] **Step 1: Apply block 2 to line 7**
+- [x] **Step 1: Apply block 2 to line 7**
 
 The program refuses to write if the line it is about to replace already differs from the merge-base blob — which is what a second run, a hand edit, or a moved base looks like. Run:
 
@@ -633,7 +633,7 @@ echo "exit=$?"
 
 Expected: a `base:` line carrying a 40-character SHA, then `replaced CLAUDE.md line 7; file is 34 lines` and `exit=0`.
 
-- [ ] **Step 2: Success criterion 2 — design conformance, now for all three files**
+- [x] **Step 2: Success criterion 2 — design conformance, now for all three files**
 
 This is the design's *Success criteria* 2, verbatim, and this is the first point in the plan at which it can go fully green: it asserts all three files at once. One program, nothing retyped on either side — the blocks are read **from the design on disk** through the shared reader, and `CLAUDE.md`'s expected content is reconstructed **from the base blob**. Run:
 
@@ -708,7 +708,7 @@ echo "exit=$?"
 
 Expected: exactly `conformance: OK` and `exit=0`. Run at the base with no edit applied, the design records that this same program printed four `MISMATCH:` lines — both new paths not existing on disk, `CLAUDE.md is not its base blob with line 7 replaced by block 2`, and `CLAUDE.md holds block 2 0 times, want exactly 1` — then `conformance: FAIL` and `exit=1`. That is its red form.
 
-- [ ] **Step 3: Success criterion 1 — file scope is exactly three files, and they are the three named**
+- [x] **Step 3: Success criterion 1 — file scope is exactly three files, and they are the three named**
 
 The design's *Success criteria* 1, verbatim. The `--name-only` set is compared for **equality** against the authorized list, so a stray edit to `plugins/`, a `plugin.json`, `check-sync.yml`, `check-sync.py`, `CONTEXT.md`, `docs/adr/` or `marketplace.json` fails the step **and names the offending path**. Run:
 
@@ -737,7 +737,7 @@ echo "exit=$?"
 
 Expected: a `base:` line carrying a 40-character SHA, then `file scope: OK` and `exit=0`. Tasks 1 and 2 have already committed their files, and `CLAUDE.md` is modified in the working tree, so all three are in `git diff`'s set here.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```sh
 git add CLAUDE.md
