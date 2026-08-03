@@ -50,6 +50,24 @@ MIRROR_PAIRS = [
             },
         ],
     },
+    {
+        "name": "adversarial-review-seed agent",
+        "a": "plugins/dev-flow/agents/adversarial-review-seed.md",
+        "b": "plugins/dev-flow-worktree/agents/adversarial-review-seed.md",
+        # The two variants ship the same protocol, so these are byte-identical;
+        # install-agents.py collapses them and refuses on a content conflict.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
+    {
+        "name": "adversarial-review-resolver agent",
+        "a": "plugins/dev-flow/agents/adversarial-review-resolver.md",
+        "b": "plugins/dev-flow-worktree/agents/adversarial-review-resolver.md",
+        # The two variants ship the same protocol, so these are byte-identical;
+        # install-agents.py collapses them and refuses on a content conflict.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
 ]
 
 
