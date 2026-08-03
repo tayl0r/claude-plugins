@@ -764,7 +764,7 @@ The design's criteria **0, 3, 4, 5 and 10 are not repeated here, on purpose.** E
 
 Run them in order and read each expected output before moving on.
 
-- [ ] **Step 1 — Criterion 1: file scope, exactly three files**
+- [x] **Step 1 — Criterion 1: file scope, exactly three files**
 
 ```sh
 python3 - <<'PY'
@@ -791,7 +791,7 @@ echo "exit=$?"
 
 Expected: a `base:` line carrying a 40-character SHA, then `file scope: OK` and `exit=0`.
 
-- [ ] **Step 2 — Criterion 2: design conformance for all three files**
+- [x] **Step 2 — Criterion 2: design conformance for all three files**
 
 ```sh
 python3 - <<'PY'
@@ -864,7 +864,7 @@ echo "exit=$?"
 
 Expected: exactly `conformance: OK` and `exit=0`.
 
-- [ ] **Step 3 — Criterion 6: the check passes this change's own PR, vacuously and visibly**
+- [x] **Step 3 — Criterion 6: the check passes this change's own PR, vacuously and visibly**
 
 ```sh
 python3 scripts/check-version-bump.py origin/main
@@ -873,7 +873,7 @@ echo "exit=$?"
 
 Expected: a `base … head … merge-base` line, then `check-version-bump: no plugin directory touched ... OK` and `exit=0`. The word *vacuously* is the point (**A5**), which is why criteria 3, 5 and 10 exist.
 
-- [ ] **Step 4 — Criterion 8: `python3 scripts/check-sync.py` passes, with output identical to before the change**
+- [x] **Step 4 — Criterion 8: `python3 scripts/check-sync.py` passes, with output identical to before the change**
 
 It reads none of the changed files; this is a regression guard, not a claim about the edit.
 
@@ -891,7 +891,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 5 — Criterion 9: `claude plugin validate .` exits 0 *and* emits exactly 8 author warnings**
+- [x] **Step 5 — Criterion 9: `claude plugin validate .` exits 0 *and* emits exactly 8 author warnings**
 
 Both halves are asserted, because either alone passes vacuously: the command exits 0 while emitting warnings (**A6**), and a count assertion alone would pass on a run that errored out. This change adds no plugin, so the count is unchanged.
 
@@ -926,7 +926,7 @@ validate: OK
 exit=0
 ```
 
-- [ ] **Step 6 — Confirm nothing in scope is left uncommitted**
+- [x] **Step 6 — Confirm nothing in scope is left uncommitted**
 
 Tasks 1–3 each committed their own file; the design and this plan are the pipeline's to commit. Run:
 
@@ -955,7 +955,7 @@ echo "exit=$?"
 
 Expected: `uncommitted in scope: []`, then `tree state: OK` and `exit=0`. Any path printed under *uncommitted in scope* is inside the change's scope — report it rather than committing it, since the three authorized files are already committed.
 
-- [ ] **Step 7 — Hand criteria 7 and 11 to the orchestrator**
+- [x] **Step 7 — Hand criteria 7 and 11 to the orchestrator**
 
 This is the last checkbox in the plan. Do **not** attempt criteria 7 and 11 yourself — neither can run yet, because both need an open PR with a *completed* CI run, and no PR exists during Execute. Report to the orchestrator, in the Execute-stage completion report, the whole of the *After the last task* section below, and say plainly that both criteria are outstanding.
 
