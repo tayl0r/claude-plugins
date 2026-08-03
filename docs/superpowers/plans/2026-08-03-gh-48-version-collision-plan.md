@@ -151,7 +151,7 @@ Three files, drawn one per task because each is independently rejectable — a r
 
 **Why the behavioural criteria live here, and only here:** design **A5** means this change touches no plugin directory, so the check passes vacuously on its own PR. The only evidence it works is criterion 3 (the incident, replayed against literal SHAs), criterion 4 (a failed producer halts), criterion 5 (the false-positive bound across history) and criterion 10 (the synthetic repository). Deferring them to the gate would leave the script's red path unexercised through two more commits. Repeating them at the gate would buy nothing: each is a deterministic function of this file's bytes over history that cannot move, and Task 4's criterion 2 asserts those bytes are unchanged in the shipped tree — so the gate re-establishes the *premise* of these results rather than re-deriving the results.
 
-- [ ] **Step 1: Confirm the design's block shape**
+- [x] **Step 1: Confirm the design's block shape**
 
 Run:
 
@@ -170,7 +170,7 @@ shape: [155, 18, 1]
 
 **Anything else: stop and report** — the design moved after this plan captured its shape, and every index and length in this plan is unreliable.
 
-- [ ] **Step 2: Create the file from block 0**
+- [x] **Step 2: Create the file from block 0**
 
 The program reads block 0 from the design on disk and refuses to write if the target already exists — which is what a second run, a hand-created file, or a moved base looks like. **Do not type the script's contents.** Run:
 
@@ -197,7 +197,7 @@ echo "exit=$?"
 
 Expected: `created scripts/check-version-bump.py, 155 lines, first line '#!/usr/bin/env python3'` and `exit=0`.
 
-- [ ] **Step 3: Verify the file is its design block, is not executable, did not exist at the base, and is the only change**
+- [x] **Step 3: Verify the file is its design block, is not executable, did not exist at the base, and is the only change**
 
 Every mismatch is collected and printed before exit, so a first failure never hides a second. Run:
 
@@ -269,7 +269,7 @@ Expected: a `base:` line carrying a 40-character SHA, `scripts/check-version-bum
 
 The `ls-files --others` half is required here and only here: at this point the file is created but not yet committed or staged, so `git diff --name-only` alone would not see it and the scope assertion would pass vacuously.
 
-- [ ] **Step 4: Success criterion 3 — the check rejects the incident**
+- [x] **Step 4: Success criterion 3 — the check rejects the incident**
 
 The criterion the whole change exists for, and the only one that exercises a red path of the shipped script. Verbatim from the design's *Success criteria* 3. Run:
 
@@ -305,7 +305,7 @@ echo "exit=$?"
 
 Expected: four rows with `exit` equal to `want` — `1`, `1`, `0`, `0` in that order — then `incident: OK` and `exit=0`.
 
-- [ ] **Step 5: Success criterion 4 — failed producers halt, and the usage line is real**
+- [x] **Step 5: Success criterion 4 — failed producers halt, and the usage line is real**
 
 Verbatim from the design's *Success criteria* 4. The `HEAD:plugins` row is the one that fails if `resolve` ever stops appending `^{commit}`: `git rev-parse --verify HEAD:plugins` succeeds and yields a tree. Run:
 
@@ -336,7 +336,7 @@ echo "exit=$?"
 
 Expected: five rows, every one with a non-zero `exit`, then `producers: OK` and `exit=0`.
 
-- [ ] **Step 6: Success criterion 5 — the check rejects nothing merged since the bump rule was written**
+- [x] **Step 6: Success criterion 5 — the check rejects nothing merged since the bump rule was written**
 
 The false-positive bound. Verbatim from the design's *Success criteria* 5. Run:
 
@@ -370,7 +370,7 @@ echo "exit=$?"
 
 Expected: `commits replayed:` at least **17** (it grows as `main` advances), `rejected: 0`, and `exit=0`. A non-zero `rejected` count names each offending commit; **stop and report** rather than editing the script — the design's replay measured zero across every post-convention merge, so a rejection here means either the script is not block 0 or `main` has since acquired a genuine violation.
 
-- [ ] **Step 7: Success criterion 10 — the check sees a touched plugin whose path git would otherwise hide**
+- [x] **Step 7: Success criterion 10 — the check sees a touched plugin whose path git would otherwise hide**
 
 The falsifier for the shipped script's `-z` and `--no-renames` flags: without either, every row below exits 0 and reports `no plugin directory touched`, which is the silent pass this whole change exists to prevent. The probe repository is built in a temporary directory and removed. Verbatim from the design's *Success criteria* 10. Run from the repo root:
 
@@ -418,7 +418,7 @@ echo "exit=$?"
 
 Expected: three rows at `exit=1`, then `hidden paths: OK` and `exit=0`. Design **A12** records the premise: the filesystem must accept a newline and a non-ASCII byte in a filename, which macOS and `ubuntu-latest` both do; on a filesystem that refuses them this step fails loudly at the write rather than passing vacuously.
 
-- [ ] **Step 8: Success criterion 6 — the check passes this change's own tree, vacuously and visibly**
+- [x] **Step 8: Success criterion 6 — the check passes this change's own tree, vacuously and visibly**
 
 Verbatim from the design's *Success criteria* 6. The word *vacuously* is the point (**A5**), which is why Steps 4, 6 and 7 exist. Run:
 
@@ -429,7 +429,7 @@ echo "exit=$?"
 
 Expected: a `check-version-bump: base … head … merge-base …` line, then `check-version-bump: no plugin directory touched ... OK` and `exit=0`. **If it prints anything about a plugin directory, stop and report** — Global Constraint 1 has been violated and something under `plugins/` was touched.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```sh
 git add scripts/check-version-bump.py
