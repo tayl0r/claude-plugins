@@ -135,7 +135,7 @@ No file is created. Six files are modified, in three groups drawn so that no mir
 - Consumes: block 0 of `docs/superpowers/specs/2026-08-02-gh-40-41-verification-blocks-design.md`, read through `read_blocks(DESIGN, [1, 1, 1])[0][0]`; anchor line `AR_I = 29`, 1-based, at the merge base.
 - Produces: both copies at 89 lines with line 29 equal to block 0. Task 2 relies on nothing from this task except that the working tree is otherwise clean; Task 4's scope equality relies on exactly these two paths having changed.
 
-- [ ] **Step 1: Confirm the design's block shape**
+- [x] **Step 1: Confirm the design's block shape**
 
 Run:
 
@@ -145,7 +145,7 @@ python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-40-41-veri
 
 Expected: `shape: [1, 1, 1]`, then three `[i] len=1: …` preview lines whose prefixes are `| **design** | The design rubric`, `- **Command discipline:**` and `- **Measurements are derived, not typed.**`. **Anything else: stop and report** — the design moved and every anchor in this plan is unreliable.
 
-- [ ] **Step 2: Apply block 0 to both copies**
+- [x] **Step 2: Apply block 0 to both copies**
 
 The program reads block 0 from the design and refuses to write if the line it is about to replace already differs from the merge-base blob — which is what a moved base, a hand edit, or a second run of this program looks like. Run:
 
@@ -192,7 +192,7 @@ echo "exit=$?"
 
 Expected: a `base:` line carrying a 40-character SHA, then one `applied block 0 to … line 29` line per file, and `exit=0`.
 
-- [ ] **Step 3: Verify reconstruction, mirror-identity and scope**
+- [x] **Step 3: Verify reconstruction, mirror-identity and scope**
 
 Every mismatch is collected and printed before exit, so a first failure never hides a second. Run:
 
@@ -254,7 +254,7 @@ echo "exit=$?"
 
 Expected: `block 0 'dev-flow' occurrences: 0`, then `plugins/dev-flow/skills/adversarial-review/SKILL.md: 89 lines` and the matching `plugins/dev-flow-worktree/…: 89 lines`, a `changed:` line listing exactly the two `adversarial-review` paths, then `task 1: OK` and `exit=0`. Run before Step 2, the same program prints `MISMATCH:` lines for both files' reconstruction and for `changed []` and exits 1.
 
-- [ ] **Step 4: Verify the removed phrase is gone from shipped text**
+- [x] **Step 4: Verify the removed phrase is gone from shipped text**
 
 Block 0 splits the junction `success criteria — plus the input-contract`, so it must no longer appear outside `docs/superpowers/`. The pathspec is required: four prior records and the design itself legitimately contain it. Run:
 
@@ -265,7 +265,7 @@ echo "exit=$?"
 
 Expected: **no output** and `exit=1`. Before Step 2 this same command printed both copies of line 29 and exited 0, which is its red run.
 
-- [ ] **Step 5: Verify the machine-checked mirror pair**
+- [x] **Step 5: Verify the machine-checked mirror pair**
 
 Run:
 
@@ -285,7 +285,7 @@ exit=0
 
 A one-sided edit prints `mirror pair "adversarial-review" ... FAIL`, names `line 29` and both sides, and exits 1.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```sh
 git add plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md
