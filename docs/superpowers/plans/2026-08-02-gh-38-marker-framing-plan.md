@@ -63,7 +63,7 @@ Run **7b** is deliberately **not a fourth task.** It is a pipeline step, specifi
 - Consumes: `read_blocks(design_path, shape)` from `scripts/design_blocks.py`. Signature: takes an absolute-or-relative design path and a required shape list; returns the design's plain (untagged) fenced blocks in document order as lists of lines; raises `SystemExit` (non-zero) if the shape moved.
 - Produces: both target files at their final text. Task 3's criteria 4, 5, and 6 read those two lines.
 
-- [ ] **Step 1: Confirm the pre-edit state — the anchor is where it should be and the edit has not been applied**
+- [x] **Step 1: Confirm the pre-edit state — the anchor is where it should be and the edit has not been applied**
 
 Write this to `/private/tmp/claude-501/-Users-taylor-dev-claude-plugins/bab62c20-63f5-4951-b1c6-d34b0e5ae74e/scratchpad/precheck.py` and run it. It is the "failing test": on a fresh branch every `NOT-YET` line below must print, proving the edit is genuinely absent before it is applied. This is the only step that can tell "I made this change" from "it was already here" — every criterion in Task 3 passes identically on a pre-existing edit.
 
@@ -110,7 +110,7 @@ Any `AssertionError`, or a `design code-block shape is ...` `SystemExit` from `r
 
 An `ALREADY` line in place of `NOT-YET` is **not** a failure — that file already carries the replacement, which is what a resumed run looks like. Continue to Step 2 either way: the replacement line still begins with `ANCHOR`, so Step 2's anchor check passes and it rewrites the same bytes, and running it is what makes a half-applied pair whole. Report a mixed result (one `ALREADY`, one `NOT-YET`) explicitly — it means a prior run stopped mid-task, and it is the one-sided state criterion 5 exists to catch.
 
-- [ ] **Step 2: Apply both replacements**
+- [x] **Step 2: Apply both replacements**
 
 Write this to `/private/tmp/claude-501/-Users-taylor-dev-claude-plugins/bab62c20-63f5-4951-b1c6-d34b0e5ae74e/scratchpad/apply.py` and run it. It re-reads the blocks from the design on disk — the replacement bytes are never retyped — and re-checks the anchor before writing. It touches only the two `SKILL.md` files.
 
@@ -156,7 +156,7 @@ replaced /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a6f97b9ce555b8
 apply ok
 ```
 
-- [ ] **Step 3: Verify the line counts are unchanged**
+- [x] **Step 3: Verify the line counts are unchanged**
 
 Run from `ROOT`:
 
@@ -166,7 +166,7 @@ wc -l plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills
 
 Expected: `277` and `271` respectively. Anything else is a blocker.
 
-- [ ] **Step 4: Criterion 3 — the removed phrase is gone from `plugins/`**
+- [x] **Step 4: Criterion 3 — the removed phrase is gone from `plugins/`**
 
 This is one of the two checks *outside* the hand-mirrored pair, and it is the one `CLAUDE.md` requires unconditionally. Run from `ROOT`:
 
@@ -178,7 +178,7 @@ Expected: **no output**, `exit=1`. (Before the edit this printed both target lin
 
 Scope matters: **do not drop the `-- plugins/`.** Unscoped, the phrase still hits four `docs/superpowers/` records (`2026-07-20-dev-flow-design.md:114`, `2026-07-24-gh-6-docs-policy-plan.md:643/649/669`). Those are dated records and are **not** to be "also fixed" (design, *What was verified* and *Removed phrase*).
 
-- [ ] **Step 5: Confirm the working tree touched only the two `SKILL.md` files**
+- [x] **Step 5: Confirm the working tree touched only the two `SKILL.md` files**
 
 Run from `ROOT`:
 
@@ -195,7 +195,7 @@ Expected exactly two modified paths:
 
 Any other path — in particular `CONTEXT.md`, `CLAUDE.md`, or anything under `scripts/` — is a **scope violation and a blocker.** Revert the stray change and report it; do not commit it.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run from `ROOT`:
 
@@ -218,7 +218,7 @@ git commit -m "dev-flow: pin the review marker's framing and extraction (#38)"
 
 Minor, not patch, is deliberate: no version either plugin has ever shipped has a nonzero patch segment, and choosing a minor-vs-patch *convention* would be a `CLAUDE.md` edit, which is out of scope (design, *Version bumps*).
 
-- [ ] **Step 1: Confirm the pre-bump versions**
+- [x] **Step 1: Confirm the pre-bump versions**
 
 Run from `ROOT`:
 
@@ -235,7 +235,7 @@ plugins/dev-flow-worktree/.claude-plugin/plugin.json:3:  "version": "1.10.0",
 
 If either differs from `2.8.0` / `1.10.0`, **halt and report** — the design's floors were computed against these (design, *Version state*).
 
-- [ ] **Step 2: Edit `plugins/dev-flow/.claude-plugin/plugin.json`**
+- [x] **Step 2: Edit `plugins/dev-flow/.claude-plugin/plugin.json`**
 
 Use the Edit tool on `/Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a6f97b9ce555b8410/plugins/dev-flow/.claude-plugin/plugin.json`.
 
@@ -253,7 +253,7 @@ with:
 
 Change nothing else in the file — not formatting, not key order, not the trailing newline.
 
-- [ ] **Step 3: Edit `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
+- [x] **Step 3: Edit `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
 
 Use the Edit tool on `/Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a6f97b9ce555b8410/plugins/dev-flow-worktree/.claude-plugin/plugin.json`.
 
@@ -271,7 +271,7 @@ with:
 
 Change nothing else in the file.
 
-- [ ] **Step 4: Verify both bumps and that the JSON still parses**
+- [x] **Step 4: Verify both bumps and that the JSON still parses**
 
 Run from `ROOT`:
 
@@ -281,7 +281,7 @@ python3 -c "import json;print(json.load(open('plugins/dev-flow/.claude-plugin/pl
 
 Expected: `2.9.0 1.11.0`
 
-- [ ] **Step 5: Verify exactly one line moved in each manifest**
+- [x] **Step 5: Verify exactly one line moved in each manifest**
 
 Run from `ROOT`:
 
@@ -298,7 +298,7 @@ Expected — one added, one deleted, per file:
 
 Then confirm scope with `git status --short` from `ROOT`: the only modified paths must be the two manifests (Task 1's `SKILL.md` edits are already committed). Anything else is a blocker.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Run from `ROOT`:
 
@@ -321,7 +321,7 @@ git commit -m "dev-flow 2.9.0, dev-flow-worktree 1.11.0 (#38)"
 
 This is the substance of the change. There is no test framework in this repo; these criteria are the entire verification surface (design, A5).
 
-- [ ] **Step 1: Criterion 1 — `check-sync.py`**
+- [x] **Step 1: Criterion 1 — `check-sync.py`**
 
 Run from `ROOT`:
 
@@ -339,7 +339,7 @@ check-sync: all checks passed
 
 The mirror-pair line must be **unchanged** — this change touches neither member of the `adversarial-review` pair, and the criterion exists to prove it did not perturb them. Remember what this does **not** prove: `check-sync.py` has no knowledge of the pipeline `SKILL.md` pair this change edits. Criteria 3, 4, and 5 are what cover that.
 
-- [ ] **Step 2: Criterion 2 — `claude plugin validate .`**
+- [x] **Step 2: Criterion 2 — `claude plugin validate .`**
 
 Run from `ROOT`:
 
@@ -351,7 +351,7 @@ grep -ci 'error' /private/tmp/claude-501/-Users-taylor-dev-claude-plugins/bab62c
 
 Expected: `exit=0`, then `8`, then `0`. Exactly 8 `No author information provided` warnings and no errors is the documented pass state (`CLAUDE.md`; design, A5).
 
-- [ ] **Step 3: Criterion 3 — removed phrase, re-run post-commit**
+- [x] **Step 3: Criterion 3 — removed phrase, re-run post-commit**
 
 Run from `ROOT`:
 
@@ -361,7 +361,7 @@ git grep -n 'with the marker line' -- plugins/ ; echo "exit=$?"
 
 Expected: no output, `exit=1`. Keep the `-- plugins/` scope (see Task 1 Step 4).
 
-- [ ] **Step 4: Refresh `origin/main`, then confirm the design's plain-fence shape — both are preconditions of the program**
+- [x] **Step 4: Refresh `origin/main`, then confirm the design's plain-fence shape — both are preconditions of the program**
 
 **Refresh first.** The program's preamble fixes `BASE = git merge-base origin/main HEAD` from the *local* `refs/remotes/origin/main`; the program's own `git fetch` does not run until criterion 7, long after `BASE` is fixed. A stale tracking ref makes `BASE` an older ancestor than the true fork point, so every line `origin/main` itself moved in between counts as changed and criterion 6 fails as `('…/SKILL.md', {167, <some other line>})` — which reads exactly like a scope violation and is not one. Measured: with `origin/main` only three commits behind, `changed(DF)` is `{167, 266}` and `changed(WT)` is `{161, 261}`. Fetching before the program starts removes the failure mode instead of leaving it to be diagnosed. Run from `ROOT`:
 
@@ -387,7 +387,7 @@ shape: [1, 1]
 
 Any other shape means a rewrite added or removed a plain fence in the design. **That is a blocker: stop and report it.** Do not adjust the shape argument to match.
 
-- [ ] **Step 5: Write the criteria 4–7 program**
+- [x] **Step 5: Write the criteria 4–7 program**
 
 Write **exactly** this to `/private/tmp/claude-501/-Users-taylor-dev-claude-plugins/bab62c20-63f5-4951-b1c6-d34b0e5ae74e/scratchpad/criteria.py`.
 
@@ -474,7 +474,7 @@ for path, want in WANT.items():
 print("versions ok")
 ```
 
-- [ ] **Step 6: Run it — criteria 4, 5, 6, and run 7a**
+- [x] **Step 6: Run it — criteria 4, 5, 6, and run 7a**
 
 Run: `python3 /private/tmp/claude-501/-Users-taylor-dev-claude-plugins/bab62c20-63f5-4951-b1c6-d34b0e5ae74e/scratchpad/criteria.py ; echo "exit=$?"`
 
@@ -498,7 +498,7 @@ Note `run("fetch", "origin", "main")` at the top of criterion 7: it updates `ref
 
 If criterion 7 fails with `not ahead of origin/main`, a concurrent PR published your target version. **Remediation (design, criterion 7):** re-target both versions upward — bump each to the next minor above the published one — then re-run the whole program from Step 6. `WANT` is a floor, not an equality, precisely so the criterion stays green through that remediation.
 
-- [ ] **Step 7: Criterion 8 — file scope**
+- [x] **Step 7: Criterion 8 — file scope**
 
 Run from `ROOT`:
 
@@ -516,7 +516,7 @@ Expected: **only** these paths appear —
 
 Any other path — **in particular `CONTEXT.md`, `CLAUDE.md`, or anything under `scripts/`** — is a scope violation and a **blocker, not a fix to apply.**
 
-- [ ] **Step 8: Confirm the working tree is clean and nothing was left uncommitted**
+- [x] **Step 8: Confirm the working tree is clean and nothing was left uncommitted**
 
 Run from `ROOT`:
 
@@ -526,7 +526,7 @@ git status --short
 
 Expected: no output. The scratchpad scripts live outside the repo and must never be added.
 
-- [ ] **Step 9: Record the pass, and hand run 7b to the orchestrator**
+- [x] **Step 9: Record the pass, and hand run 7b to the orchestrator**
 
 No commit is needed — this task changed no file. Report the criteria pass as: criteria 1, 2, 3, 8 green (shell); criteria 4, 5, 6 and **run 7a** green (one Python program).
 
