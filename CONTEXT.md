@@ -15,16 +15,17 @@ A reviewer in the second tier, which weighs grouped seed findings against the de
 _Avoid_: group agent, group-resolution agent, judge, arbiter
 
 **Tier**:
-The model class a reviewer is spawned on — `sonnet` for seeds, `opus` for resolvers. Distinct from *family*.
+The model a reviewer is spawned on — `claude-sonnet-4-6` for seeds, `claude-opus-4-8` for resolvers. Named by dated id, not by family alias, so that a new release in either family cannot silently re-point a tier. Distinct from *family*.
 
 **Family**:
 A model's product line (Opus, Sonnet, Fable), independent of any dated version within it. A plugin's product line likewise: `dev-flow` is the family name its two variants share, independent of either variant's own version. A set of merely related constructs (connectors, handlers, jobs…) is not a family — the word for that is *kind*.
 
-**Family match**:
-The check that a reviewer's self-reported model belongs to the family its requested tier names. Preferred over matching a dated model id, which drifts.
+**Tier match**:
+The check that a reviewer's self-reported model is the dated id its requested tier names, or — where the spawn interface accepts only family aliases — another model of that id's *family*, which is what such an interface resolves to.
+_Avoid_: family match (the name from when tiers were named by alias)
 
 **Provenance**:
-The line a review returns stating how many reviewers it actually spawned per tier. Evidence of fan-out and tier conformance — never of model diversity.
+The line a review returns stating how many reviewers it actually spawned per tier, and the model each one self-reported. Evidence of fan-out and tier conformance — never of model diversity.
 
 **Angle**:
 One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement, glossary conformance.
