@@ -320,7 +320,7 @@ exit=0
 
 ### Steps
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```sh
 cd /Users/taylor/dev/claude-plugins
@@ -337,7 +337,7 @@ Expected:
 - `CLAUDE.md:29`.
 - `809ca485a1ee5c515d2ef0de4181a762253887ae`. **Any other value → halt and report "design doc modified".**
 
-- [ ] **Step 2: Run §V0 — the block shape guard**
+- [x] **Step 2: Run §V0 — the block shape guard**
 
 Run **§V0** from *Verification scripts* above, verbatim.
 
@@ -352,7 +352,7 @@ exit=0
 
 Anything else → **stop and report**. Every later step indexes off this shape.
 
-- [ ] **Step 3: Run §V2 and watch it FAIL (red)**
+- [x] **Step 3: Run §V2 and watch it FAIL (red)**
 
 Run **§V2** from *Verification scripts* above, verbatim. This is the design's *Verification* step 2, run before the edit so you can watch it discriminate.
 
@@ -368,7 +368,7 @@ exit=1
 
 Three MISMATCH lines and no more. If you see `reconstruction: OK`, the edit is already applied — skip to Step 6. Any **fourth** MISMATCH line means one of the seven base-side or block-side assertions is failing, which the tree cannot cause → **stop and report**; the design or the base moved.
 
-- [ ] **Step 4: Run §V1 and watch it FAIL (red)**
+- [x] **Step 4: Run §V1 and watch it FAIL (red)**
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -382,7 +382,7 @@ exit=1
 
 `changed []` is the pre-edit state: nothing outside `docs/superpowers/` has moved yet. If `changed` already lists `CLAUDE.md`, the edit is applied — skip to Step 6. If it lists **any other path**, something outside the authorized set is already modified → **halt and report**.
 
-- [ ] **Step 5: Apply both hunks with the applier**
+- [x] **Step 5: Apply both hunks with the applier**
 
 Reads both blocks from the design **on disk** through the shared reader and reconstructs `CLAUDE.md` from its **merge-base blob** — it does not patch the working tree, which is what makes it byte-exact and idempotent. It types **no byte of block content**: the only literals are the three ASCII/plain guards `"**Always:**"`, `"**When the change has a design doc**"` and `"## Verifying a change"`, reproduced verbatim from §V2 and only ever compared against. It refuses to write unless the working tree is either already the intended result or byte-identical to the base blob, so it can never silently clobber someone else's edit. The trailing newline is carried over from the base blob's raw bytes rather than reconstructed, so the file's final byte is unchanged. **Unindented fence, pure ASCII — copy exactly.**
 
@@ -440,7 +440,7 @@ echo "exit=$?"
 
 Expected: `applied: CLAUDE.md, 29 -> 34 lines` and `exit=0` (or `already applied: CLAUDE.md is 34 lines` if re-run). This exact output was produced by a dry run of the same program against base `0445fb9` while the plan was written, writing to a scratch path outside the repo. Any `SystemExit` message is a **stop and report** — do not hand-patch `CLAUDE.md` to satisfy it, and never fall back to the `Edit` tool with retyped text.
 
-- [ ] **Step 6: Run §V2 and watch it PASS (green)**
+- [x] **Step 6: Run §V2 and watch it PASS (green)**
 
 Run **§V2** from *Verification scripts* above, verbatim — the same characters as in Step 3.
 
@@ -453,7 +453,7 @@ exit=0
 
 and nothing else. This was confirmed green while the plan was written, by running §V2 with `new` read from the applier's dry-run output instead of from `CLAUDE.md`. This is the `CLAUDE.md`-mandated design-sourced check going green, and it is simultaneously this repo's own `Always:` rule run on the change that relocates it: the file is proved to be its merge-base blob with exactly the intended edit applied, both blocks proved to have come from the design on disk, and both hoisted bullets proved byte-identical to the base's prescription spans. Any `MISMATCH:` line is a **stop and report** — do not hand-patch `CLAUDE.md` to satisfy it; re-read the applier's output instead.
 
-- [ ] **Step 7: Run §V1 and watch it PASS (green)**
+- [x] **Step 7: Run §V1 and watch it PASS (green)**
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -467,7 +467,7 @@ exit=0
 
 Exactly one file changed, and it is not a plugin file. This is also the removed-phrase grep in its stronger form: the junction `pair. **Always:**` sat in exactly one file outside `docs/superpowers/`, and §V1 plus §V2 together leave it nowhere to reappear (*Verification scripts* preamble). A `file scope: FAIL` line names the changed set it found; any path in it other than `CLAUDE.md` → **stop and report**, and if it is a version bump, revert it.
 
-- [ ] **Step 8: Run §V3 — `check-sync.py` regression guard**
+- [x] **Step 8: Run §V3 — `check-sync.py` regression guard**
 
 Run **§V3** from *Verification scripts* above, verbatim.
 
@@ -482,7 +482,7 @@ exit=0
 
 Identical to before the change. Any difference means a mirrored file or a manifest `description` moved → **stop and report**.
 
-- [ ] **Step 9: Run §V4 — `claude plugin validate .`, before committing**
+- [x] **Step 9: Run §V4 — `claude plugin validate .`, before committing**
 
 Run **§V4** from *Verification scripts* above, verbatim. `CLAUDE.md` says to validate before committing, which is why this runs here and not only in Task 2.
 
@@ -496,7 +496,7 @@ exit=0
 
 The 8 warnings are the pass state (design A3). A `MISMATCH:` line → **stop and report**; do not add author fields.
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 Stage by exact path — never `git add -A`.
 
