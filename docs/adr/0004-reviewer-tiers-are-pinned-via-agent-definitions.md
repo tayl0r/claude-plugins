@@ -12,7 +12,7 @@ The `Agent` tool's `model` parameter accepts **only** family aliases and rejects
 InputValidationError: Invalid option: expected one of "sonnet"|"opus"|"haiku"|"fable"
 ```
 
-Agent-definition frontmatter *does* accept a full id. So each tier is a `plugins/<name>/agents/<name>.md` definition whose frontmatter carries the pin, distributed by the plugin system exactly like a skill. Two properties of that registration are load-bearing:
+Agent-definition frontmatter *does* accept a full id. So each tier is a `plugins/<plugin>/agents/<agent>.md` definition whose frontmatter carries the pin, distributed by the plugin system exactly like a skill. Two properties of that registration are load-bearing:
 
 - **The registered name is plugin-qualified** — `dev-flow:adversarial-review-seed`, not `adversarial-review-seed`. The bare name does not resolve. Skills must spawn the qualified form, which is why each mirrored copy names its own plugin; `check-sync.py`'s `dev-flow-worktree` → `dev-flow` canonicalization folds the pair back together.
 - **Passing `model` at the spawn site overrides the frontmatter**, silently un-pinning the tier. The skills must never pass it.
