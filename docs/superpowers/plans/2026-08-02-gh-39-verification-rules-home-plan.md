@@ -745,7 +745,7 @@ exit=0
 
 ### Steps
 
-- [ ] **Step 1: Confirm the tree is clean, the edit is committed, and the design doc is intact**
+- [x] **Step 1: Confirm the tree is clean, the edit is committed, and the design doc is intact**
 
 ```sh
 cd /Users/taylor/dev/claude-plugins
@@ -757,7 +757,7 @@ git hash-object docs/superpowers/specs/2026-08-02-gh-39-verification-rules-home-
 
 Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked `docs/superpowers/plans/2026-08-02-gh-39-verification-rules-home-plan.md` (this plan's own checkbox ticks); the newest commit's subject is `CLAUDE.md: give the verification rules a repo-wide home (#39)`; `CLAUDE.md:34`; and `809ca485a1ee5c515d2ef0de4181a762253887ae` — **any other hash means the implementation modified the design doc → halt and report.** If `CLAUDE.md:29`, Task 1 has not landed — **halt and report** rather than running Task 1's applier from here.
 
-- [ ] **Step 2: Design *Verification* step 0 — block shape**
+- [x] **Step 2: Design *Verification* step 0 — block shape**
 
 Run **§V0** from *Verification scripts* above, verbatim.
 
@@ -770,7 +770,7 @@ shape guard: OK
 exit=0
 ```
 
-- [ ] **Step 3: Design *Verification* step 1 — file scope**
+- [x] **Step 3: Design *Verification* step 1 — file scope**
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -784,7 +784,7 @@ exit=0
 
 and no other line. Exactly one file changed, it is `CLAUDE.md`, and no `plugin.json` version moved.
 
-- [ ] **Step 4: Design *Verification* step 2 — reconstruction, design conformance, verbatim hoist**
+- [x] **Step 4: Design *Verification* step 2 — reconstruction, design conformance, verbatim hoist**
 
 Run **§V2** from *Verification scripts* above, verbatim.
 
@@ -795,7 +795,7 @@ reconstruction: OK
 exit=0
 ```
 
-- [ ] **Step 5: Design *Verification* step 3 — `check-sync.py`**
+- [x] **Step 5: Design *Verification* step 3 — `check-sync.py`**
 
 Run **§V3** from *Verification scripts* above, verbatim.
 
@@ -808,7 +808,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 6: Design *Verification* step 4 — `claude plugin validate .`**
+- [x] **Step 6: Design *Verification* step 4 — `claude plugin validate .`**
 
 Run **§V4** from *Verification scripts* above, verbatim.
 
@@ -820,7 +820,7 @@ validate: OK
 exit=0
 ```
 
-- [ ] **Step 7: Record the verdict**
+- [x] **Step 7: Record the verdict**
 
 Every row must be green:
 
