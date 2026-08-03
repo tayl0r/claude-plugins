@@ -488,7 +488,7 @@ git commit -m "dev-flow: Command discipline governs emitted success criteria; me
 
 **Do not reformat the JSON.** The edit is a single-line string replacement; re-serializing with `json.dump` would rewrite the whole file and put a stray path into scope.
 
-- [ ] **Step 1: Apply both bumps**
+- [x] **Step 1: Apply both bumps**
 
 The program asserts each old `"version"` line appears exactly once before replacing it, so a file already bumped or unexpectedly shaped halts rather than being written. Run:
 
@@ -515,7 +515,7 @@ echo "exit=$?"
 
 Expected: one `… 1 occurrences of "version": "2.9.0",` line and one `… 1 occurrences of "version": "1.11.0",` line, each followed by its `bumped …` line, and `exit=0`.
 
-- [ ] **Step 2: Verify versions are strictly greater than published, and the six-file scope**
+- [x] **Step 2: Verify versions are strictly greater than published, and the six-file scope**
 
 The comparison is a **tuple of integers**, not a string — `"2.10.0" > "2.9.0"` is false lexicographically, and this is the first change in the repo's history where that bites. `WANT` is a floor, never an equality, so re-targeting upward leaves it green. Run:
 
@@ -572,7 +572,7 @@ echo "exit=$?"
 
 Expected: two `… mine (…), origin/main (…)` lines, a `changed:` line listing all six paths, then `task 3: OK` and `exit=0`. Run before Step 1 it prints four `MISMATCH:` lines — one *below the designed floor* and one *not strictly greater* per plugin — plus a scope mismatch, and exits 1.
 
-- [ ] **Step 3: Verify the manifests still validate**
+- [x] **Step 3: Verify the manifests still validate**
 
 Both halves are asserted, because either alone passes vacuously: the command exits 0 *while* emitting the warnings, and a count assertion alone would pass on a run that errored out. Run:
 
@@ -608,7 +608,7 @@ validate: OK
 exit=0
 ```
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```sh
 git add plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
