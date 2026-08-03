@@ -505,7 +505,7 @@ Expected: the commit succeeds and `git show --stat` lists **exactly one** file, 
 
 **Nothing in this task edits a file. If a check fails, stop and report — do not repair by editing the file the check names.**
 
-- [ ] **Step 1: Confirm the tree is clean and the design doc is intact**
+- [x] **Step 1: Confirm the tree is clean and the design doc is intact**
 
 ```sh
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a4ba04cbf6e3a28ca
@@ -516,7 +516,7 @@ wc -l CLAUDE.md
 
 Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked `docs/superpowers/plans/2026-08-02-gh-32-33-claude-md-conventions-plan.md` (this plan's own checkbox ticks); `732abd31c58c05fcea472799d1e094769968a315` — **any other value means the implementation modified the design doc → halt and report**; and `29 CLAUDE.md`, unchanged from before the change.
 
-- [ ] **Step 2: Design *Verification* step 0 — block shape**
+- [x] **Step 2: Design *Verification* step 0 — block shape**
 
 ```sh
 python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md
@@ -532,7 +532,7 @@ shape: [1, 1]
 
 Anything other than two entries means the design was edited after this plan captured its shape — **stop and report**.
 
-- [ ] **Step 3: Design *Verification* step 1 — file scope**
+- [x] **Step 3: Design *Verification* step 1 — file scope**
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -548,7 +548,7 @@ exit=0
 
 and no other stat row. Exactly one file changed, and it is not a plugin file.
 
-- [ ] **Step 4: Design *Verification* step 2 — design conformance, through the shared reader**
+- [x] **Step 4: Design *Verification* step 2 — design conformance, through the shared reader**
 
 Run **§V2** from *Verification scripts* above, verbatim.
 
@@ -559,7 +559,7 @@ design-conformance: OK
 exit=0
 ```
 
-- [ ] **Step 5: Design *Verification* step 3 — residue**
+- [x] **Step 5: Design *Verification* step 3 — residue**
 
 ```sh
 git grep -n -F 'expecting no hits. **When the change' -- . ':!docs/superpowers/'
@@ -567,7 +567,7 @@ git grep -n -F 'expecting no hits. **When the change' -- . ':!docs/superpowers/'
 
 Expected: no output and a non-zero exit.
 
-- [ ] **Step 6: Design *Verification* step 4 — presence, both new clauses, once each**
+- [x] **Step 6: Design *Verification* step 4 — presence, both new clauses, once each**
 
 ```sh
 git grep -c -F 'Always the minor segment' -- CLAUDE.md
@@ -576,7 +576,7 @@ git grep -c -F 'byte-for-byte its merge-base blob' -- CLAUDE.md
 
 Expected: `CLAUDE.md:1` from each.
 
-- [ ] **Step 7: Design *Verification* step 5 — the changed-line set is exactly `{7, 9}`**
+- [x] **Step 7: Design *Verification* step 5 — the changed-line set is exactly `{7, 9}`**
 
 Run **§V5** from *Verification scripts* above, verbatim.
 
@@ -588,7 +588,7 @@ line-set: OK
 exit=0
 ```
 
-- [ ] **Step 8: Design *Verification* step 6 — `check-sync.py`**
+- [x] **Step 8: Design *Verification* step 6 — `check-sync.py`**
 
 ```sh
 python3 scripts/check-sync.py
@@ -606,7 +606,7 @@ exit=0
 
 Identical to before the change — it reads none of the changed files. `.claude-plugin/marketplace.json` is untouched, so Check A is unaffected, and Check B's mirror pair is not in this change at all.
 
-- [ ] **Step 9: Design *Verification* step 7 — `claude plugin validate .`**
+- [x] **Step 9: Design *Verification* step 7 — `claude plugin validate .`**
 
 ```sh
 claude plugin validate .
@@ -615,7 +615,7 @@ echo "exit=$?"
 
 Expected: `⚠ Found 8 warnings:`, eight `author: No author information provided…` lines, `✔ Validation passed with warnings`, and `exit=0`. **The 8 warnings are expected and are NOT a failure** (design A4). A non-zero exit, any error, or a warning count other than 8 is a failure.
 
-- [ ] **Step 10: Design *Verification* step 8 — no version moved**
+- [x] **Step 10: Design *Verification* step 8 — no version moved**
 
 ```sh
 git grep '"version"' -- plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
@@ -630,7 +630,7 @@ plugins/dev-flow/.claude-plugin/plugin.json:  "version": "2.8.0",
 
 `git grep` rather than bare `grep`, because the assertion is *which plugin is at which version* and only the per-file labels carry it. **If either version moved, revert the bump** — `CLAUDE.md` ships into no version-keyed cache, so no bump is warranted (Global Constraints, design *Out of scope*).
 
-- [ ] **Step 11: Record the verdict**
+- [x] **Step 11: Record the verdict**
 
 Every row must be green:
 
