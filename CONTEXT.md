@@ -12,7 +12,7 @@ _Avoid_: finder, first-pass reviewer
 
 **Resolver**:
 A reviewer in the second tier, which weighs grouped seed findings against the design rubric and decides what changes.
-_Avoid_: group agent, judge, arbiter
+_Avoid_: group agent, group-resolution agent, judge, arbiter
 
 **Tier**:
 The model class a reviewer is spawned on — `sonnet` for seeds, `opus` for resolvers. Distinct from *family*.
@@ -51,6 +51,20 @@ A boundary where the pipeline halts and hands control back: `post-design`, `post
 
 **Slug**:
 The short, opaque, immutable identifier for one pipeline run, threading its branch, its document filenames, and its PR. Renaming a feature changes prose, never the slug.
+
+### Topology
+
+**Orchestrator**:
+The agent that drives one pipeline run from stage to stage, and the run's only *spawner* — the one agent that spawns any other; every other agent in the run is a leaf.
+
+**Leaf**:
+A spawned subagent that spawns nothing itself: a produce-subagent, one of a review's seeds or resolvers, one of SDD's implementers or fixers.
+
+**Fan-out**:
+One agent dispatching N workers and holding their loop — a review's seeds and resolvers, SDD's implementers. That agent is the fan-out's *controller*, and in both pipelines it is always the orchestrator, which is why fanning out adds no level.
+
+**Flat topology**:
+The property that every spawn in a run is one level deep: the orchestrator spawns leaves, and nothing else spawns at all. *Topology* alone names this axis — which agent may spawn which — and nothing else here. Required rather than preferred, for reasons independent of any harness version (ADR-0003).
 
 ### Duplication
 

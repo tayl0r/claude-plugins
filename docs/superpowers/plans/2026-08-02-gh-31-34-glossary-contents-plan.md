@@ -90,7 +90,7 @@ Criteria 3, 4 and 5 are deliberately **retyped** from the design's *rulings*, no
 - Consumes: `read_blocks(design_path, shape) -> list[list[str]]` from `scripts/design_blocks.py`, imported as `sys.path.insert(0, f"{ROOT}/scripts")` then `from design_blocks import read_blocks`. It returns the design's plain (untagged) fenced blocks in document order, as lists of lines, **after** checking `[len(b) for b in blocks] == list(shape)`; on mismatch it raises `SystemExit` (exit 1, one line on stderr) rather than returning. The shape for this design is **`[1, 14]`**: block 0 is the 1-line replacement `_Avoid_:` line, block 1 the 14-line `### Topology` section whose **first line is empty** and which has **no** trailing blank line.
 - Produces: `CONTEXT.md` at 81 lines, which Task 2 verifies. Nothing later depends on the applier itself.
 
-- [ ] **Step 1: Pre-flight — confirm the tree, the design, and both anchors**
+- [x] **Step 1: Pre-flight — confirm the tree, the design, and both anchors**
 
 This is the design's *The edit* pre-flight, which **runs before any write**. Run each command separately.
 
@@ -123,7 +123,7 @@ Expected, measured in this checkout at `b4b5d1c`:
 
 **Any other result — no hit, more than one hit, a different line number — means the file has drifted from the base this design measured: STOP and re-derive, do not edit.** Do not adjust the numbers to match what you see.
 
-- [ ] **Step 2: Run the design-conformance check and watch it FAIL (red)**
+- [x] **Step 2: Run the design-conformance check and watch it FAIL (red)**
 
 Run this **before** touching `CONTEXT.md`. It is the design's criterion 6 verbatim, with `<wd, absolute>` substituted. Running it red first is what shows the check discriminates, rather than merely asserting that it does. **The fence is unindented on purpose.**
 
@@ -170,7 +170,7 @@ Expected, **measured** against the unedited file: `exit=1`, and an `AssertionErr
 
 If instead it fails on one of the three earlier asserts (`len(old)`, `old[14]`, `old[52]`), the branch's base is not what this plan measured → **HALT and report**. If it exits with `design doc is …`, the design changed since Step 1 → **HALT and report**; if with `design code-block shape is …`, the design's blocks moved → **HALT and report**. If it prints `design-conformance: OK`, `CONTEXT.md` was edited before this step ran → **HALT and report**; the check has not been shown to discriminate.
 
-- [ ] **Step 3: Apply both edits, reading both blocks from the design**
+- [x] **Step 3: Apply both edits, reading both blocks from the design**
 
 One applier, both edits, **no replacement text retyped**. It reads block 0 and block 1 through `read_blocks`, locates each site by **anchor text**, asserts both anchors are unique and where the design says they are, and only then writes. The two strings it does type are *pre-edit* anchors — a typo in either makes it refuse to write rather than misroute the edit. **The fence is unindented on purpose.**
 
@@ -233,7 +233,7 @@ Block 0 is one line, so replacing line 15 shifts no index and the **Slug** ancho
 
 The applier is deliberately single-shot: run it twice and the second run exits 1 with `CONTEXT.md is 81 lines, want 67`. That is correct behaviour, not a bug — if you see it, the edit already landed; go to Step 4 rather than re-applying. **Do not hand-edit around a refusal, and do not paste block text into an `Edit` call to "finish the job".** If the applier refuses for any reason, **HALT and report its message verbatim.**
 
-- [ ] **Step 4: Re-run the design-conformance check and watch it PASS (green) — success criterion 6**
+- [x] **Step 4: Re-run the design-conformance check and watch it PASS (green) — success criterion 6**
 
 Run **the identical script from Step 2 again** — same text, unchanged. Do not edit it, do not substitute an equivalent of your own: its whole point is that it re-reads the design's blocks from disk rather than trusting any transcription.
 
@@ -260,7 +260,7 @@ The source is `HEAD`, not `BASE`, and it is a **ref rather than a value** — no
 
 **If the check fails again after one restore-and-re-apply, HALT and report both failures.** The applier is deterministic; a second identical failure is not a transient, and re-running it a third time is a loop, not a recovery.
 
-- [ ] **Step 5: Report — do not commit**
+- [x] **Step 5: Report — do not commit**
 
 Leave the change in the working tree. Report that Task 1 is complete, quoting the Step 2 red result (two diff hunks, `exit=1`), the Step 3 applier line, and the Step 4 green result. **Do not commit, do not push, do not open a PR, do not close an issue, do not invoke a review skill.**
 
