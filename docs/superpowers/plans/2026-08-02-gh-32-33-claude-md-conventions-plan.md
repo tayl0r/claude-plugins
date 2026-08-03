@@ -359,7 +359,7 @@ Expected: the commit succeeds and `git show --stat` lists **exactly one** file, 
 
 **What changes:** one line. Everything before `**Always:**` and everything from `**When the change has a design doc**` onward is byte-identical to the line #24 landed at `963a66c`; the span between those two markers is a single sentence in the base, and block 1 replaces it with a longer sentence plus one new one (design *Block 1*). Unlike block 0, **this edit does remove a phrase** — the sentence junction `expecting no hits. **When the change` — so the residue grep in Step 4 has something to search for.
 
-- [ ] **Step 1: Confirm the starting state**
+- [x] **Step 1: Confirm the starting state**
 
 ```sh
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a4ba04cbf6e3a28ca
@@ -371,7 +371,7 @@ git grep -c -F 'Always the minor segment' -- CLAUDE.md
 
 Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked plan file (checkbox ticks); `29 CLAUDE.md`; `732abd31c58c05fcea472799d1e094769968a315` (**any other value → halt and report "design doc modified"**); and `CLAUDE.md:1`, which is Task 1's committed result. If that last command prints nothing, Task 1 has not landed — **halt and report** rather than running Task 1's applier from here.
 
-- [ ] **Step 2: Confirm the junction this edit removes is present (red for the residue check)**
+- [x] **Step 2: Confirm the junction this edit removes is present (red for the residue check)**
 
 ```sh
 git grep -n -F 'expecting no hits. **When the change' -- . ':!docs/superpowers/'
@@ -380,7 +380,7 @@ echo "exit=$?"
 
 Expected: **exactly one hit**, on `CLAUDE.md:9`, then `exit=0`. That is the phrase Step 4 will require to be gone. If there is no hit, the edit is already applied — skip to Step 4. The `':!docs/superpowers/'` pathspec is required: the design quotes this phrase.
 
-- [ ] **Step 3: Apply block 1 with the applier**
+- [x] **Step 3: Apply block 1 with the applier**
 
 Reads block 1 from the design **on disk** through the shared reader and writes it into `CLAUDE.md`, selecting the target as the unique line sharing block 1's head and tail. It types **no byte of block 1** — the only literals are the two ASCII markers `"**Always:**"` and `"**When the change has a design doc**"`, reproduced verbatim from the design's *Verification* step 2 and only ever compared against. Idempotent. **Unindented fence, pure ASCII — copy exactly.**
 
@@ -420,7 +420,7 @@ echo "exit=$?"
 
 Expected: `applied: block 1, at line 9 of CLAUDE.md` and `exit=0` (or the `already applied:` line if re-run). Any `SystemExit` message is a **stop and report** — do not hand-patch `CLAUDE.md` to satisfy it.
 
-- [ ] **Step 4: Residue — the removed junction is gone from the tree** (design *Verification* step 3)
+- [x] **Step 4: Residue — the removed junction is gone from the tree** (design *Verification* step 3)
 
 ```sh
 git grep -n -F 'expecting no hits. **When the change' -- . ':!docs/superpowers/'
@@ -428,7 +428,7 @@ git grep -n -F 'expecting no hits. **When the change' -- . ':!docs/superpowers/'
 
 Expected: **no output** and a non-zero exit (`git grep` exits 1 on no match — that is the pass here). The pathspec is required: the design quotes the phrase, and without the exclusion this reports the design doc and this plan is impossible to satisfy. Any hit outside `docs/superpowers/` means the old junction survives → **stop and report**.
 
-- [ ] **Step 5: Presence — the new clause is in `CLAUDE.md`, once** (design *Verification* step 4, second command)
+- [x] **Step 5: Presence — the new clause is in `CLAUDE.md`, once** (design *Verification* step 4, second command)
 
 ```sh
 git grep -c -F 'byte-for-byte its merge-base blob' -- CLAUDE.md
@@ -436,7 +436,7 @@ git grep -c -F 'byte-for-byte its merge-base blob' -- CLAUDE.md
 
 Expected, exactly `CLAUDE.md:1`. Before Step 3 this printed nothing and exited 1.
 
-- [ ] **Step 6: Run §V2 and watch it PASS (green)**
+- [x] **Step 6: Run §V2 and watch it PASS (green)**
 
 Run **§V2** from *Verification scripts* above, verbatim — the same characters as in Tasks 1 Steps 2 and 5.
 
@@ -449,7 +449,7 @@ exit=0
 
 Any `MISMATCH:` line is a **stop and report** — do not hand-patch `CLAUDE.md` to satisfy it; re-run Step 3 instead. This is the `CLAUDE.md`-mandated design-sourced check going green: both blocks are proved to be at lines 7 and 9 byte-for-byte, uniquely, with every untouched span re-derived from git rather than trusted.
 
-- [ ] **Step 7: Run §V5 and watch it PASS (green)**
+- [x] **Step 7: Run §V5 and watch it PASS (green)**
 
 Run **§V5** from *Verification scripts* above, verbatim.
 
@@ -463,7 +463,7 @@ exit=0
 
 Steps 6 and 7 together are exactly the reconstruction the new clause asks for — §V2 proves the intended edit is what landed on lines 7 and 9, §V5 proves no other line moved — so this change exercises its own new rule end to end (design A8). Any other set, or a `LENGTH:` line, is a **stop and report**.
 
-- [ ] **Step 8: Run §V1 — file scope, end-state form** (design *Verification* step 1)
+- [x] **Step 8: Run §V1 — file scope, end-state form** (design *Verification* step 1)
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -479,7 +479,7 @@ exit=0
 
 This is now the design's stated end state. `--stat` is for reading; **the assertion is `file scope: OK`**.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 Stage by exact path — never `git add -A`.
 
