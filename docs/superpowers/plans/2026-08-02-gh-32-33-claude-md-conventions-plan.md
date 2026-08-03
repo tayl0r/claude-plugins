@@ -200,7 +200,7 @@ The single pass token is `file scope: OK`, and the `base:` line must carry a 40-
 
 **What changes:** one line. Block 0 is a **pure append** — the bullet's two existing sentences are unchanged and everything from `**Always the minor segment**` onward is new. That is why the applier's selector is "the unique line that is a prefix of block 0", and why §V2 asserts the base line 7 is a strict prefix of block 0 rather than grepping for a removed phrase: **this edit removes no phrase**, so the residue grep has nothing to search for on this line (design *Block 0*).
 
-- [ ] **Step 1: Confirm the starting state and the block shape** (design *Verification* step 0)
+- [x] **Step 1: Confirm the starting state and the block shape** (design *Verification* step 0)
 
 ```sh
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-a4ba04cbf6e3a28ca
@@ -227,7 +227,7 @@ shape: [1, 1]
 
 Anything other than two entries of one line each means the design was edited after this plan captured its shape — **stop and report** (design A9).
 
-- [ ] **Step 2: Run §V2 and watch it FAIL (red)**
+- [x] **Step 2: Run §V2 and watch it FAIL (red)**
 
 Run **§V2** from *Verification scripts* above, verbatim. This is the design's *Verification* step 2, run before the edit so you can watch it discriminate.
 
@@ -242,7 +242,7 @@ exit=1
 
 Both blocks are absent because neither edit has been applied yet. If you instead see only the `block 1` line, block 0 is already applied — skip to Step 4. If you see `design-conformance: OK`, both edits are already applied — skip to Step 7.
 
-- [ ] **Step 3: Apply block 0 with the applier**
+- [x] **Step 3: Apply block 0 with the applier**
 
 Reads block 0 from the design **on disk** through the shared reader and writes it into `CLAUDE.md`, selecting the target as the unique non-empty line that block 0 extends. It types **no byte of block 0** — the only literal is the ASCII guard `" **Always the minor segment**"`, reproduced verbatim from the design's *Verification* step 2 and only ever compared against. Idempotent. **Unindented fence, pure ASCII — copy exactly.**
 
@@ -278,7 +278,7 @@ echo "exit=$?"
 
 Expected: `applied: block 0, at line 7 of CLAUDE.md` and `exit=0` (or the `already applied:` line if re-run). Any `SystemExit` message is a **stop and report** — do not hand-patch `CLAUDE.md` to satisfy it.
 
-- [ ] **Step 4: Presence — the new clause is in `CLAUDE.md`, once** (design *Verification* step 4, first command)
+- [x] **Step 4: Presence — the new clause is in `CLAUDE.md`, once** (design *Verification* step 4, first command)
 
 ```sh
 git grep -c -F 'Always the minor segment' -- CLAUDE.md
@@ -286,7 +286,7 @@ git grep -c -F 'Always the minor segment' -- CLAUDE.md
 
 Expected, exactly `CLAUDE.md:1`. Before Step 3 this printed nothing and exited 1.
 
-- [ ] **Step 5: Run §V2 again — one MISMATCH must remain, and it must name block 1**
+- [x] **Step 5: Run §V2 again — one MISMATCH must remain, and it must name block 1**
 
 Run **§V2** verbatim again.
 
@@ -300,7 +300,7 @@ exit=1
 
 **This FAIL is the expected mid-change state, not a defect** — block 1 is Task 2's deliverable. What matters is that the `block 0` MISMATCH is **gone** and that no *new* MISMATCH line has appeared. Any line other than the single `block 1` one — in particular `CLAUDE.md gained or lost lines`, `base line 7 is not a prefix of block 0`, or `block 0 appends something other than the minor-segment clause` — is a **stop and report**.
 
-- [ ] **Step 6: Run §V5 — the changed-line set must be exactly `[7]`**
+- [x] **Step 6: Run §V5 — the changed-line set must be exactly `[7]`**
 
 Run **§V5** from *Verification scripts* above, verbatim.
 
@@ -314,7 +314,7 @@ exit=1
 
 **This FAIL is expected mid-change**: §V5 asserts the *final* set `{7, 9}` and line 9 is Task 2's. The assertion this task owns is the printed set — `[7]` and nothing else. `[]` means Step 3 did not write; anything containing a line other than 7 means a stray edit landed → **stop and report**. A `LENGTH:` line means `CLAUDE.md` gained or lost a line → **stop and report**.
 
-- [ ] **Step 7: Run §V1 — file scope** (design *Verification* step 1)
+- [x] **Step 7: Run §V1 — file scope** (design *Verification* step 1)
 
 Run **§V1** from *Verification scripts* above, verbatim.
 
@@ -330,7 +330,7 @@ exit=0
 
 The `--stat` rows differ from the design's stated end state (` CLAUDE.md | 4 ++--`, `2 insertions(+), 2 deletions(-)`) because only one of the two lines has changed so far; Task 2 Step 8 and Task 3 assert the end-state form. `--stat` is for reading — **the assertion is `file scope: OK`**. A `file scope: FAIL` line names the changed set it found; any path in it other than `CLAUDE.md` means something outside the authorized set moved → **stop and report**, and if it is a version bump, revert it (Global Constraints).
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Stage by exact path — never `git add -A`.
 
