@@ -278,7 +278,7 @@ Leave the change in the working tree. Report that Task 1 is complete, quoting th
 
 **Why this task exists separately from criterion 6.** Every expectation in Steps 1–5 is retyped from the design's *rulings* — which terms are defined, which names are avoided, how many of each — rather than read from the design's blocks. Criterion 6 draws its expected text from the same document a rewrite of the blocks would have changed, so a block reworded inside the design (at the same line count) passes it. These five are what fail loudly in that case. Steps 6–8 sit in this task rather than a third one because they read the same artifact under the same single dependency, write nothing, and feed the same verdict: Step 9 covers all eight criteria, so only the agent that watched all eight run can record it honestly. Run all eight checks and report each one's actual output; do not stop at the first green.
 
-- [ ] **Step 1: Criterion 1 — the removed line is gone**
+- [x] **Step 1: Criterion 1 — the removed line is gone**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e grep -n '^_Avoid_: group agent, judge, arbiter$' -- CONTEXT.md ; echo "exit=$?"
@@ -288,7 +288,7 @@ Expected: **no output**, `exit=1`. This is the grep-for-what-you-removed discipl
 
 The pathspec `-- CONTEXT.md` is required and must not be widened: the old line legitimately survives in `docs/superpowers/` records and in this change's own design doc.
 
-- [ ] **Step 2: Criterion 2 — no rejected name entered the glossary**
+- [x] **Step 2: Criterion 2 — no rejected name entered the glossary**
 
 ```bash
 git -C /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e grep -in -e 'nested' -e 'depth-2' -e 'stage subagent' -- CONTEXT.md ; echo "exit=$?"
@@ -298,7 +298,7 @@ Expected: **no output**, `exit=1`. These are the three `_Avoid_:` names issue #3
 
 The pathspec is again required: all three names legitimately appear in `docs/adr/`, in `docs/superpowers/` records, and in shipped text under `plugins/` — none of which this change touches.
 
-- [ ] **Step 3: Criterion 3 — the three `_Avoid_:` lines read exactly**
+- [x] **Step 3: Criterion 3 — the three `_Avoid_:` lines read exactly**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e
@@ -315,7 +315,7 @@ Expected — exactly these three lines, in this order, and no others:
 
 Line 15 is issue #31's whole ruling, with the new name placed **second** so the two `group`-prefixed forms sit together. Line 81 is the **Seam** entry's avoid line, which moves from 67 to 81 and stays the file's last line. Line 11 must be untouched.
 
-- [ ] **Step 4: Criterion 4 — structure**
+- [x] **Step 4: Criterion 4 — structure**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e
@@ -329,7 +329,7 @@ Expected, in order: `81`, `21`, `5`, `3`. (BSD `wc` pads its number with spaces;
 
 `wc -l` and criterion 6's `len(new)` are **not redundant** — `split_lines` treats a missing final newline as invisible and `wc -l` does not, so the two together are what pin it. Neither may be dropped.
 
-- [ ] **Step 5: Criterion 5 — the new entries are present and Provenance is untouched**
+- [x] **Step 5: Criterion 5 — the new entries are present and Provenance is untouched**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e
@@ -354,7 +354,7 @@ Expected:
 
 Those line numbers fall out of the design's arithmetic: block 1's 14 lines occupy 54–67, so its blank first line is 54, `### Topology` lands at 55, and the four headwords at 57 / 60 / 63 / 66. All four were measured against the reconstructed file while this plan was written.
 
-- [ ] **Step 6: Criterion 7a — `check-sync.py`**
+- [x] **Step 6: Criterion 7a — `check-sync.py`**
 
 ```bash
 python3 /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e/scripts/check-sync.py ; echo "exit=$?"
@@ -370,7 +370,7 @@ check-sync: all checks passed
 
 This script reads nothing in `CONTEXT.md` (design **A3**, verified) and will pass identically before and after the edit, having proved nothing about it. It is here to prove the change broke nothing. **Never edit `scripts/check-sync.py` — it is hard-excluded and concurrently owned.** If it fails, **HALT and report**; the failure is not this change's to fix.
 
-- [ ] **Step 7: Criterion 7b — `claude plugin validate .`**
+- [x] **Step 7: Criterion 7b — `claude plugin validate .`**
 
 ```bash
 cd /Users/taylor/dev/claude-plugins/.claude/worktrees/agent-ab7c57714912b7b5e
@@ -379,7 +379,7 @@ claude plugin validate . ; echo "exit=$?"
 
 Expected: `exit=0`, `⚠ Found 8 warnings:`, eight `author: No author information provided…` lines, and `✔ Validation passed with warnings`. **This is a PASS** (design **A4**, `CLAUDE.md`). Zero *errors* is the requirement; the 8 warnings are expected and must not be "fixed" by adding author fields. Any error, a different warning count, or a non-zero exit → **HALT and report**.
 
-- [ ] **Step 8: Criterion 8 — file-level scope**
+- [x] **Step 8: Criterion 8 — file-level scope**
 
 First look at it, then assert it. `BASE` is computed, never hardcoded, and the diff runs `BASE` → **working tree** (not `BASE..HEAD`), because `..HEAD` sees committed work only and would pass vacuously on the uncommitted implementation criterion 6 read.
 
@@ -422,7 +422,7 @@ Expected: the `BASE =` line, one `in scope:` line per path, then `criterion 8: P
 
 Any printed `SCOPE VIOLATION` — in particular anything under `plugins/`, `scripts/`, `docs/adr/`, `docs/agents/`, `.claude-plugin/`, or `CLAUDE.md` — is a scope violation: **HALT and report the path.** Do not revert it silently; the pipeline needs to know how it got there. Line-level scope is criterion 6's `assert new == want`, which pins all 81 lines and needs no separate check here.
 
-- [ ] **Step 9: Record the verdict — do not commit**
+- [x] **Step 9: Record the verdict — do not commit**
 
 Report each of the eight results, quoting its actual output. All eight criteria must be green:
 
