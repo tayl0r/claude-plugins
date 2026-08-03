@@ -54,18 +54,20 @@ MIRROR_PAIRS = [
         "name": "adversarial-review-seed agent",
         "a": "plugins/dev-flow/agents/adversarial-review-seed.md",
         "b": "plugins/dev-flow-worktree/agents/adversarial-review-seed.md",
-        # Deliberately no "canonicalize": install-agents.py compares these two
-        # byte-for-byte and refuses on a conflict, so any substitution here could
-        # pass this check while breaking the install. Byte-identity is the rule.
+        # Same canonicalization as the SKILL.md pair: each variant's agent body
+        # may name its own plugin, and both register under their own qualified
+        # name, so "dev-flow-worktree" there is correct rather than drift.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
         "exceptions": [],
     },
     {
         "name": "adversarial-review-resolver agent",
         "a": "plugins/dev-flow/agents/adversarial-review-resolver.md",
         "b": "plugins/dev-flow-worktree/agents/adversarial-review-resolver.md",
-        # Deliberately no "canonicalize": install-agents.py compares these two
-        # byte-for-byte and refuses on a conflict, so any substitution here could
-        # pass this check while breaking the install. Byte-identity is the rule.
+        # Same canonicalization as the SKILL.md pair: each variant's agent body
+        # may name its own plugin, and both register under their own qualified
+        # name, so "dev-flow-worktree" there is correct rather than drift.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
         "exceptions": [],
     },
 ]

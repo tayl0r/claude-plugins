@@ -18,7 +18,7 @@ _Avoid_: group agent, group-resolution agent, judge, arbiter
 The model a reviewer is spawned on — `claude-sonnet-4-6` for seeds, `claude-opus-4-8` for resolvers. Pinned by dated id in an *agent definition* rather than by family alias, so that a new release in either family cannot silently re-point a tier. Distinct from *family*.
 
 **Agent definition**:
-A `plugins/<plugin>/agents/<name>.md` file whose frontmatter pins a spawnable `subagent_type` to a dated model id. The only place a dated id can be requested at all — the `Agent` tool's `model` parameter takes family aliases only, and passing it overrides the pin. Installed into `~/.claude/agents/` by `scripts/install-agents.py`, because Claude Code does not register a plugin's own `agents/` directory.
+A `plugins/<plugin>/agents/<name>.md` file whose frontmatter pins a spawnable `subagent_type` to a dated model id. The only place a dated id can be requested at all — the `Agent` tool's `model` parameter takes family aliases only, and passing it overrides the pin. Distributed by the plugin system like a skill, and registered under the plugin-qualified name `<plugin>:<name>` — the bare name does not resolve.
 _Avoid_: subagent file, agent template
 
 **Family**:
