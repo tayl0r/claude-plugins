@@ -10,7 +10,7 @@ dev-flow:
 
 **Goal:** Replace two whole lines of `CLAUDE.md` — line 7 (issue #33, the version-bump segment rule) and line 9 (issue #32, the mirrored-pair `Always:` clause) — with the two plain fenced blocks the design gives, read from the design on disk. Nothing else in the repo changes.
 
-**Architecture:** Two independent whole-line replacements in one un-mirrored, un-cached Markdown file. `CLAUDE.md` is **29 lines before and after** — replacements, not appends to the file. Neither edit shifts the other's line index, so the two are order-independent; this plan runs line 7 first only to match the design's block order. Line 7 goes 28 → 76 words and line 9 goes 246 → 286 (design *Length budget*, informational — no check asserts a word count). **No `scripts/` file, no plugin file, no `plugin.json`, no `CONTEXT.md`, no `docs/adr/`, and no version bump.**
+**Architecture:** Two independent whole-line replacements in one un-mirrored, un-cached Markdown file. `CLAUDE.md` is **29 lines before and after** — replacements, not appends to the file. Neither edit shifts the other's line index, so the two are order-independent; this plan runs line 7 first only to match the design's block order. Line 7 goes 28 → 75 words and line 9 goes 246 → 286 (design *Length budget*, informational — no check asserts a word count). **No `scripts/` file, no plugin file, no `plugin.json`, no `CONTEXT.md`, no `docs/adr/`, and no version bump.**
 
 **Tech Stack:** Markdown. `python3` (stdlib only, plus this repo's `scripts/design_blocks.py`), `git`, `git grep`, `git diff`, `python3 scripts/check-sync.py`, `claude plugin validate .`. **There is no build, no linter, and no test framework in this repo (design A3) — do not run `pytest`, `npm test`, or `ruff`, and do not add one.** The design's `## Verification` section is the entire verification surface.
 
@@ -29,7 +29,7 @@ Every task's requirements implicitly include this section.
 - **The two appliers type zero bytes of block content.** Each locates its target line by a property of the block itself (see *Design block map*) and writes `want` — the block, straight from `read_blocks`. The only string literals either applier types are ASCII markers reproduced verbatim from the design's *Verification* step 2: `"**Always:**"`, `"**When the change has a design doc**"`, and `" **Always the minor segment**"`. Those are **guards**, never sources: they are compared against, never written.
 - **Scope is exactly one file: `CLAUDE.md`.** Nothing else may appear in the branch diff beyond this run's own `docs/superpowers/` design and plan artifacts. Hard-excluded by the design's *Out of scope* — touching any of these is a **HALT and report**, not a judgment call: `plugins/` and every `plugin.json`, `.claude-plugin/marketplace.json`, `scripts/` (including `design_blocks.py`, which is *used* and never modified, and `check-sync.py`), `CONTEXT.md`, `docs/adr/`, `docs/agents/`, `.gitignore`, either `README.md`, and **every pre-existing file under `docs/superpowers/`** — meaning the prior records. This run's own design doc is read-only input; this plan file takes checkbox ticks only.
 - **NO VERSION BUMP.** `dev-flow` stays `2.8.0` and `dev-flow-worktree` stays `1.10.0`. `CLAUDE.md` sits outside `plugins/`, ships into no version-keyed cache, and is read at edit time rather than into any model invocation, so `CLAUDE.md`'s own bump rule does not fire (design *Out of scope*). This is a conclusion, not a deferral. **If any step seems to need a version bump, that is a HALT — stop and report.** Verification step 8 asserts it because the reflex is to bump.
-- **The design doc is read-only input.** `docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md` must end this work byte-identical to how it started. Expected blob hash — `git hash-object docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md` → `732abd31c58c05fcea472799d1e094769968a315`. If it differs at a task's Step 1, **halt and report** — do not proceed and do not "fix" the design. Editing it would silently change what every conformance check compares against.
+- **The design doc is read-only input.** `docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md` must end this work byte-identical to how it started. Expected blob hash — `git hash-object docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions-design.md` → `a4f1e3d146a8b197c6fbb65236e40ceb177658b1`. If it differs at a task's Step 1, **halt and report** — do not proceed and do not "fix" the design. Editing it would silently change what every conformance check compares against.
 - **The base is always computed, never hardcoded:** `git merge-base origin/main HEAD`. It resolves to `b4b5d1ca5d19b36e992f9ff1f3d2ff7a1b989037` today. **Every step that consumes it — §V1, §V2 and §V5 — computes it inside `python3` and passes it to `git` as an `argv` element, never through a shell.** `git merge-base` writes nothing to stdout when it fails (exit 128 for an unresolvable `origin/main`; exit 1 with no message at all for histories sharing no ancestor), so in a shell an unquoted `$(…)` vanishes by word-splitting and degrades a base comparison into a working-tree-vs-index one, which in a repo that commits per task is empty and prints a pass token on an arbitrarily broken branch. `argv` has no word-splitting to exploit. **Do not rewrite any of these three into a shell `&&` chain, and do not hardcode a SHA.**
 - **Every inline `python3` script below is pure ASCII on purpose**, including its guard strings, so a mistyped copy fails loudly instead of passing. The *content* it moves is not ASCII — but you never type that content, `read_blocks` supplies it. **Copy each script exactly, character for character. Every heredoc fence is unindented on purpose: a `python3` heredoc indented under a list item is an `IndentationError`.**
 - **No new files anywhere, including temp files inside the repo.** Every Python snippet runs as a heredoc piped to `python3 -`.
@@ -216,7 +216,7 @@ Expected:
 - `tayl0r/gh-32-33-claude-md-conventions`.
 - `git status --porcelain` prints nothing except, possibly, a **modified or untracked** `docs/superpowers/plans/2026-08-02-gh-32-33-claude-md-conventions-plan.md` (this plan's own checkbox ticks; it is untracked until the pipeline commits it). Any other modified or untracked path → **halt and report**: the tree is not in the state this plan was written against.
 - `29 CLAUDE.md`.
-- `732abd31c58c05fcea472799d1e094769968a315`. **Any other value → halt and report "design doc modified".**
+- `a4f1e3d146a8b197c6fbb65236e40ceb177658b1`. **Any other value → halt and report "design doc modified".**
 - Then, from `design_blocks.py`:
 
 ```text
@@ -369,7 +369,7 @@ git hash-object docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions
 git grep -c -F 'Always the minor segment' -- CLAUDE.md
 ```
 
-Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked plan file (checkbox ticks); `29 CLAUDE.md`; `732abd31c58c05fcea472799d1e094769968a315` (**any other value → halt and report "design doc modified"**); and `CLAUDE.md:1`, which is Task 1's committed result. If that last command prints nothing, Task 1 has not landed — **halt and report** rather than running Task 1's applier from here.
+Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked plan file (checkbox ticks); `29 CLAUDE.md`; `a4f1e3d146a8b197c6fbb65236e40ceb177658b1` (**any other value → halt and report "design doc modified"**); and `CLAUDE.md:1`, which is Task 1's committed result. If that last command prints nothing, Task 1 has not landed — **halt and report** rather than running Task 1's applier from here.
 
 - [x] **Step 2: Confirm the junction this edit removes is present (red for the residue check)**
 
@@ -514,7 +514,7 @@ git hash-object docs/superpowers/specs/2026-08-02-gh-32-33-claude-md-conventions
 wc -l CLAUDE.md
 ```
 
-Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked `docs/superpowers/plans/2026-08-02-gh-32-33-claude-md-conventions-plan.md` (this plan's own checkbox ticks); `732abd31c58c05fcea472799d1e094769968a315` — **any other value means the implementation modified the design doc → halt and report**; and `29 CLAUDE.md`, unchanged from before the change.
+Expected: `git status --porcelain` prints nothing except, possibly, a modified or untracked `docs/superpowers/plans/2026-08-02-gh-32-33-claude-md-conventions-plan.md` (this plan's own checkbox ticks); `a4f1e3d146a8b197c6fbb65236e40ceb177658b1` — **any other value means the implementation modified the design doc → halt and report**; and `29 CLAUDE.md`, unchanged from before the change.
 
 - [x] **Step 2: Design *Verification* step 0 — block shape**
 

@@ -12,7 +12,7 @@ dev-flow:
 Both issues ask the same question about the same file — *which unwritten convention should become a written rule in `CLAUDE.md`?* — and both are answered **yes, with the rule narrowed to the part that is actually invariant**.
 
 - **#32** — mirrored-pair verification proves the intended lines changed, never that no other line did. The **property** ("every file the edit touches is byte-for-byte its merge-base blob with exactly the intended edit applied") joins the `Always:` list on line 9. The **instrument** does not: three consecutive changes each invented a different one, and the check #32 sketches cannot run on an insertion, a deletion, or a created file.
-- **#33** — the bump rule says *whether*, not *how much*. Line 7 gains **always the minor segment**, with major reserved for when a plugin is split or renamed.
+- **#33** — the bump rule says *whether*, not *how much*. Line 7 gains **always the minor segment**, with major reserved for when a plugin is split.
 
 One file changes: `CLAUDE.md`, lines 7 and 9, each a whole-line replacement. **No `scripts/` change, no plugin file, no version bump.** That is a conclusion, not a deferral — there is no HALT in this design.
 
@@ -121,13 +121,13 @@ Block 0 is the complete new line 7. The reasoning, in the order it should be wei
 - **Precedent is unanimous and free to keep.** 18 of 18 non-major bumps are minor. Writing down what has always happened costs one clause and forecloses re-derivation; it introduces no migration and invalidates no existing version.
 - **Version numbers are not scarce.** The only cost of minor-always is that the minor segment burns fast — four in a day. That is a cost of nothing.
 
-Major stays named because "always minor" alone would be literally false about the one major this repo has (`a104d2b`) and would forbid the next plugin split. Nothing else about major needs saying.
+Major stays named because "always minor" alone would be literally false about the one major this repo has (`a104d2b`) and would forbid the next plugin split. A **rename** is deliberately not named alongside it, though an earlier draft did: there has never been one (`git log --diff-filter=R` over `plugins/` is empty at any rename threshold), the cache path is `<plugin>/<version>` so a rename gets a fresh tree whatever the version — the bullet's own mechanical reason does not fire — and the repo's nearest precedent points the other way, since `dev-flow-worktree`, the side of `a104d2b` that took a *new name* carrying the *old* behaviour, was created at `1.2.0`. The major went to the side whose behaviour broke. Naming rename would have shipped an undefended trigger and opened a question nothing answers — carry the number forward, or restart at `1.0.0`? — inside the one change whose premise is that such questions are defects. A renamer falls to the general rule and bumps minor, or does not bump at all, a rename being no behaviour change. Nothing else about major needs saying.
 
 ### Rejected alternatives for #33
 
 - **(2) Patch for editorial, minor for behavioural.** The genuinely attractive option — it carries information, and `CLAUDE.md` already draws a behavioural line for *whether* to bump, so reusing it for *how much* looks free. Rejected on the measured cost of its test, twice observed: #30 and #37 both tried to apply it informally and neither could settle it from the artifact alone. And the boundary is not merely hard, it is ill-defined for this product: every shipped byte is model input, so "no behavior changed" is a claim about a model's response to a prompt edit, which nothing in this repo can check. The written test such a rule would need is longer than the rule it replaces, and it would still be adjudicated per change.
 - **(3) Say nothing on purpose.** As the issue argues, this collapses into (1) with the ruling unstated — and "unstated" is exactly what produced two re-derivations in one day. Strictly worse than (1).
-- **Close as not worth a rule.** This was live, and it is the outcome constraint 5 protects. What defeats it is not the failure mode — a version one segment off has no mechanical consequence, and the issue is right about that — but the *cost of the question*. Two designs in one day spent real reasoning on it and both ended by pointing at this file. The bar is "a rule that stops a decision being re-derived earns its line"; this one arrives with receipts, and the clause costs 48 words.
+- **Close as not worth a rule.** This was live, and it is the outcome constraint 5 protects. What defeats it is not the failure mode — a version one segment off has no mechanical consequence, and the issue is right about that — but the *cost of the question*. Two designs in one day spent real reasoning on it and both ended by pointing at this file. The bar is "a rule that stops a decision being re-derived earns its line"; this one arrives with receipts, and the clause costs 47 words.
 - **An ADR.** Out of scope by constraint, and not warranted anyway. ADR-0001, -0002 and -0003 record architecture decisions with live consequences (a duplication policy, a model-tier change, a topology invariant). "Which segment moves" is a convention with no consequence beyond the log. The rule's home is `CLAUDE.md` and its reasoning is this document — the same disposition #24 reached for the same reason.
 
 ## The concurrent-bump collision is a separate concern
@@ -161,7 +161,7 @@ Both blocks were produced by applying the substitution to the file on disk in `p
 Replaces line 7 in full. The bullet's two existing sentences are unchanged; everything from `**Always the minor segment**` onward is new, so this is a **pure append**.
 
 ```
-- **Bump `version` in `plugins/<name>/.claude-plugin/plugin.json` on any behavior change.** The install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so an edit at an unchanged version is never picked up on re-sync. **Always the minor segment** — `1.4.0 → 1.5.0`. Nothing reads the segment (the cache keys the whole string), and for prose a model reads there is no stable editorial-versus-behavioural line for a patch to mark. Major only when a plugin is split or renamed (`dev-flow` 1.x → 2.0.0).
+- **Bump `version` in `plugins/<name>/.claude-plugin/plugin.json` on any behavior change.** The install cache is version-keyed (`~/.claude/plugins/cache/taylor-plugins/<plugin>/<version>/`), so an edit at an unchanged version is never picked up on re-sync. **Always the minor segment** — `1.4.0 → 1.5.0`. Nothing reads the segment (the cache keys the whole string), and for prose that a model reads, there is no stable editorial-versus-behavioural line for a patch to mark. Major only when a plugin is split (`dev-flow` 1.x → 2.0.0).
 ```
 
 The example is `1.4.0 → 1.5.0`, a number neither plugin currently sits at, so it cannot be misread as an instruction to bump to a particular version.
@@ -186,7 +186,7 @@ Pure ASCII, and `git grep -F` finds it at exactly one place outside `docs/superp
 
 ## Length budget
 
-`CLAUDE.md` is read in full by every contributor and every agent working this repo, so length has a real cost and any addition must be paid for. Line 7 goes **28 → 76 words**; line 9 goes **246 → 286**. The file stays **29 lines**.
+`CLAUDE.md` is read in full by every contributor and every agent working this repo, so length has a real cost and any addition must be paid for. Line 7 goes **28 → 75 words**; line 9 goes **246 → 286**. The file stays **29 lines**.
 
 The search for offsetting cuts was run and found nothing worth taking; it is recorded here so it is not re-run:
 
@@ -409,7 +409,7 @@ and for plugins whose product is prose a model reads there is no stable
 editorial-versus-behavioural line for a patch to mark -- #37, the first
 purely-editorial-shaped change this repo has had, still had to argue it and
 still chose minor. The rule is now written: always the minor segment, major
-only when a plugin is split or renamed.
+only when a plugin is split.
 
 CLAUDE.md lines 7 and 9, whole-line replacements, 29 lines before and after.
 No plugin file is touched and no version is bumped: CLAUDE.md ships into no
@@ -438,4 +438,4 @@ Closes #33
 - **Internal consistency:** block 0 is the base line 7 plus one appended clause and nothing else; block 1 is the base line 9 with only the `Always:` sentence rewritten. Both were produced by substitution on the file on disk rather than retyped, and *Verification* step 2 re-derives the untouched spans from git rather than trusting that. The word counts in *Length budget* and the `29 lines` invariant are consistent with two whole-line replacements and with shape `[1, 1]`; A9 states which numbers a review edit to a block's text can leave stale — the word counts, and only those — and how to re-measure them.
 - **Scope:** one file, two lines. Step 1 checks it by file, step 5 by line. `CONTEXT.md`, `plugins/`, `scripts/`, `docs/adr/` and the version bump are each named in *Out of scope* with the reason, and each is a conclusion rather than a deferral.
 - **Ambiguity:** the one place a fresh implementer could go wrong is grep scope — the removed junction and both new clauses legitimately appear in this document. Called out at each point of use with the `':!docs/superpowers/'` pathspec.
-- **Positions taken:** #32 ships, narrowed to the property and to a form exact on all four edit shapes; **no instrument is named**, because naming one shape's instrument under `Always:` is the defect that rejects #32's own snippet. #33 ships as minor-always, with major named only for a plugin being split or renamed. The `split_lines` question resolves to "no helper is needed". Hoisting the clause out of the mirror-pair bullet is **#39**'s charter, not this change's. The concurrent-bump collision is ruled a separate concern and filed, not designed here; #39, #40 and #41 were filed by this design's own review and are likewise not implemented here (A10). No question is left open and nothing is left for the implementer to decide.
+- **Positions taken:** #32 ships, narrowed to the property and to a form exact on all four edit shapes; **no instrument is named**, because naming one shape's instrument under `Always:` is the defect that rejects #32's own snippet. #33 ships as minor-always, with major named only for a plugin being split. The `split_lines` question resolves to "no helper is needed". Hoisting the clause out of the mirror-pair bullet is **#39**'s charter, not this change's. The concurrent-bump collision is ruled a separate concern and filed, not designed here; #39, #40 and #41 were filed by this design's own review and are likewise not implemented here (A10). No question is left open and nothing is left for the implementer to decide.
