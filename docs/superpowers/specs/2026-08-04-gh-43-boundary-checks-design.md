@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-43-boundary-checks
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
