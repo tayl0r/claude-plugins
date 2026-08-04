@@ -148,7 +148,7 @@ git commit -m "gh-45: add task self-sufficiency rule to both pipeline SKILL.md f
 
 **What the edit is:** block 1 **replaces** the single existing line beginning `| **plan** |` (present exactly once in each file). The row is selected by content (`startswith("| **plan** |")`), never by line number; the applier asserts uniqueness before writing, and is idempotent (a re-run that finds the row already equal to block 1 makes no change). Block 1 itself begins `| **plan** |`, so the replaced row stays unique. Both files must stay byte-identical after this edit (`check-sync.py` canonicalizes `dev-flow-worktree` → `dev-flow`; block 1 names neither plugin, so canonicalization is a no-op).
 
-- [ ] **Step 1: Run the red check — confirm the plan row is NOT yet block 1.**
+- [x] **Step 1: Run the red check — confirm the plan row is NOT yet block 1.**
 
 Run from the repo root. Expect `task2 conformance: FAIL` and `exit=1` (the plan row still equals the merge-base row, not block 1).
 
@@ -202,7 +202,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 2: Apply the edit — replace the plan row with block 1 in both files.**
+- [x] **Step 2: Apply the edit — replace the plan row with block 1 in both files.**
 
 Run the applier. Expect one `replaced the plan-mode row with block 1` line per file.
 
@@ -234,11 +234,11 @@ for f in REVIEW:
 PY
 ```
 
-- [ ] **Step 3: Run the green check — re-run the Step 1 block verbatim.**
+- [x] **Step 3: Run the green check — re-run the Step 1 block verbatim.**
 
 Re-run the exact `python3 - <<'PY' … PY` block from Step 1. Expect `task2 conformance: OK` and `exit=0`. Uniqueness plus equality proves the old row is gone (the removed-phrase check) and block 1 landed; the per-file hunk proves nothing else moved.
 
-- [ ] **Step 4: Run the pair-agreement and presence checks.**
+- [x] **Step 4: Run the pair-agreement and presence checks.**
 
 `check-sync.py` proves the two review files still agree; the grep proves the load-bearing boundary phrase is present in each (one match per file). Expect `check-sync.py` to pass, and each `git grep -c` line to end in `:1`.
 
@@ -249,7 +249,7 @@ git grep -c 'with no plan-file path' -- \
   plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md
 ```
 
-- [ ] **Step 5: Commit.**
+- [x] **Step 5: Commit.**
 
 ```bash
 git add plugins/dev-flow/skills/adversarial-review/SKILL.md \
