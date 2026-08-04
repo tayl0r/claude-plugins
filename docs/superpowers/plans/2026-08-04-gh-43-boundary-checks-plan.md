@@ -292,7 +292,7 @@ git commit -m "gh-43: Edit 3 — discharge ## Merge-gate checks at merge-gate st
 
 Derive the target from `origin/main` at execute time — the next **minor** past whatever Step 1 prints for each plugin — and **do not type a number a command did not print**, because a concurrent merge may have advanced `origin/main` since this plan was written. (At `BASE`, `origin/main` published `2.14.0` (dev-flow) and `1.16.0` (dev-flow-worktree); absent a concurrent merge the target is therefore `2.15.0` / `1.17.0` — an illustration of the derivation, not a value to hardcode.)
 
-- [ ] **Step 1: Fetch and read the current `origin/main` versions**
+- [x] **Step 1: Fetch and read the current `origin/main` versions**
 
 ```sh
 git fetch --no-tags origin "+refs/heads/main:refs/remotes/origin/main" \
@@ -305,15 +305,15 @@ git show origin/main:plugins/dev-flow-worktree/.claude-plugin/plugin.json \
 
 Record the two printed versions. The new versions are each the next **minor** past the printed value (e.g. `2.14.0 → 2.15.0`, `1.16.0 → 1.17.0`).
 
-- [ ] **Step 2: Set the new version in `plugins/dev-flow/.claude-plugin/plugin.json`**
+- [x] **Step 2: Set the new version in `plugins/dev-flow/.claude-plugin/plugin.json`**
 
 Edit the `"version"` field to the next minor past the printed dev-flow version (e.g. `2.15.0`). Change nothing else in the file — in particular, leave `description` untouched (it is checked against the marketplace by `check-sync.py`).
 
-- [ ] **Step 3: Set the new version in `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
+- [x] **Step 3: Set the new version in `plugins/dev-flow-worktree/.claude-plugin/plugin.json`**
 
 Edit the `"version"` field to the next minor past the printed dev-flow-worktree version (e.g. `1.17.0`). Change nothing else.
 
-- [ ] **Step 4: Confirm both are ahead of `origin/main` (criterion 9)**
+- [x] **Step 4: Confirm both are ahead of `origin/main` (criterion 9)**
 
 ```sh
 git fetch --no-tags origin "+refs/heads/main:refs/remotes/origin/main" \
@@ -324,7 +324,7 @@ echo "exit=$?"
 
 Expected: exit 0. If it fails, a concurrent merge took your target — re-read `origin/main` (Step 1) and bump both past it, then re-run.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
