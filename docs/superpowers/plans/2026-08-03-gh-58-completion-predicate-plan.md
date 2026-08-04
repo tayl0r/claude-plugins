@@ -206,7 +206,7 @@ Proves the predicate *behaves* correctly on the real plan corpus (the outside-th
 - Consumes: Task 1's edited working tree (for the version-bump and sync gates and the shipped literal).
 - Produces: evidence that all seven design success criteria hold. No artifacts.
 
-- [ ] **Step 1: Demonstrate the anchored predicate excludes markup on real plans (criterion #3)**
+- [x] **Step 1: Demonstrate the anchored predicate excludes markup on real plans (criterion #3)**
 
 Run:
 ```bash
@@ -244,7 +244,7 @@ echo "OK: no dash-vs-[-*+] mismatch on any plan"
 ```
 Expected: `raw=3 anchored=0` for the headline plan; no `MISMATCH …` line; exactly three non-zero count lines — `32  …/2026-07-20-dev-flow-plan.md`, `26  …/2026-07-28-gh-16-terminology-collision-plan.md`, `24  …/2026-07-22-dev-flow-nested-review-fix.md`; then a final `OK: no dash-vs-[-*+] mismatch on any plan` (exit 0). A `MISMATCH`/`FAIL` line + non-zero exit means a plan carries a line-start `* [ ]` or `+ [ ]` task box — stop and reconcile, since the design's `-`-only corpus measurement assumes there are none. This is the load-bearing outside-the-pair check.
 
-- [ ] **Step 2: `check-sync.py` still exits 0 (criterion #4)**
+- [x] **Step 2: `check-sync.py` still exits 0 (criterion #4)**
 
 Run:
 ```bash
@@ -252,7 +252,7 @@ python3 scripts/check-sync.py; echo "exit=$?"
 ```
 Expected: `exit=0`. The edit touches no `adversarial-review` file and no manifest `description`, and the pipeline pair is outside `MIRROR_PAIRS`, so sync is unaffected.
 
-- [ ] **Step 3: Verify both plugins are bumped ahead of `origin/main` (criterion #5)**
+- [x] **Step 3: Verify both plugins are bumped ahead of `origin/main` (criterion #5)**
 
 The load-bearing local check is a **working-tree** version comparison. `scripts/check-version-bump.py` is *vacuous here*: it diffs committed trees (`git diff merge-base HEAD`), but by the Global Constraint the bumps are still uncommitted at Execute time, so it finds no `plugins/` path and prints `no plugin directory touched ... OK` (exit 0) **whether or not the bumps were made**. So assert the bump directly against the working tree, then run the CI command as a parity dry-run.
 
@@ -288,7 +288,7 @@ python3 scripts/check-version-bump.py origin/main; echo "exit=$?"
 ```
 Expected locally: `check-version-bump: no plugin directory touched ... OK` and `exit=0`. This confirms the CI script runs clean but — per the note above — does **not** re-prove the bump here; the working-tree check above is what proves it. PR CI re-runs this same command against the committed tree after the adversarial-review stage commits the work, where it becomes the authoritative gate.
 
-- [ ] **Step 4: `claude plugin validate .` passes (criterion #6)**
+- [x] **Step 4: `claude plugin validate .` passes (criterion #6)**
 
 Run:
 ```bash
