@@ -349,7 +349,7 @@ WT=plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md
 echo "BASE=$BASE"
 ```
 
-- [ ] **Step 1: Criterion 1 — repo mirror check untouched**
+- [x] **Step 1: Criterion 1 — repo mirror check untouched**
 
 ```sh
 python3 scripts/check-sync.py; echo "exit=$?"
@@ -357,7 +357,7 @@ python3 scripts/check-sync.py; echo "exit=$?"
 
 Expected: exit 0; the `mirror pair "adversarial-review"` line is unchanged (this change touches neither member of that pair).
 
-- [ ] **Step 2: Criterion 2 — marketplace valid**
+- [x] **Step 2: Criterion 2 — marketplace valid**
 
 ```sh
 out=$(claude plugin validate . 2>&1); rc=$?
@@ -370,7 +370,7 @@ echo "criterion 2 OK: validate exit 0, $warns author warnings, no errors"
 
 Expected: exits 0 with exactly **8** `No author information provided` warnings and no errors (the documented pass state).
 
-- [ ] **Step 3: Criterion 3 — file scope**
+- [x] **Step 3: Criterion 3 — file scope**
 
 ```sh
 git diff --name-only "$BASE"..HEAD \
@@ -380,28 +380,28 @@ git diff --name-only "$BASE"..HEAD \
 
 Expected: `scope OK` (the `grep -vE` prints nothing and exits non-zero). Any printed path — `CONTEXT.md`, `CLAUDE.md`, `README.md`, `scripts/*` — is a blocker.
 
-- [ ] **Step 4: Criterion 4 — the coined term landed in both twins**
+- [x] **Step 4: Criterion 4 — the coined term landed in both twins**
 
 ```sh
 git grep -cF 'merge-time check' -- "$DF"   # >= 1
 git grep -cF 'merge-time check' -- "$WT"   # >= 1
 ```
 
-- [ ] **Step 5: Criterion 5 — the plan section is named ≥ 2× in each twin**
+- [x] **Step 5: Criterion 5 — the plan section is named ≥ 2× in each twin**
 
 ```sh
 git grep -cF 'Merge-gate checks' -- "$DF"  # criterion 5 needs >= 2; actually 3 (Edit 1 + Edit 2 + Edit 3)
 git grep -cF 'Merge-gate checks' -- "$WT"  # criterion 5 needs >= 2; actually 3
 ```
 
-- [ ] **Step 6: Criterion 6 — the discharge fetches a freshly-fetched base, in both twins**
+- [x] **Step 6: Criterion 6 — the discharge fetches a freshly-fetched base, in both twins**
 
 ```sh
 git grep -cF 'freshly-fetched' -- "$DF"    # >= 1
 git grep -cF 'freshly-fetched' -- "$WT"    # >= 1
 ```
 
-- [ ] **Step 7: Criterion 7 — Edit 1 is a substitution image across the twins**
+- [x] **Step 7: Criterion 7 — Edit 1 is a substitution image across the twins**
 
 ```sh
 python3 - <<'PY'
@@ -421,14 +421,14 @@ PY
 
 Expected: `criterion 7 OK`.
 
-- [ ] **Step 8: Criterion 8 — the section is constrained to prose, no boxes, in both twins**
+- [x] **Step 8: Criterion 8 — the section is constrained to prose, no boxes, in both twins**
 
 ```sh
 git grep -cF 'never `- [ ]` boxes' -- "$DF"   # >= 1
 git grep -cF 'never `- [ ]` boxes' -- "$WT"   # >= 1
 ```
 
-- [ ] **Step 9: Criterion 9 — both plugin versions bumped past `origin/main`**
+- [x] **Step 9: Criterion 9 — both plugin versions bumped past `origin/main`**
 
 ```sh
 git fetch --no-tags origin "+refs/heads/main:refs/remotes/origin/main" \
@@ -438,14 +438,14 @@ python3 scripts/check-version-bump.py origin/main; echo "exit=$?"
 
 Expected: exit 0.
 
-- [ ] **Step 10: Criterion 10 — Edit 3's stripped-state bypass landed, in both twins**
+- [x] **Step 10: Criterion 10 — Edit 3's stripped-state bypass landed, in both twins**
 
 ```sh
 git grep -cF 'this discharge is not attempted' -- "$DF"   # >= 1
 git grep -cF 'this discharge is not attempted' -- "$WT"   # >= 1
 ```
 
-- [ ] **Step 11: Always-check — nothing beyond the intended edits changed**
+- [x] **Step 11: Always-check — nothing beyond the intended edits changed**
 
 Confirm the removed old header is gone and eyeball the diff for exactly the four intended hunks per SKILL (Edit 1 append, Edit 2 bullet, Edit 3 header rename + extension) plus the two `version` lines — no other lines:
 
@@ -459,7 +459,7 @@ git diff "$BASE"..HEAD -- "$DF" "$WT" \
 
 Expected: both greps print `OK: old header gone …` (a `FAIL` line with a non-zero exit means the old header survived); the diff shows only the intended insertions/header-rename in each twin and the single `version` line change in each manifest. (This change carries no fenced replacement blocks in the *design*, so the `scripts/design_blocks.py` re-read check does not apply; the verbatim block source of truth is this plan, which the implementers insert without paraphrase.)
 
-- [ ] **Step 12: Record the sweep result**
+- [x] **Step 12: Record the sweep result**
 
 No commit — this task asserts, it does not change files. If every check above passed, the correctness surface is green.
 
