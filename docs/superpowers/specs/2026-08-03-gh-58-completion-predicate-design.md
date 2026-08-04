@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-58-completion-predicate
-  stops: [post-design]
+  stops: []
   docs: commit
 ---
 
