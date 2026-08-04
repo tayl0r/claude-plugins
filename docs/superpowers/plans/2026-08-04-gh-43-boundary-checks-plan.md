@@ -129,19 +129,19 @@ and ending `… **halt and report** any out-of-section reference that cannot be 
 - **Place a merge-time check in a `## Merge-gate checks` section, never a task.** A design success criterion that is a **merge-time check** (per *Execution-complete signal* — its verdict turns on the current `origin/main`, re-evaluated at merge, not on the branch tip) goes there as prose steps, never `- [ ]` boxes and never a `## Task N`. Each step must be self-contained per Command discipline — it names and validates any git ref it consumes and depends on no other section — because `task-brief` briefs only `## Task N` spans, so the section is (correctly) invisible to implementers and is discharged only by Stage 5's merge gate. If the design declares no merge-time check, the section is omitted. This doubles as a `writing-plans` self-review criterion: a step that cannot complete in Execute and cannot be given such a home is a **halt-and-report**, not a fourth task.
 ```
 
-- [ ] **Step 1: Locate the DF anchor bullet**
+- [x] **Step 1: Locate the DF anchor bullet**
 
 Read `plugins/dev-flow/skills/dev-flow/SKILL.md`; find the line beginning `- **Make each `## Task N` section self-sufficient`. Note the bullet directly after it (`- The **orchestrator** invokes …`).
 
-- [ ] **Step 2: Insert the new bullet into DF**
+- [x] **Step 2: Insert the new bullet into DF**
 
 Insert the NEW-BULLET as a new line between the anchor bullet and the `- The **orchestrator** invokes …` bullet.
 
-- [ ] **Step 3: Insert the identical bullet into WT**
+- [x] **Step 3: Insert the identical bullet into WT**
 
 Read `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`; find its byte-identical `- **Make each `## Task N` section self-sufficient` bullet, and insert the **identical** NEW-BULLET as a new line directly after it.
 
-- [ ] **Step 4: Verify the box-free constraint token landed (criterion 8)**
+- [x] **Step 4: Verify the box-free constraint token landed (criterion 8)**
 
 Run (fenced so the backticks and `[ ]` survive literally):
 
@@ -154,7 +154,7 @@ git grep -cF 'never `- [ ]` boxes' -- "$WT"   # expect >= 1
 
 Expected: each prints a count ≥ 1.
 
-- [ ] **Step 5: Verify the section is named in both twins**
+- [x] **Step 5: Verify the section is named in both twins**
 
 Run:
 
@@ -169,7 +169,7 @@ git grep -cF 'merge-time check' -- "$WT"    # expect >= 1
 
 Expected: both `merge-time check` counts ≥ 1; both `Merge-gate checks` counts are **2** here — Edit 1's appended passage already names the section and Edit 2 names it again — so criterion 5's ≥ 2 aggregate is already satisfied at this point (Edit 3 raises it to 3, re-verified in Task 5).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md
