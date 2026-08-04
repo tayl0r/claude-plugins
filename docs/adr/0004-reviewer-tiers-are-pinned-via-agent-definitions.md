@@ -19,7 +19,7 @@ Agent-definition frontmatter *does* accept a full id. So each tier is a `plugins
 
 Verified end-to-end: spawned by qualified name with no `model` parameter, the seed self-reports `claude-sonnet-4-6` and the resolver `claude-opus-4-8[1m]` — `[1m]` marks the 1M-context variant and is no part of the pin, so tier match normalizes it away.
 
-Registration happens at session startup, so an edit needs a marketplace re-sync and a restart. `claude plugin details <plugin>` reports the agents a plugin will register, for the *installed* version — re-sync before trusting it.
+Registration happens at session startup, so an edit needs a marketplace re-sync, a `claude plugin update <plugin>@<marketplace>`, and a restart. `claude plugin details <plugin>` reports the agents in the version the marketplace has **synced**, which is not necessarily the version installed — it can show a new agent while the running install is still the old one, which is exactly how this change was nearly reported as live before it was.
 
 ## A wrong turn worth recording
 
