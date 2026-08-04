@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: gh-45-plan-cross-task-refs
-  stops: [post-design]
+  stops: [pre-merge]
   docs: commit
 ---
 
