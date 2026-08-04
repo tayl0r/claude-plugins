@@ -180,6 +180,8 @@ git commit -m "gh-43: Edit 2 — plan author's ## Merge-gate checks section, in 
 
 ### Task 3: Edit 3 — discharge the section by extending merge-gate step 3, and rename its header (both twins)
 
+> **Amendment (applied post-`pre-merge` review — supersedes this task's Part A and its header-verification steps; the design's Edit 3 is now authoritative).** After the final diff review, the discharge was **extracted from the crammed step-3 extension into a dedicated `4. **Discharge the merge-gate checks.**`** step, with the strip renumbered `4 → 5` and the merge `5 → 6`. Rationale: the merge gate is the spec's densest section, and one numbered step per responsibility reads far better than a double-barreled step-3 header carrying a ~2 KB body; the renumber was a handful of mechanical, assertion-guarded `step N` edits (both worktree-entry `step 4` references were deliberately left untouched). Effects on this task's record, which was accurate as executed but is now superseded: **Part A (the header rename) no longer applies** — step 3 reverts to its plain `**Consult `stops`** from …` header; the EXTENSION blocks' internal `step 4's strip` / `five steps` / `Then, after that stop consultation` became `step 5's strip` / `six steps` / `After step 3's stop consultation`; and the **old-header-gone** assertions (Task 3 Step 6 and Task 5 Step 11) are **inverted** — that plain step-3 header is now correctly *present* again, and the compound header Step 5 checked for is *gone*. The pinned tokens and design criteria 4–10 are unaffected (they grep the file, not the step number) and remain green. See `docs/superpowers/specs/2026-08-04-gh-43-boundary-checks-design.md` Edit 3 for the authoritative as-built.
+
 **Files:**
 - Modify: `plugins/dev-flow/skills/dev-flow/SKILL.md` (DF) — Stage 5, merge-gate step 3
 - Modify: `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` (WT) — Stage 5, merge-gate step 3
@@ -495,7 +497,7 @@ git show origin/main:plugins/dev-flow-worktree/.claude-plugin/plugin.json \
 
 - **Edit 1** → Task 1; criteria **4** (Task 1 Step 4 / Task 5 Step 4) and **7** (Task 1 Step 5 / Task 5 Step 7).
 - **Edit 2** → Task 2; criteria **8** (Task 2 Step 4 / Task 5 Step 8) and **5** (Task 2 Step 5 / Task 5 Step 5).
-- **Edit 3** → Task 3; criteria **6** (Task 3 Step 5 / Task 5 Step 6), **10** (Task 3 Step 5 / Task 5 Step 10), header rename + old-header-gone always-check (Task 3 Steps 5–7 / Task 5 Step 11), and the WT-only worktree-clause divergence (Task 3 Step 7).
+- **Edit 3** → Task 3; criteria **6** (Task 3 Step 5 / Task 5 Step 6), **10** (Task 3 Step 5 / Task 5 Step 10), and the WT-only worktree-clause divergence (Task 3 Step 7). **Superseded by the Task 3 amendment** (discharge moved to a dedicated step 4): the header-rename and old-header-gone checks (Task 3 Steps 5–7 / Task 5 Step 11) are inverted per that note — see the design's Edit 3 for the authoritative as-built.
 - **Version bumps** → Task 4; criterion **9** (Task 4 Step 4 / Task 5 Step 9).
 - **Criteria 1, 2, 3** (mirror check, marketplace valid, file scope) → Task 5 Steps 1–3.
 - **`## Merge-gate checks` dogfood** → the box-free section above, discharged manually at the pre-merge boundary until the new behavior ships.
