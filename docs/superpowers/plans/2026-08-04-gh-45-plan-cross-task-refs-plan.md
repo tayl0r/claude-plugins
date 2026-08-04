@@ -40,7 +40,7 @@ dev-flow:
 
 **What the edit is:** block 0 becomes a new bullet immediately after this byte-identical anchor line (present exactly once in each file): the line containing `` Spawn a subagent to run `superpowers:writing-plans` against the design ``. The insertion is content-anchored (located by full-line exact match — the same predicate Task 3's sweep and the design use), never by line number; the applier asserts the anchor is unique before writing, and is idempotent (a re-run that finds block 0 already after the anchor makes no change).
 
-- [ ] **Step 1: Run the red check — confirm block 0 is NOT yet after the anchor.**
+- [x] **Step 1: Run the red check — confirm block 0 is NOT yet after the anchor.**
 
 Run from the repo root. Expect `task1 conformance: FAIL` and `exit=1` (the demonstrated red form: the line after the anchor is not block 0, and the diff is empty).
 
@@ -89,7 +89,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 2: Apply the edit — insert block 0 after the anchor in both files.**
+- [x] **Step 2: Apply the edit — insert block 0 after the anchor in both files.**
 
 Run the applier. Expect one `inserted block 0 immediately after the anchor line` line per file.
 
@@ -121,11 +121,11 @@ for f in PIPELINE:
 PY
 ```
 
-- [ ] **Step 3: Run the green check — re-run the Step 1 block verbatim.**
+- [x] **Step 3: Run the green check — re-run the Step 1 block verbatim.**
 
 Re-run the exact `python3 - <<'PY' … PY` block from Step 1. Expect `task1 conformance: OK` and `exit=0`. This proves, per file: block 0 is the line immediately after the (unique) anchor, and the only change vs the merge base is that one added line — nothing removed, nothing else touched.
 
-- [ ] **Step 4: Commit.**
+- [x] **Step 4: Commit.**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md \
