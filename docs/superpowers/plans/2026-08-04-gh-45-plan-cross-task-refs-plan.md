@@ -280,7 +280,7 @@ git fetch origin main
 
 **What the edit is:** each `plugin.json`'s `version` bumps its **minor** segment by one, derived at apply time from that plugin's `origin/main` version (not hardcoded), so it is guaranteed to be past `origin/main` even if a concurrent branch already advanced it. Expected result: `dev-flow` `2.13.0 → 2.14.0`, `dev-flow-worktree` `1.15.0 → 1.16.0`. The bumper selects the unique `"version"` line by content, edits only that line (JSON is not round-tripped, so no other line reformats), and is idempotent.
 
-- [ ] **Step 1: Bump both versions.**
+- [x] **Step 1: Bump both versions.**
 
 Run the bumper. Expect two `… -> …` lines, e.g. `plugins/dev-flow/.claude-plugin/plugin.json: 2.13.0 -> 2.14.0` and `plugins/dev-flow-worktree/.claude-plugin/plugin.json: 1.15.0 -> 1.16.0` (the exact numbers are whatever `origin/main + 1 minor` yields at apply time).
 
@@ -321,7 +321,7 @@ for f in PLUGINS:
 PY
 ```
 
-- [ ] **Step 2: Sweep check A — block shape smoke-test.**
+- [x] **Step 2: Sweep check A — block shape smoke-test.**
 
 ```bash
 python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-03-gh-45-plan-cross-task-refs-design.md
@@ -331,7 +331,7 @@ Expect `shape: [1, 1]`. (If the shape ever moved, the conformance and scope chec
 
 **Steps 3–4 are the design's `## Verification` steps 1 and 2, inlined here so this task is self-contained** (the design's copies are indented under list items, and a quoted heredoc preserves leading spaces — inlined and dedented, they run as-is). Both re-read blocks 0 and 1 from the design via `read_blocks`; neither block is retyped.
 
-- [ ] **Step 3: Sweep check B — design-conformance (both blocks landed verbatim, old plan row gone).**
+- [x] **Step 3: Sweep check B — design-conformance (both blocks landed verbatim, old plan row gone).**
 
 Run from the repo root. Block 0 must be the line immediately after the (unique) anchor in each pipeline file; block 1 must be the unique `| **plan** |` row in each review file (uniqueness + equality proves the base row is gone). Expect `design-conformance: OK` and `exit=0`.
 
@@ -372,7 +372,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 4: Sweep check C — scope + per-file hunks (nothing else changed).**
+- [x] **Step 4: Sweep check C — scope + per-file hunks (nothing else changed).**
 
 Run from the repo root. Asserts the changed set, excluding `docs/superpowers/`, is exactly the six files, and that each file's hunk vs the merge base is precisely its intended edit — block 0 added to each pipeline file with nothing removed; block 1 added and the base `| **plan** |` row removed in each review file; exactly one `"version"` line changed in each `plugin.json`. Expect `file scope + hunks: OK` and `exit=0`.
 
@@ -433,7 +433,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 5: Sweep check D — pair agreement and boundary-phrase presence.**
+- [x] **Step 5: Sweep check D — pair agreement and boundary-phrase presence.**
 
 ```bash
 python3 scripts/check-sync.py
@@ -444,7 +444,7 @@ git grep -c 'with no plan-file path' -- \
 
 Expect `check-sync.py` to pass and each `git grep -c` line to end in `:1`.
 
-- [ ] **Step 6: Sweep check E — both versions bumped past origin/main.**
+- [x] **Step 6: Sweep check E — both versions bumped past origin/main.**
 
 ```bash
 python3 scripts/check-version-bump.py origin/main
@@ -452,7 +452,7 @@ python3 scripts/check-version-bump.py origin/main
 
 Expect it to pass (both touched plugins ahead of `origin/main`).
 
-- [ ] **Step 7: Sweep check F — marketplace still validates.**
+- [x] **Step 7: Sweep check F — marketplace still validates.**
 
 ```bash
 claude plugin validate .
@@ -460,7 +460,7 @@ claude plugin validate .
 
 Expect exit 0 with exactly the 8 expected missing-author warnings (a PASS, not a regression).
 
-- [ ] **Step 8: Commit.**
+- [x] **Step 8: Commit.**
 
 ```bash
 git add plugins/dev-flow/.claude-plugin/plugin.json \
