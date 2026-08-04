@@ -51,19 +51,19 @@ dev-flow:
  A criterion that **cannot be discharged inside Execute** — because its verdict is defined only at merge time, turning on the current `origin/main` rather than on the branch tip — is a **merge-time check**, and is **never a plan task box**. Forced into a box it fails two ways: left **unticked**, Execute's exit is unsatisfiable and the resume row (which matches `^[[:space:]]*[-*+] \[ \]`, evaluated above the marker rows) re-routes an already-reviewed, marker-and-CI-ready PR back into Execute; **ticked** where its step actually runs, the tick is a commit landing after the review marker and (under `docs: commit`) invalidates it, routing the resume to a re-review of an already-clean PR. Its home is instead the plan's `## Merge-gate checks` section (Stage 2 — Plan), which Stage 5's merge gate discharges before merge. The line-anchored task count already tolerates this: that section carries no `- [ ]` boxes, so it neither counts toward Execute's completion nor trips the resume row.
 ```
 
-- [ ] **Step 1: Locate the DF anchor**
+- [x] **Step 1: Locate the DF anchor**
 
 Read `plugins/dev-flow/skills/dev-flow/SKILL.md` and find the line beginning `**Execution-complete signal.**`. Confirm it ends with `do not re-implement.` (nothing after it on the line).
 
-- [ ] **Step 2: Append the passage to DF**
+- [x] **Step 2: Append the passage to DF**
 
 Append the APPEND-PASSAGE block (with its leading space) to the end of that line, keeping it on the same line. Do not start a new paragraph.
 
-- [ ] **Step 3: Locate the WT anchor and append the identical passage**
+- [x] **Step 3: Locate the WT anchor and append the identical passage**
 
 Read `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, find its `**Execution-complete signal.**` line (ends with `do not re-implement.`), and append the **identical** APPEND-PASSAGE block to the end of that line.
 
-- [ ] **Step 4: Verify the coined term landed in both twins (criterion 4)**
+- [x] **Step 4: Verify the coined term landed in both twins (criterion 4)**
 
 Run:
 
@@ -76,7 +76,7 @@ git grep -cF 'merge-time check' -- "$WT"   # expect >= 1
 
 Expected: each prints a count ≥ 1.
 
-- [ ] **Step 5: Verify Edit 1 is a substitution image (criterion 7)**
+- [x] **Step 5: Verify Edit 1 is a substitution image (criterion 7)**
 
 Run:
 
@@ -100,7 +100,7 @@ PY
 
 Expected: prints `Edit 1 OK: …`. Any assertion failure means the two passages diverged — fix and re-run.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md
