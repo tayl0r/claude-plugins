@@ -444,15 +444,7 @@ git grep -c 'with no plan-file path' -- \
 
 Expect `check-sync.py` to pass and each `git grep -c` line to end in `:1`.
 
-- [x] **Step 6: Sweep check E — both versions bumped past origin/main.**
-
-```bash
-python3 scripts/check-version-bump.py origin/main
-```
-
-Expect it to pass (both touched plugins ahead of `origin/main`).
-
-- [x] **Step 7: Sweep check F — marketplace still validates.**
+- [x] **Step 6: Sweep check E — marketplace still validates.**
 
 ```bash
 claude plugin validate .
@@ -460,7 +452,7 @@ claude plugin validate .
 
 Expect exit 0 with exactly the 8 expected missing-author warnings (a PASS, not a regression).
 
-- [x] **Step 8: Commit.**
+- [x] **Step 7: Commit.**
 
 ```bash
 git add plugins/dev-flow/.claude-plugin/plugin.json \
@@ -468,6 +460,16 @@ git add plugins/dev-flow/.claude-plugin/plugin.json \
 git commit -m "gh-45: bump dev-flow and dev-flow-worktree minor versions" \
            -m "Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
+
+- [x] **Step 8: Sweep check F — both versions bumped past origin/main (runs after the Step 7 commit).**
+
+`check-version-bump.py` reads each plugin's committed version via `git show HEAD:…plugin.json`, not the working tree, so it can only see the bump once it is committed — it must run *after* the Step 7 commit, not in the pre-commit sweep. (Run before committing, it compares `origin/main`'s version against the still-unbumped committed HEAD and reports FAIL; that FAIL is a staleness artifact of the uncommitted bump, not a real version collision.)
+
+```bash
+python3 scripts/check-version-bump.py origin/main
+```
+
+Expect it to pass (both touched plugins now ahead of `origin/main`).
 
 **Expected end-state (whole change):** ignoring this run's own `docs/superpowers/` artifacts, the branch touches exactly these six files — proven by Step 4's scope assertion:
 
