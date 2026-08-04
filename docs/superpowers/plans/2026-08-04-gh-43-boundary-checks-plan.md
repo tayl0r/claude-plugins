@@ -214,23 +214,23 @@ with
  Then, after that stop consultation — on the resuming, non-paused pass, or immediately when no `pre-merge` stop is recorded — and **before** proceeding to step 4's strip, discharge the plan's `## Merge-gate checks` section against a **freshly-fetched** `origin/main`. A plan with **no** such section — most plans, and every plan authored before this construct — discharges nothing and proceeds: an absent section is a **pass, never a halt**, and no fetch runs, so a section-less `commit`-policy run still merges without reaching origin, exactly as before. When the section **is** present, first refresh the base with the explicit refspec — `git fetch origin "+refs/heads/<default>:refs/remotes/origin/<default>"`, as the strip-path fetch uses, never a bare `git fetch origin <default>` that leaves `origin/<default>` unresolvable in a single-branch clone — and **halt and report on fetch failure**, because a discharge against a base it could not refresh is worthless and the gate is re-entrant, so resume retries for free, exactly like step 2's CI-pending halt. Then run each of the section's prose steps in order (each a deterministic pass/fail command by Stage 2's authoring rule); **any step that fails → halt and report** the failing check and its remediation, and do **not** merge — a remediating commit (e.g. a version re-bump) invalidates the marker, so the correct response is the resume routing back through Stage 4's re-review, which the pipeline already owns, never an in-gate auto-fix. In the stripped state the plan doc is gone at tip and this discharge is not attempted — it ran on the pre-strip pass, exactly as the `stops` read above is not attempted there. This is the gate's only re-verification of a fact anchored to the *moving* `origin/main` rather than to the branch SHA that the marker and step 2's CI wait already certify, and it is what makes the gate's re-entrancy invariant true of the design's criteria and not only of the gate's own five steps. Like every git command in this gate, this fetch and each discharged step run from inside the pipeline worktree (worktree entry, step 4).
 ```
 
-- [ ] **Step 1: Rename step 3's header in DF (Part A)**
+- [x] **Step 1: Rename step 3's header in DF (Part A)**
 
 In `plugins/dev-flow/skills/dev-flow/SKILL.md`, replace the exact substring `3. **Consult `stops`** from` with `3. **Consult `stops`, then discharge the merge-gate checks.** Consult `stops` from`. Leave the remainder of the line unchanged.
 
-- [ ] **Step 2: Append DF-EXTENSION to step 3 in DF (Part B)**
+- [x] **Step 2: Append DF-EXTENSION to step 3 in DF (Part B)**
 
 Append the DF-EXTENSION block (leading space included) to the end of that same step-3 line, immediately after `step 1 already halted it.)`. Keep it on the same line.
 
-- [ ] **Step 3: Rename step 3's header in WT (Part A)**
+- [x] **Step 3: Rename step 3's header in WT (Part A)**
 
 In `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`, apply the **identical** header replacement (`3. **Consult `stops`** from` → `3. **Consult `stops`, then discharge the merge-gate checks.** Consult `stops` from`).
 
-- [ ] **Step 4: Append WT-EXTENSION to step 3 in WT (Part B)**
+- [x] **Step 4: Append WT-EXTENSION to step 3 in WT (Part B)**
 
 Append the **WT-EXTENSION** block (the one ending with the pipeline-worktree sentence) to the end of WT's step-3 line, immediately after `step 1 already halted it.)`.
 
-- [ ] **Step 5: Verify the discharge tokens landed (criteria 6 and 10) and the header renamed**
+- [x] **Step 5: Verify the discharge tokens landed (criteria 6 and 10) and the header renamed**
 
 Run:
 
@@ -247,7 +247,7 @@ git grep -cF 'Consult `stops`, then discharge the merge-gate checks' -- "$WT"  #
 
 Expected: every count ≥ 1.
 
-- [ ] **Step 6: Verify the old header string is gone (nothing else changed there)**
+- [x] **Step 6: Verify the old header string is gone (nothing else changed there)**
 
 Run:
 
@@ -260,7 +260,7 @@ git grep -qF '**Consult `stops`** from the design' -- "$WT" && { echo "FAIL: old
 
 Expected: `OK: old header gone from DF` and `OK: old header gone from WT` (the old bold header no longer precedes `from the design`). A `FAIL` line with a non-zero exit means the rename did not land.
 
-- [ ] **Step 7: Confirm the WT-only worktree clause is present in WT and absent from DF**
+- [x] **Step 7: Confirm the WT-only worktree clause is present in WT and absent from DF**
 
 Run:
 
@@ -273,7 +273,7 @@ git grep -qF 'this fetch and each discharged step run from inside the pipeline w
 
 Expected: `OK: worktree clause present in WT` and `OK: worktree clause absent from DF` — the sole WT-only divergence is in WT and not in DF. Any `FAIL` line (non-zero exit) means the clause is missing from WT or leaked into DF.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md
