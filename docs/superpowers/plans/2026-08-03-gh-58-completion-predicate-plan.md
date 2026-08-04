@@ -45,7 +45,7 @@ Applies all four block replacements and both version bumps as one reviewable uni
 - Consumes: the design's four fenced blocks, shape `[1, 1, 1, 1]`, obtained via `read_blocks(DESIGN, [1, 1, 1, 1])` where `read_blocks` comes from `scripts/design_blocks.py` (`sys.path.insert(0, "scripts")`). `read_blocks` returns a list of four one-element lists; `b[i][0]` is the full replacement line for Block `[i]`.
 - Produces: two edited `SKILL.md` files whose lines 165/191 (dev-flow) and 159/185 (worktree) equal Blocks [0]/[2] and [1]/[3] respectively; two bumped `plugin.json` versions. Task 2 consumes these for the repo-wide verification pass.
 
-- [ ] **Step 1: Confirm the design block shape before touching anything**
+- [x] **Step 1: Confirm the design block shape before touching anything**
 
 Run:
 ```bash
@@ -53,7 +53,7 @@ python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-03-gh-58-complet
 ```
 Expected: first line reads `shape: [1, 1, 1, 1]`, with `[0]`/`[1]` starting `**Execution-complete signal.**` and `[2]`/`[3]` starting `| Plan at tip has ≥1 unchecked task box`. If the shape is anything other than `[1, 1, 1, 1]`, STOP — the design's blocks moved and every edit below is misrouted.
 
-- [ ] **Step 2: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 165 (signal paragraph) with Block [0]**
+- [x] **Step 2: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 165 (signal paragraph) with Block [0]**
 
 Old line (`old_string`, currently line 165 — note the parenthetical **"is not durable pipeline state"**):
 ```text
@@ -64,7 +64,7 @@ Replace with Block [0] (`new_string`):
 **Execution-complete signal.** When a task's review comes back clean, the orchestrator (SDD's controller) ticks that task's `- [ ]` checkboxes in the plan file and commits them, alongside SDD's ledger append. **Committed checkboxes are the durable, authoritative cross-session signal; SDD's `.superpowers/sdd/progress.md` ledger stays in-session scratch (it is git-ignored and is not durable pipeline state).** Execution is complete if and only if the plan at branch tip has zero unchecked task boxes — lines matching `^[[:space:]]*[-*+] \[ \]` (a task checkbox at line start, optionally indented; markdown's `-`, `*`, and `+` bullets all render a checkbox, so all three count). The count is line-anchored, not a raw token count: a `- [ ]` inside an inline code span or a blockquote line — such as the `writing-plans` header that documents the checkbox syntax — is documentation of the syntax, not a task, and the anchor excludes it. (A line-start task checkbox inside a fenced code block would still match; `writing-plans` emits none, and even if one appeared, over-counting only keeps Execute running rather than ever signalling a false complete.) Tie-break: if `git log` shows a task's commits but its boxes are unticked (a crash in the gap), verify via `git log`, tick the boxes, and do not re-implement.
 ```
 
-- [ ] **Step 3: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 191 (resume row) with Block [2]**
+- [x] **Step 3: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 191 (resume row) with Block [2]**
 
 Old line (`old_string`):
 ```text
@@ -75,7 +75,7 @@ Replace with Block [2] (`new_string`):
 | Plan at tip has ≥1 unchecked task box (a line matching `^[[:space:]]*[-*+] \[ \]`) | Execute — resume at first unchecked task (cross-check ledger + `git log`) |
 ```
 
-- [ ] **Step 4: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 159 (signal paragraph) with Block [1]**
+- [x] **Step 4: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 159 (signal paragraph) with Block [1]**
 
 Old line (`old_string`, currently line 159 — note the parenthetical **"dies with the worktree"**, the only difference from the dev-flow copy):
 ```text
@@ -86,7 +86,7 @@ Replace with Block [1] (`new_string`):
 **Execution-complete signal.** When a task's review comes back clean, the orchestrator (SDD's controller) ticks that task's `- [ ]` checkboxes in the plan file and commits them, alongside SDD's ledger append. **Committed checkboxes are the durable, authoritative cross-session signal; SDD's `.superpowers/sdd/progress.md` ledger stays in-session scratch (it is git-ignored and dies with the worktree).** Execution is complete if and only if the plan at branch tip has zero unchecked task boxes — lines matching `^[[:space:]]*[-*+] \[ \]` (a task checkbox at line start, optionally indented; markdown's `-`, `*`, and `+` bullets all render a checkbox, so all three count). The count is line-anchored, not a raw token count: a `- [ ]` inside an inline code span or a blockquote line — such as the `writing-plans` header that documents the checkbox syntax — is documentation of the syntax, not a task, and the anchor excludes it. (A line-start task checkbox inside a fenced code block would still match; `writing-plans` emits none, and even if one appeared, over-counting only keeps Execute running rather than ever signalling a false complete.) Tie-break: if `git log` shows a task's commits but its boxes are unticked (a crash in the gap), verify via `git log`, tick the boxes, and do not re-implement.
 ```
 
-- [ ] **Step 5: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 185 (resume row) with Block [3]**
+- [x] **Step 5: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 185 (resume row) with Block [3]**
 
 Block [3] is byte-identical to Block [2]. Old line (`old_string`):
 ```text
@@ -97,7 +97,7 @@ Replace with Block [3] (`new_string`):
 | Plan at tip has ≥1 unchecked task box (a line matching `^[[:space:]]*[-*+] \[ \]`) | Execute — resume at first unchecked task (cross-check ledger + `git log`) |
 ```
 
-- [ ] **Step 6: Bump `plugins/dev-flow/.claude-plugin/plugin.json` version to `2.13.0` (re-checked against `origin/main`)**
+- [x] **Step 6: Bump `plugins/dev-flow/.claude-plugin/plugin.json` version to `2.13.0` (re-checked against `origin/main`)**
 
 First read what `origin/main` publishes, then bump past it:
 ```bash
@@ -106,7 +106,7 @@ git show "$base:plugins/dev-flow/.claude-plugin/plugin.json" | python3 -c "impor
 ```
 If it prints `2.12.0`, edit the manifest's `version` field from `2.12.0` to `2.13.0` (bump the minor segment). If `origin/main` has advanced past `2.12.0`, bump the minor segment past whatever it now publishes instead (e.g. if it prints `2.13.0`, use `2.14.0`). Edit only the `version` value; leave the rest of the manifest untouched.
 
-- [ ] **Step 7: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json` version to `1.15.0` (re-checked against `origin/main`)**
+- [x] **Step 7: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json` version to `1.15.0` (re-checked against `origin/main`)**
 
 Same procedure:
 ```bash
@@ -115,7 +115,7 @@ git show "$base:plugins/dev-flow-worktree/.claude-plugin/plugin.json" | python3 
 ```
 If it prints `1.14.0`, edit the `version` field from `1.14.0` to `1.15.0`. If `origin/main` has advanced, bump the minor segment past whatever it now publishes.
 
-- [ ] **Step 8: Verify the removed phrasing is gone (criterion #1)**
+- [x] **Step 8: Verify the removed phrasing is gone (criterion #1)**
 
 Run — both must return **no** output (exit status 1 from grep is expected on no match):
 ```bash
@@ -124,7 +124,7 @@ git grep -F -- 'unchecked `- [ ]`' -- plugins/
 ```
 Expected: neither prints any line. (The surviving `` `- [ ]` `` in each signal paragraph is the *action* verb "ticks that task's `- [ ]` checkboxes", which is intended to remain — these greps target only the removed phrasings, not the bare token.)
 
-- [ ] **Step 9: Verify the shipped anchored literal is present in both files (criterion #7)**
+- [x] **Step 9: Verify the shipped anchored literal is present in both files (criterion #7)**
 
 Run:
 ```bash
@@ -132,7 +132,7 @@ git grep -F -- '^[[:space:]]*[-*+] \[ \]' -- plugins/
 ```
 Expected: **four** matching lines — the signal paragraph and the resume row in each of the two `SKILL.md` files. `-F` (fixed-string) is required because the literal is entirely regex metacharacters. This pins the character-for-character string that ships to the one the corpus demonstration (Task 2) validates.
 
-- [ ] **Step 10: Run the design-block re-read + byte-for-byte blob check (criterion #2)**
+- [x] **Step 10: Run the design-block re-read + byte-for-byte blob check (criterion #2)**
 
 Run this inline — a `python3 - <<'PY'` heredoc, so nothing is written into the repo (the old `scratchpad/verify_blocks.py` path does not exist in the repo root and would leave an untracked file an Execute-stage `git add` could sweep in). It re-reads the four blocks from the design on disk (never retyped), **locates each edit site by its old line's anchor in the `origin/main` blob** (so it survives an `origin/main` line-shift above the site instead of asserting a stale hardcoded index), asserts each new block landed verbatim at that site, asserts the two parentheticals landed in the correct files (not swapped — each block is pinned to the base line that held *that* file's signal paragraph), and asserts each touched `SKILL.md` is its `origin/main` blob with **exactly** the two intended line replacements and nothing else:
 ```bash
