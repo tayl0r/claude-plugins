@@ -15,16 +15,21 @@ A reviewer in the second tier, which weighs grouped seed findings against the de
 _Avoid_: group agent, group-resolution agent, judge, arbiter
 
 **Tier**:
-The model class a reviewer is spawned on — `sonnet` for seeds, `opus` for resolvers. Distinct from *family*.
+The model a reviewer is spawned on — `claude-sonnet-4-6` for seeds, `claude-opus-4-8` for resolvers. Pinned by dated id in an *agent definition* rather than by family alias, so that a new release in either family cannot silently re-point a tier. Distinct from *family*.
+
+**Agent definition**:
+A `plugins/<plugin>/agents/<agent>.md` file whose frontmatter pins a spawnable `subagent_type` to a dated model id. The only place a dated id can be requested *when spawning a subagent* — the `Agent` tool's `model` parameter takes family aliases only, and passing it overrides the pin. The session's own model is a separate surface, where `claude --model` does accept a full id. Distributed by the plugin system like a skill, and registered under the plugin-qualified name `<plugin>:<name>` — the bare name does not resolve.
+_Avoid_: subagent file, agent template
 
 **Family**:
 A model's product line (Opus, Sonnet, Fable), independent of any dated version within it. A plugin's product line likewise: `dev-flow` is the family name its two variants share, independent of either variant's own version. A set of merely related constructs (connectors, handlers, jobs…) is not a family — the word for that is *kind*.
 
-**Family match**:
-The check that a reviewer's self-reported model belongs to the family its requested tier names. Preferred over matching a dated model id, which drifts.
+**Tier match**:
+The check that a reviewer's self-reported model is the dated id its tier pins, ignoring any variant suffix the harness appends (`claude-opus-4-8[1m]` matches `claude-opus-4-8`).
+_Avoid_: family match (the name from when tiers were named by alias)
 
 **Provenance**:
-The line a review returns stating how many reviewers it actually spawned per tier. Evidence of fan-out and tier conformance — never of model diversity.
+The line a review returns stating how many reviewers it actually spawned per tier, and the normalized dated id each one matched to. Evidence of fan-out and tier conformance — never of model diversity.
 
 **Angle**:
 One lens in the diff-mode quality seed's list: reuse, simplification, efficiency, altitude, seam placement, glossary conformance.

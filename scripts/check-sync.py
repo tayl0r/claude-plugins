@@ -50,6 +50,26 @@ MIRROR_PAIRS = [
             },
         ],
     },
+    {
+        "name": "adversarial-review-seed agent",
+        "a": "plugins/dev-flow/agents/adversarial-review-seed.md",
+        "b": "plugins/dev-flow-worktree/agents/adversarial-review-seed.md",
+        # Same canonicalization as the SKILL.md pair: each variant's agent body
+        # may name its own plugin, and both register under their own qualified
+        # name, so "dev-flow-worktree" there is correct rather than drift.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
+    {
+        "name": "adversarial-review-resolver agent",
+        "a": "plugins/dev-flow/agents/adversarial-review-resolver.md",
+        "b": "plugins/dev-flow-worktree/agents/adversarial-review-resolver.md",
+        # Same canonicalization as the SKILL.md pair: each variant's agent body
+        # may name its own plugin, and both register under their own qualified
+        # name, so "dev-flow-worktree" there is correct rather than drift.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
 ]
 
 
