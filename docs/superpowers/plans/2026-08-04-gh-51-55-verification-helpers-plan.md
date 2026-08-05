@@ -747,7 +747,7 @@ Expected: one commit containing exactly `CLAUDE.md`. Confirm with `git show --st
 
 **Design doc (authoritative source of the blocks re-read below):** `/Users/taylor/dev/claude-plugins/docs/superpowers/specs/2026-08-04-gh-51-55-verification-helpers-design.md`. Step 2 re-reads the two plain blocks (`read_blocks(DESIGN, [1, 1])`) and the four tagged blocks (via the inlined `fenced_block`). **Read every block verbatim from the design; never retype; if you cannot read the design, stop and report.**
 
-- [ ] **Step 0: Block shape guard**
+- [x] **Step 0: Block shape guard**
 
 ```bash
 python3 - <<'PY'
@@ -764,7 +764,7 @@ echo "exit=$?"
 
 Expected: two block previews, `shape guard: OK`, `exit=0`.
 
-- [ ] **Step 1: File scope — exactly the three files, and no fourth (design step 1)**
+- [x] **Step 1: File scope — exactly the three files, and no fourth (design step 1)**
 
 ```bash
 python3 - <<'PY'
@@ -792,7 +792,7 @@ echo "exit=$?"
 
 Expected: a `base:` line with a 40-char SHA (`7f78af0…` today), then `file scope: OK` and `exit=0`. A stray path (any `plugins/` file, a `plugin.json`, `design_blocks.py`, `CONTEXT.md`, `docs/adr/`, `.github/`, `marketplace.json`) fails the step and is named.
 
-- [ ] **Step 2: Reconstruction + design conformance + `verify_blob.py` is new (design step 2)**
+- [x] **Step 2: Reconstruction + design conformance + `verify_blob.py` is new (design step 2)**
 
 Three sub-checks in sequence; each must print `OK` and `exit=0`.
 
@@ -942,7 +942,7 @@ echo "exit=$?"
 
 Expected: `verify_blob.py new at base: True`, `check-sync.py present at base: True`, `new-file check: OK`, `exit=0`.
 
-- [ ] **Step 3: Residue — #51's removed phrase is gone from shipped text (design step 3)**
+- [x] **Step 3: Residue — #51's removed phrase is gone from shipped text (design step 3)**
 
 ```bash
 git grep -n -F 'The 8 missing-author warnings are expected' -- . ':!docs/superpowers/'
@@ -951,7 +951,7 @@ echo "exit=$?"
 
 Expected: no output and a non-zero exit.
 
-- [ ] **Step 4: `check-sync.py` green, including the author check (design step 4)**
+- [x] **Step 4: `check-sync.py` green, including the author check (design step 4)**
 
 ```bash
 python3 scripts/check-sync.py
@@ -970,7 +970,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 5: `verify_blob --selftest` — the byte check flags what the line check passed (design step 5)**
+- [x] **Step 5: `verify_blob --selftest` — the byte check flags what the line check passed (design step 5)**
 
 ```bash
 python3 scripts/verify_blob.py --selftest
@@ -979,7 +979,7 @@ echo "exit=$?"
 
 Expected: the three-row table (OLD `pass` everywhere; NEW `OK`, `FAIL` + `lines match but bytes differ`, `FAIL` + visible `\r`), then `verify_blob self-test: all cases as expected` and `exit=0`.
 
-- [ ] **Step 6: `author_problems` — the #51 criterion can fail (design step 6)**
+- [x] **Step 6: `author_problems` — the #51 criterion can fail (design step 6)**
 
 ```bash
 python3 - <<'PY'
@@ -1001,7 +1001,7 @@ echo "exit=$?"
 
 Expected: `8 … -> OK (0)`, `7 … -> FAIL (1)`, `9 … -> FAIL (1)`, `author_problems self-test: all cases as expected`, `exit=0`.
 
-- [ ] **Step 7: `check-version-bump.py` — no plugin touched, so no bump (design step 7; runs after all commits)**
+- [x] **Step 7: `check-version-bump.py` — no plugin touched, so no bump (design step 7; runs after all commits)**
 
 Reads committed HEAD (`git diff merge-base..HEAD`), so per the verification-ordering rule it runs here, after Tasks 1–3 have committed. All three touched files sit outside `plugins/`, so `touched()` finds no plugin directory and the check passes without asking for a bump. Pass `origin/main` as the symbolic ref shown — never a captured `$(…)`.
 
