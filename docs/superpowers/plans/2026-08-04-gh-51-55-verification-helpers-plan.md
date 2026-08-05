@@ -580,7 +580,7 @@ Expected: one commit containing exactly `scripts/check-sync.py`. Confirm with `g
 
 **What the edit is.** Block 0 is a **pure append** to line 16: it starts with the entire existing "Always" bullet and adds one sentence pointing at `verify_blob` (the check below asserts the strict-prefix relation — nothing removed). Block 1 **fully replaces** line 11: it drops the bare number and the phrase `The 8 missing-author warnings are expected`, pointing instead at the CI-enforced author check. Both anchors are located by content, not line number.
 
-- [ ] **Step 1: Confirm the design's block shape (design Verification step 0)**
+- [x] **Step 1: Confirm the design's block shape (design Verification step 0)**
 
 Calls the `read_blocks` guard: if the design's plain-block shape is not `[1, 1]`, it exits non-zero rather than misrouting an edit. Run from the repo root:
 
@@ -599,7 +599,7 @@ echo "exit=$?"
 
 Expected: block `[0]` previewing the "Always" bullet, block `[1]` previewing the validate bullet, then `shape guard: OK` and `exit=0`. A `design code-block shape is …` error means the design moved after this plan captured its shape — **stop and report**.
 
-- [ ] **Step 2: Apply both edits — build the target from the base blob + blocks 0/1, and write it**
+- [x] **Step 2: Apply both edits — build the target from the base blob + blocks 0/1, and write it**
 
 Reads the base blob and both design blocks, replaces the two anchor lines (each asserted unique), verifies block 0 strictly extends the base "Always" line and block 1 drops the removed phrase, and writes `CLAUDE.md`. Run from the repo root:
 
@@ -658,7 +658,7 @@ echo "exit=$?"
 
 Expected: `wrote CLAUDE.md: 35 lines (block 0 -> Always, block 1 -> Validate)` and `exit=0`. Any `anchors not unique` / `strict append` / `removed phrase` message means the base or a design block moved — **stop and report**.
 
-- [ ] **Step 3: Green check — byte-for-byte reconstruction against the base blob (uses `verify_blob`)**
+- [x] **Step 3: Green check — byte-for-byte reconstruction against the base blob (uses `verify_blob`)**
 
 Independently re-derives `CLAUDE.md` from the base blob + blocks 0/1 and asserts the on-disk file equals it byte-for-byte via `verify_blob.reconstructed` — proving no other line moved. Run from the repo root:
 
@@ -700,7 +700,7 @@ echo "exit=$?"
 
 Expected: `CLAUDE.md reconstruction: OK` and `exit=0`. Run before Step 2's write, `reconstructed` reports the first differing line (the working tree still carries the old line 11/16) and exits 1 — the red form.
 
-- [ ] **Step 4: Residue check — the removed phrase is gone from shipped text (design step 3)**
+- [x] **Step 4: Residue check — the removed phrase is gone from shipped text (design step 3)**
 
 #55 removes nothing (Step 3's strict-append assertion is its counterpart); #51's replacement drops the phrase. The `docs/superpowers/` pathspec is required — one prior plan there legitimately contains it. Run from the repo root:
 
@@ -711,7 +711,7 @@ echo "exit=$?"
 
 Expected: **no output** and a **non-zero** exit (the phrase survives only in the excluded `docs/superpowers/`). If it prints `CLAUDE.md:11:…`, the replacement did not land — re-run Step 2.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add CLAUDE.md
