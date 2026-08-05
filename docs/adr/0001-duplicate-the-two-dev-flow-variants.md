@@ -6,7 +6,7 @@ We control the resulting drift mechanically where the file structure allows and 
 
 ## Consequences
 
-A one-sided edit to the hand-mirrored pair passes every check in CI. Changes touching it must carry their own verification — see the residue-grep and design-conformance rules in `CLAUDE.md`, both of which exist because this gap was hit in practice.
+A one-sided edit to the hand-mirrored pair passes every check in CI. Changes touching it must carry their own verification — see the removed-phrase grep and design-conformance rules in `CLAUDE.md`, both of which exist because this gap was hit in practice.
 
 ## Revisit when
 
