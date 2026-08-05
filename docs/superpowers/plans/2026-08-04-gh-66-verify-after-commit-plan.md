@@ -55,7 +55,7 @@ This is a single, tightly-specified, atomic change: four file edits that form on
 
 **The exact bytes to insert (do not retype them).** The new bullet is **block 0** of the design: the single plain (untagged) ` ``` ` fenced block under the heading `### Block 0` in `/Users/taylor/dev/claude-plugins/docs/superpowers/specs/2026-08-04-gh-66-verify-after-commit-design.md`. Read it verbatim from that file — never retype, reconstruct, reflow, or paraphrase it. If you cannot read that file, **stop and report**. The insertion step below reads it programmatically via `read_blocks` so the bytes are never transcribed by hand; the reconstruction check (design step 2) re-reads the same block the same way and asserts each file equals its base blob with exactly that bullet inserted, so any hand-transcription drift would fail.
 
-- [ ] **Step 1: Pre-flight — confirm branch, resolvable base, and block shape**
+- [x] **Step 1: Pre-flight — confirm branch, resolvable base, and block shape**
 
 Confirms you are on the feature branch, that the merge-base against `origin/main` resolves (every later check consumes it), and that the design still carries exactly one plain fenced block of shape `[1]` (design step 0). If the shape guard trips (`design code-block shape is [N], want [1]`), the design was edited after this plan was written — **stop and report**, do not proceed.
 
@@ -81,7 +81,7 @@ shape guard: OK
 exit=0
 ```
 
-- [ ] **Step 2: Apply the two SKILL.md inserts programmatically (bytes read from the design, never retyped)**
+- [x] **Step 2: Apply the two SKILL.md inserts programmatically (bytes read from the design, never retyped)**
 
 This reads block 0 from the design via `read_blocks`, finds the single Command discipline opener line in each target, inserts the bullet as the very next line, and writes each file back. It preserves each file's trailing newline. It refuses to run if a file has other than exactly one Command discipline opener. Because it reads the bytes from the design and both files get the same `bullet` object, the two edits cannot diverge.
 
@@ -120,15 +120,15 @@ inserts: OK
 exit=0
 ```
 
-- [ ] **Step 3: Bump `dev-flow` version 2.14.0 → 2.15.0**
+- [x] **Step 3: Bump `dev-flow` version 2.14.0 → 2.15.0**
 
 Edit `plugins/dev-flow/.claude-plugin/plugin.json`: change the line `"version": "2.14.0",` to `"version": "2.15.0",`. Change nothing else — the `name` and `description` stay byte-for-byte. (This is a whole-value replacement; the design gives no fenced block for it because design step 3 asserts the bumped value directly.)
 
-- [ ] **Step 4: Bump `dev-flow-worktree` version 1.16.0 → 1.17.0**
+- [x] **Step 4: Bump `dev-flow-worktree` version 1.16.0 → 1.17.0**
 
 Edit `plugins/dev-flow-worktree/.claude-plugin/plugin.json`: change the line `"version": "1.16.0",` to `"version": "1.17.0",`. Change nothing else — the `name` and `description` stay byte-for-byte.
 
-- [ ] **Step 5: Run the pre-commit-safe verification checks (design steps 1, 2, 4, 5)**
+- [x] **Step 5: Run the pre-commit-safe verification checks (design steps 1, 2, 4, 5)**
 
 These read the working tree and the base blob, not committed HEAD, so they are meaningful now (before the commit). Do **not** run design step 3 or step 6 here — those read committed HEAD and are covered post-commit in Step 7. Run all four; each must end `exit=0` and print its `OK` line.
 
@@ -260,7 +260,7 @@ exit=0
 
 If any of these four checks fails, fix the edit and re-run — do **not** commit until all four are green.
 
-- [ ] **Step 6: Commit all four files as one atomic commit**
+- [x] **Step 6: Commit all four files as one atomic commit**
 
 Stage exactly the four edited files and commit them together. This is the single commit; do not split it, and do not stage anything else. (The design and this plan under `docs/superpowers/` are committed separately by the dev-flow pipeline per `docs: commit`; do not add them here.)
 
@@ -290,7 +290,7 @@ EOF
 ```
 Expected: one commit created with the four files. Confirm with `git show --stat HEAD` that exactly those four paths appear and nothing else.
 
-- [ ] **Step 7: Run the post-commit verification checks (design steps 3 and 6)**
+- [x] **Step 7: Run the post-commit verification checks (design steps 3 and 6)**
 
 These read committed HEAD (`git show HEAD:…` and `check-version-bump.py`'s `git diff merge-base..HEAD`), so per the very rule this change adds they are meaningful only **after** the Step 6 commit. Both must end `exit=0`.
 
