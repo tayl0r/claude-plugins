@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Mechanical drift check for the facts this repo duplicates by hand.
 
-Two independent checks, one command, no flags:
+Three independent checks, one command, no flags:
 
   Check A  every plugins/<dir>/.claude-plugin/plugin.json agrees with its
            .claude-plugin/marketplace.json entry (name, source, description),
@@ -9,6 +9,11 @@ Two independent checks, one command, no flags:
 
   Check B  each pair declared in MIRROR_PAIRS is line-for-line identical after
            canonicalization, except where an exception declares otherwise.
+
+  Check C  the number of plugins/<dir>/.claude-plugin/plugin.json files with no
+           `author` key equals the EXPECTED_AUTHORLESS_PLUGINS tripwire -- the
+           `No author information provided` count `claude plugin validate .`
+           warns on but exits 0 for, so nothing else enforces it.
 
 Both checks run every time, so one run reports every problem in the tree.
 Exit 0 iff every check passed, 1 otherwise. Python 3 stdlib only, no flags.
@@ -23,6 +28,14 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MARKETPLACE = ".claude-plugin/marketplace.json"
+
+# Number of plugins whose plugin.json carries no `author` key. A hand-set
+# tripwire, not a value derived from the tree: a change that adds an author-less
+# plugin or drops an author key must bump this deliberately, which is the signal
+# #51 exists to preserve. It equals the `No author information provided` count
+# `claude plugin validate .` warns on -- Check A's marketplace<->dir bijection
+# makes the two counts identical -- but needs no validator to measure.
+EXPECTED_AUTHORLESS_PLUGINS = 8
 
 # Pairs of files that must stay line-for-line parallel. Enrollment requires
 # line-for-line parallelism: this schema can only declare same-index,
@@ -448,11 +461,49 @@ def check_pair(pair):
     return summary, [header, *items]
 
 
+def author_problems(count, expected):
+    """The pure decision, factored out so the criterion is testable without the
+    tree: the problems (possibly empty) with `count` author-less plugins against
+    the `expected` tripwire."""
+    if count == expected:
+        return []
+    return ["%d plugin.json files lack an \"author\" key, want exactly %d -- bump "
+            "EXPECTED_AUTHORLESS_PLUGINS deliberately if a plugin was added or an "
+            "author key set" % (count, expected)]
+
+
+def check_authors():
+    """Returns (summary, problems). Counts plugin.json files with no top-level
+    `author` key and tripwires the count against EXPECTED_AUTHORLESS_PLUGINS --
+    the count `claude plugin validate .` warns on but exits 0 for, so nothing
+    else enforces it."""
+    manifests = sorted((REPO_ROOT / "plugins").glob("*/.claude-plugin/plugin.json"))
+    problems, authorless = [], []
+    for manifest in manifests:
+        rel = manifest.relative_to(REPO_ROOT).as_posix()
+        try:
+            data = json.loads(read_text(rel))
+        except READ_ERRORS as exc:
+            problems.append(f"cannot read {rel}: {exc}")
+            continue
+        except json.JSONDecodeError as exc:
+            problems.append(f"cannot parse {rel}: {exc}")
+            continue
+        if not (isinstance(data, dict) and "author" in data):
+            authorless.append(rel)
+    problems.extend(author_problems(len(authorless), EXPECTED_AUTHORLESS_PLUGINS))
+    return plural(len(authorless), "author-less plugin"), problems
+
+
 def main():
     failures = 0
 
     summary, problems = check_manifests()
     if not report("manifest descriptions", summary, problems):
+        failures += 1
+
+    summary, problems = check_authors()
+    if not report("author attribution", summary, problems):
         failures += 1
 
     for pair in MIRROR_PAIRS:
