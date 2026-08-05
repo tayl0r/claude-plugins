@@ -247,7 +247,7 @@ WANT = sorted([
     "plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md",
 ])
 def git(*a):
-    r = subprocess.run(("git",) + a, capture_output=True, text=True)
+    r = subprocess.run(("git",) + a, capture_output=True, text=True, encoding="utf-8")
     if r.returncode != 0:
         raise SystemExit("FAILED: git %s -- exit %d, %s"
                          % (" ".join(a), r.returncode, r.stderr.strip() or "(no message)"))
@@ -285,7 +285,7 @@ TARGETS = ["plugins/dev-flow/skills/dev-flow/SKILL.md",
 OPENER = "- **Command discipline:**"
 
 def git(*a):
-    return subprocess.run(("git",) + a, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(("git",) + a, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 def split(t):
     o = t.split("\n")
     if o and o[-1] == "":
@@ -345,7 +345,7 @@ import json, subprocess, sys
 WANT = {"dev-flow": ("2.14.0", "2.15.0"), "dev-flow-worktree": ("1.16.0", "1.17.0")}
 MAN = "plugins/%s/.claude-plugin/plugin.json"
 def git(*a):
-    return subprocess.run(("git",) + a, capture_output=True, text=True, check=True).stdout
+    return subprocess.run(("git",) + a, capture_output=True, text=True, encoding="utf-8", check=True).stdout
 def field(rev, name, key):
     return json.loads(git("show", "%s:%s" % (rev, MAN % name)))[key]
 base = git("merge-base", "origin/main", "HEAD").strip()
