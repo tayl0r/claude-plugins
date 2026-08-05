@@ -55,7 +55,7 @@ The prose insertion and the two version bumps are one atomic change: `scripts/ch
 - Both plugins' `version` is currently equal to `origin/main`'s (`dev-flow` `2.15.0`, `dev-flow-worktree` `1.17.0`), so a minor bump computed from `origin/main` lands strictly ahead.
 - **`origin/main` is assumed current** (the dev-flow pipeline keeps it fetched); criterion 5's `check-version-bump.py origin/main` reads the local `origin/main` ref exactly as this plan does, so no `git fetch` is introduced here.
 
-- [ ] **Step 1: Confirm the design's block shape is `[1]`**
+- [x] **Step 1: Confirm the design's block shape is `[1]`**
 
 Run:
 
@@ -65,7 +65,7 @@ python3 scripts/design_blocks.py /Users/taylor/dev/claude-plugins/docs/superpowe
 
 Expected: first line `shape: [1]`; block `[0]` begins `- **Measurements are derived, not typed.** Every measurement an artifa…`. If the shape is anything other than `[1]`, STOP and report — every splice below is indexed off that shape.
 
-- [ ] **Step 2: Apply the byte-identical bullet insertion to both SKILL.md copies**
+- [x] **Step 2: Apply the byte-identical bullet insertion to both SKILL.md copies**
 
 The replacement line is re-read from the design via `read_blocks`; it is not typed here. Each file's unique `Measurements are derived, not typed` marker locates the single line to replace; the script asserts exactly one match per file, replaces it with the **same** block `0` line in both, and preserves every other byte (splits on `\n` only via `to_lines`, restores each file's own trailing-newline convention, writes raw bytes). Run:
 
@@ -104,7 +104,7 @@ PY
 
 Expected: two lines, `edited plugins/dev-flow/skills/dev-flow/SKILL.md (line 279)` and `edited plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md (line 273)`. (Line numbers are informational; correctness comes from the anchor match, not the number.) Any `SystemExit` — a shape mismatch or an anchor that did not match exactly once — means STOP and report.
 
-- [ ] **Step 3: Bump both plugins' `version` — minor segment, computed from `origin/main`**
+- [x] **Step 3: Bump both plugins' `version` — minor segment, computed from `origin/main`**
 
 No target number is fixed here. For each plugin the target is `origin/main`'s current version with the **minor** segment incremented and the patch zeroed (e.g. `2.15.0` → `2.16.0`), which lands strictly past `origin/main` even if a concurrent branch already published the next number relative to the merge base. Only the `version` value changes; every other byte of each `plugin.json` is preserved. Run:
 
@@ -157,7 +157,7 @@ PY
 
 Expected: two lines, `bumped dev-flow: 2.15.0 -> 2.16.0 (origin/main was 2.15.0)` and `bumped dev-flow-worktree: 1.17.0 -> 1.18.0 (origin/main was 1.17.0)` (the concrete numbers depend on `origin/main` at execute time). Any `SystemExit` means STOP and report.
 
-- [ ] **Step 4: Removed-phrase grep — the broken sentence junction is gone from both copies (working tree)**
+- [x] **Step 4: Removed-phrase grep — the broken sentence junction is gone from both copies (working tree)**
 
 This is a pure insertion, so the only text that ceases to exist is the old sentence junction `does not show. A spec self-review` (the inserted sentences now sit between `does not show.` and `A spec self-review`). Assert it returns **no** hits in either `SKILL.md`. Run:
 
@@ -193,7 +193,7 @@ PY
 
 Expected: `PASS (…)` for each file and the final `removed-phrase grep OK: …`, exit 0. The junction was present once per file before the edit (see Preconditions), so a PASS is non-vacuous. A FAIL (junction survived) or ERROR (grep exit ≥2) raises `SystemExit`: STOP and report.
 
-- [ ] **Step 5: `verify_blob` — each touched file byte-for-byte its merge-base blob with exactly the one intended change**
+- [x] **Step 5: `verify_blob` — each touched file byte-for-byte its merge-base blob with exactly the one intended change**
 
 The merge-base ref is computed as a validated, non-empty variable and passed to `git` as an `argv` element (never interpolated into a shell string) — this change dogfooding its own rule. For each `SKILL.md` the reconstruction finds the `Measurements are derived, not typed` marker line **in the base blob** and splices in the design's block `0`; for each `plugin.json` it finds the `"version"` line in the base blob and swaps only its value for **the working tree manifest's own current version value** — read here, never recomputed — so Step 5 verifies structural integrity only: every byte equals the base blob except the version value. That the value is a valid forward bump is Step 3's and Step 10's job, not this check's. Then it asserts the working-tree bytes equal the reconstruction exactly. (The design's criterion 3 names the two `SKILL.md` copies; the two `plugin.json` files are added here because CLAUDE.md's `## Verifying a change` **Always** rule binds *every* file the edit touches, and the design's Affected-files list includes both manifests.) Because the reconstruction splices in the design's block `0` re-read from disk (`read_blocks(DESIGN, [1])[0][0]`, never retyped), a passing `verify_blob` also proves block `0` landed verbatim at the anchor line in both copies — so this step is *also* the design-block-conformance check CLAUDE.md's design-doc rule asks for, and no separate `read_blocks` presence check is carried (it would be a strict consequence of this one). Run:
 
@@ -259,7 +259,7 @@ PY
 
 Expected: the single `verify_blob OK: …` line and exit 0. Because the `plugin.json` reconstruction swaps in the working tree's own version value rather than a recomputed target, no second computation can disagree with Step 3 — so any problem list (a differing line, a changed line count, or "lines match but bytes differ") means a genuine stray edit landed somewhere. STOP and report.
 
-- [ ] **Step 6: The two copies stay mirrored — compare the bullet's bytes, not its line number (working tree)**
+- [x] **Step 6: The two copies stay mirrored — compare the bullet's bytes, not its line number (working tree)**
 
 `scripts/check-sync.py` does **not** cover this pipeline `SKILL.md` pair (it covers the `adversarial-review` pair and the manifest `description`s only), so verify the mirror directly. The bullet sits at a different line in each copy (279 vs 273), so the comparison must be of the line's **bytes**, never its line number. This is the *outside-the-pair* check CLAUDE.md requires for any mirrored-pair edit — Steps 4 and 5 already verify each copy against the design and its own merge-base blob independently (Step 5 splices in the design's block `0` re-read from disk), so a doubled-but-wrong edit cannot pass unseen; this step confirms the two copies are identical to each other. Run:
 
@@ -294,7 +294,7 @@ PY
 
 Expected: the single `mirror OK: …` line and exit 0. This is the robust form of the design's `diff <(grep -F …) <(grep -F …)` criterion — it additionally asserts each grep matched exactly one non-empty line, so a marker that vanished from *both* copies (which would make a bare `diff` of two empty outputs exit 0 spuriously) is caught here. Any `SystemExit` means STOP and report.
 
-- [ ] **Step 7: `claude plugin validate .` — the marketplace is still valid (working tree)**
+- [x] **Step 7: `claude plugin validate .` — the marketplace is still valid (working tree)**
 
 Run:
 
@@ -310,7 +310,7 @@ claude plugin validate . ; echo "exit: $?"
 
 Expected: `exit: 0`. A non-zero exit means STOP and report.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 Only after Steps 4–7 all pass. Stage the two edited `SKILL.md` copies, the two bumped `plugin.json` manifests, and the dev-flow docs (`docs: commit` applies), then commit:
 
@@ -336,7 +336,7 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 Expected: one commit created containing the two `SKILL.md` copies, the two `plugin.json` manifests, and the two dev-flow docs. (If a dev-flow doc is already committed and unchanged, `git add` on it is a harmless no-op.)
 
-- [ ] **Step 9: File scope — exactly the six intended files changed on this branch, and no seventh (committed HEAD)**
+- [x] **Step 9: File scope — exactly the six intended files changed on this branch, and no seventh (committed HEAD)**
 
 This dogfoods the very rule this change adds: a measurement of *the change itself* — here its **file scope** — computes its base with `git merge-base origin/main HEAD` (a computed ref, validated non-empty, passed to `git` as an `argv` element), never a hardcoded SHA, so it keeps measuring what *this branch* changed as `origin/main` advances. It reads committed HEAD (`git diff --name-only <base> HEAD`), so per the Verification-ordering rule it runs **after** the Step 8 commit. The intended set is the four code files plus the two dev-flow docs (design + plan, committed on this branch — Step 8 stages both), so `base..HEAD` lists exactly six; a stray edit to any seventh file (another plugin, `scripts/`, `CLAUDE.md`, `CONTEXT.md`, `marketplace.json`, a `README.md`, `docs/adr/`, the `adversarial-review` pair) makes the set differ and fails the step. `WANT` names the same six paths as Step 8's `git add`. Run:
 
@@ -372,7 +372,7 @@ echo "exit=$?"
 
 Expected: a `base:` line with the 40-char merge-base SHA, then `file scope: OK` and `exit=0`. A `file scope: FAIL` line naming the differing set — a stray seventh path, or a missing intended file — means STOP and report; do not weaken `WANT` to match a stray. (If `changed` is missing the plan doc, the pipeline has not committed it yet: commit it, then re-run.)
 
-- [ ] **Step 10: `check-version-bump.py` — both plugins land past `origin/main` (committed HEAD)**
+- [x] **Step 10: `check-version-bump.py` — both plugins land past `origin/main` (committed HEAD)**
 
 This check reads `git show HEAD:plugins/<name>/.claude-plugin/plugin.json`, so it must run **after** the commit (Step 8). It compares each touched plugin's HEAD version against `origin/main`'s *tip* (not the merge base) and exits 0 only if both are strictly ahead. Run:
 
