@@ -66,7 +66,7 @@ whole file CRLF          | pass              | FAIL
 
 Binding requirements: both deviations the OLD check **passes** must **FAIL** under `verify_blob`; the lost-newline failure names `lines match but bytes differ`; the CRLF failure shows a visible `\r`. On all-pass, `--selftest` prints a final `verify_blob self-test: all cases as expected` and returns 0; on any mismatch it prints `MISMATCH: …` and returns non-zero. (The exact self-test bytes are not byte-checked by any later step, so the reference implementation below is authoritative only insofar as it reproduces this contract — run step 3 and confirm.)
 
-- [ ] **Step 1: Write the library source verbatim from the design**
+- [x] **Step 1: Write the library source verbatim from the design**
 
 Extracts the `python` block (first line `#!/usr/bin/env python3`) from the design and writes it to `scripts/verify_blob.py`. Run from the repo root:
 
@@ -125,7 +125,7 @@ echo "exit=$?"
 
 Expected: `wrote scripts/verify_blob.py (161 lines, verbatim from the design)` and `exit=0`. The script asserts both the 161-line count and the `_selftest`-guard last line before writing, so a design whose library block moved exits non-zero here — **stop and report**.
 
-- [ ] **Step 2: Insert the authored `_selftest` (and its `_old_line_check` helper) before the `if __name__` guard**
+- [x] **Step 2: Insert the authored `_selftest` (and its `_old_line_check` helper) before the `if __name__` guard**
 
 Open `scripts/verify_blob.py` and insert the two functions below **immediately before** the line `if __name__ == "__main__":` (keep PEP-8 two-blank-line spacing at every top-level boundary — the two blank lines the library block already places before the guard now sit between `reconstructed` and `_old_line_check`; the block below already carries two blank lines between `_old_line_check` and `_selftest`; add two blank lines after `_selftest` so it is not flush against `if __name__`). Do not change any other line. These are authored to reproduce the step-5 contract above; the base blob is `b"# title\n"`, so the sole reconstruction is the file unchanged, and each deviation corrupts `actual_bytes` only:
 
@@ -181,7 +181,7 @@ def _selftest():
     return 0 if not bad else 1
 ```
 
-- [ ] **Step 3: Run the self-test — the byte check flags what the line check passed**
+- [x] **Step 3: Run the self-test — the byte check flags what the line check passed**
 
 ```bash
 python3 scripts/verify_blob.py --selftest
@@ -190,7 +190,7 @@ echo "exit=$?"
 
 Expected: the three-row table exactly as in the contract above — OLD `pass` on every row; NEW `OK` for the control, `FAIL` for the lost newline (with `lines match but bytes differ`) and `FAIL` for the CRLF (with `file: '# title\r'` showing a visible `\r`) — then `verify_blob self-test: all cases as expected` and `exit=0`. If any row disagrees, the self-test prints `MISMATCH: …` and exits 1 — fix the inserted `_selftest`/`_old_line_check` (never the library body, which is verbatim from the design) and re-run.
 
-- [ ] **Step 4: Confirm the module is import-only without `--selftest`**
+- [x] **Step 4: Confirm the module is import-only without `--selftest`**
 
 ```bash
 python3 scripts/verify_blob.py
@@ -199,7 +199,7 @@ echo "exit=$?"
 
 Expected: `verify_blob is import-only; pass --selftest to run its test` on stderr and a non-zero exit — the guard from the verbatim library body. This proves only that the import-only guard rejects a no-arg invocation with that message and a non-zero exit; it does **not** exercise `_selftest` (the `if "--selftest" not in sys.argv` branch raises before `_selftest` is ever referenced, so a missing or misplaced `_selftest` would not surface here). Step 3's `--selftest` run — which reaches `raise SystemExit(_selftest())` — is what proves `_selftest` resolves.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 Stage only the new file (the design/plan under `docs/superpowers/` are committed later by the pipeline — do not add them):
 
