@@ -249,7 +249,7 @@ Expected: one commit containing exactly `scripts/verify_blob.py`. Confirm with `
 
 **Splice recipe (fixed by the design; the builder in Step 1 applies it, the check in Step 2 re-derives and byte-verifies it).** Against the merge-base blob of `scripts/check-sync.py`, the edit is: the docstring line `Two independent checks, one command, no flags:` becomes `Three independent checks, one command, no flags:`; the Check C paragraph is inserted (after one blank line) right after the Check B docstring line ending `canonicalization, except where an exception declares otherwise.`; the constant block is inserted (after one blank line) right after `MARKETPLACE = ".claude-plugin/marketplace.json"`; the `main` wiring is inserted (after one blank line) right after the `failures += 1` that follows `if not report("manifest descriptions", summary, problems):`; and `author_problems` + `check_authors` are inserted (with PEP-8 two-blank spacing) right before `def main():`. Nothing else in the file changes.
 
-- [ ] **Step 1: Apply the additions — build the target from the base blob + the design blocks, and write it**
+- [x] **Step 1: Apply the additions — build the target from the base blob + the design blocks, and write it**
 
 Reads the base blob, reads the four design blocks verbatim, splices them at the anchors above (anchors located by content, each asserted unique), and writes `scripts/check-sync.py`. Run from the repo root:
 
@@ -357,7 +357,7 @@ echo "exit=$?"
 
 Expected: `wrote scripts/check-sync.py: base 471 lines -> 522 lines; anchors all unique` and `exit=0` (line count is base + the spliced blanks and blocks; the exact new count is informational — the byte check in Step 2 is authoritative). Any `anchor(s) not unique` or shape message means the base or the design moved — **stop and report**.
 
-- [ ] **Step 2: Green check — byte-for-byte reconstruction against the base blob (uses `verify_blob`)**
+- [x] **Step 2: Green check — byte-for-byte reconstruction against the base blob (uses `verify_blob`)**
 
 Independently re-derives the target from the base blob + the design blocks and asserts the on-disk file equals it **byte-for-byte** via `verify_blob.reconstructed` — the byte check catching a stray trailing-newline or CRLF the line lists cannot see, and proving nothing outside the spliced additions moved. Run from the repo root:
 
@@ -454,7 +454,7 @@ echo "exit=$?"
 
 Expected: `check-sync reconstruction: OK` and `exit=0`. Run before Step 1's write, `reconstructed` reports the working tree's first differing line and exits 1 — the red form.
 
-- [ ] **Step 3: Green check — `check-sync.py` runs, now with the author line**
+- [x] **Step 3: Green check — `check-sync.py` runs, now with the author line**
 
 ```bash
 python3 scripts/check-sync.py
@@ -473,7 +473,7 @@ check-sync: all checks passed
 exit=0
 ```
 
-- [ ] **Step 4: Green check — the `author_problems` criterion can fail (design step 6)**
+- [x] **Step 4: Green check — the `author_problems` criterion can fail (design step 6)**
 
 Drives the pure decision with synthetic counts, so no tree mutation is needed to prove it fails on a wrong count and passes at the true one. `check-sync.py`'s hyphenated name is loaded via `importlib`. Run from the repo root:
 
@@ -512,7 +512,7 @@ author_problems self-test: all cases as expected
 exit=0
 ```
 
-- [ ] **Step 5: Presence check — the docstring enumeration and the check's key lines landed**
+- [x] **Step 5: Presence check — the docstring enumeration and the check's key lines landed**
 
 An independent confirmation (outside the reconstruction) that the design's exact lines are present — one match each. Run from the repo root:
 
@@ -536,7 +536,7 @@ echo "exit=$?"
 
 Expected: no output and a non-zero exit (the `Two…` line was replaced by `Three…`).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add scripts/check-sync.py
