@@ -15,7 +15,7 @@ Three independent checks, one command, no flags:
            `No author information provided` count `claude plugin validate .`
            warns on but exits 0 for, so nothing else enforces it.
 
-Both checks run every time, so one run reports every problem in the tree.
+All three checks run every time, so one run reports every problem in the tree.
 Exit 0 iff every check passed, 1 otherwise. Python 3 stdlib only, no flags.
 
 Design: docs/superpowers/specs/2026-07-26-gh-8-drift-check-design.md
