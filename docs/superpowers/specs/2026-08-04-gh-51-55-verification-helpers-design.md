@@ -255,7 +255,7 @@ Crucially, the fact the count measures — *how many plugins lack an `author` ke
 
 ### The chosen change
 
-**Modify `scripts/check-sync.py` — add a third check, `check_authors`.** It sits beside `check_manifests` and `check_pair`, is wired into `main`'s report loop as `"author attribution"`, and touches neither `MIRROR_PAIRS` nor the existing checks. The module docstring's check enumeration goes from two to three. `check-sync.py` is not a mirrored file and lives under `scripts/`, so this touches no plugin and no version (A4). The additions:
+**Modify `scripts/check-sync.py` — add a third check, `check_authors`.** It sits beside `check_manifests` and `check_pair`, is wired into `main`'s report loop as `"author attribution"`, and touches neither `MIRROR_PAIRS` nor the existing checks. The module docstring's check enumeration goes from two to three. `check-sync.py` is not a mirrored file and lives under `scripts/`, so this touches no plugin and no version (A4). The additions are a named tripwire constant:
 
 ```python
 # Number of plugins whose plugin.json carries no `author` key. A hand-set
@@ -265,8 +265,11 @@ Crucially, the fact the count measures — *how many plugins lack an `author` ke
 # `claude plugin validate .` warns on -- Check A's marketplace<->dir bijection
 # makes the two counts identical -- but needs no validator to measure.
 EXPECTED_AUTHORLESS_PLUGINS = 8
+```
 
+and the two pure functions spliced beside `check_manifests`:
 
+```python
 def author_problems(count, expected):
     """The pure decision, factored out so the criterion is testable without the
     tree: the problems (possibly empty) with `count` author-less plugins against
@@ -470,9 +473,10 @@ author_problems self-test: all cases as expected
 
 This is what makes CI's author check a criterion that can go red: a count diverging from `EXPECTED_AUTHORLESS_PLUGINS` returns a non-empty problem list, which `main` reports as FAIL and exits 1.
 
-**7. `python3 scripts/check-version-bump.py origin/main` — no plugin touched, so no bump.** This is A4 made a criterion: the change confines itself to `CLAUDE.md` and `scripts/`, so `check-version-bump.py` finds no `plugins/<name>/` path and passes without asking for a bump. Expected after the edit:
+**7. `python3 scripts/check-version-bump.py origin/main` — no plugin touched, so no bump.** This is A4 made a criterion: the change confines itself to `CLAUDE.md` and `scripts/`, so `check-version-bump.py` finds no `plugins/<name>/` path and passes without asking for a bump. Expected after the edit (the first line's three SHAs are 9-char abbreviations that vary per commit; `check-version-bump.py` always prints this header before the result line):
 
 ```text
+check-version-bump: base <sha>, head <sha>, merge-base <sha>
 check-version-bump: no plugin directory touched ... OK
 exit=0
 ```
