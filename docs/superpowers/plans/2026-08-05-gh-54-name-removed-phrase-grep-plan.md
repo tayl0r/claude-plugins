@@ -43,7 +43,7 @@ Both edits share the single coined name and the same design-conformance source (
 
 **Preconditions (informational — hold at plan time):** In the working tree, `git grep -c -F 'expecting no hits, and assert' -- CLAUDE.md` is `1` and `git grep -c -i 'residue' -- . ':(exclude)docs/superpowers'` is `1`, so the "expect 0" grep checks below are non-vacuous. `CLAUDE.md` and the ADR are byte-identical to their merge-base blob (base `= git merge-base HEAD origin/main`), so the `verify_blob` "exactly one line changed" assertion is satisfiable.
 
-- [ ] **Step 1: Confirm the design's block shape is `[1, 1]`**
+- [x] **Step 1: Confirm the design's block shape is `[1, 1]`**
 
 Run:
 
@@ -53,7 +53,7 @@ python3 scripts/design_blocks.py /Users/taylor/dev/claude-plugins/docs/superpowe
 
 Expected: first line `shape: [1, 1]`; block `[0]` begins `- **Always:** grep for the exact phrases the edit removes, expecting n…` and block `[1]` begins `A one-sided edit to the hand-mirrored pair passes every check in CI. C…`. If the shape is anything other than `[1, 1]`, STOP and report — every edit below is indexed off that shape.
 
-- [ ] **Step 2: Apply both one-line edits, reading each replacement from the design doc**
+- [x] **Step 2: Apply both one-line edits, reading each replacement from the design doc**
 
 The replacement lines are re-read from the design via `read_blocks`; they are not typed here. Each file's unique anchor substring locates the single line to replace; the script asserts exactly one match per file and preserves every other byte (splits on `\n` only, restores the file's own trailing-newline convention, writes raw bytes). Run:
 
@@ -94,7 +94,7 @@ PY
 
 Expected: two lines, `edited CLAUDE.md (line 16)` and `edited docs/adr/0001-duplicate-the-two-dev-flow-variants.md (line 9)`. (The line numbers are informational; correctness comes from the anchor match, not the number.) Any `SystemExit` — a shape mismatch or an anchor that did not match exactly once — means STOP and report.
 
-- [ ] **Step 3: Removed-phrase grep — one scoped target per file (working tree)**
+- [x] **Step 3: Removed-phrase grep — one scoped target per file (working tree)**
 
 Each edit dissolves one contiguous string that must be gone afterward. Both greps are pre-scoped so committed `docs/superpowers/` history (which legitimately still contains both strings) does not false-positive. Run:
 
@@ -135,7 +135,7 @@ PY
 
 Expected: three lines — `PASS (CLAUDE.md phrase): no match`, `PASS (residue token): no match`, and the final `removed-phrase grep OK: …` — and exit 0. Each string was present (count `1`) before the edit (see Preconditions), so a `PASS` here is non-vacuous. A `FAIL` (the string survived) or an `ERROR` (git grep exited `>=2` — e.g. a bad pathspec, which exits 128) raises `SystemExit`: STOP and report.
 
-- [ ] **Step 4: `verify_blob` — each file byte-for-byte its merge-base blob with exactly the one intended line replaced**
+- [x] **Step 4: `verify_blob` — each file byte-for-byte its merge-base blob with exactly the one intended line replaced**
 
 The merge-base ref is computed as a validated, non-empty variable and passed to git as an argv element (never interpolated into a shell string). For each file the reconstruction finds the anchor line **in the base blob** and splices in that file's replacement block, then asserts the working-tree bytes equal the reconstruction exactly. Run:
 
@@ -187,7 +187,7 @@ PY
 
 Expected: the single `verify_blob OK: …` line and exit 0. Any problem list (a differing line, a changed line count, or "lines match but bytes differ") means a stray edit landed somewhere — STOP and report.
 
-- [ ] **Step 5: `read_blocks` design-conformance — each replacement appears verbatim in its target**
+- [x] **Step 5: `read_blocks` design-conformance — each replacement appears verbatim in its target**
 
 Re-reads the two blocks from the design (never retyped) and asserts each is present verbatim in the edited file it belongs to. Run:
 
@@ -214,7 +214,7 @@ PY
 
 Expected: the single `read_blocks OK: …` line and exit 0. Any `SystemExit` means STOP and report.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 Only after Steps 3–5 all pass. Stage the two edited files plus the dev-flow docs (`docs: commit` applies), and commit:
 
