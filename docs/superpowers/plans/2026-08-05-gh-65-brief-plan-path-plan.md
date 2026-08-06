@@ -263,7 +263,7 @@ git commit -m "gh-65: ADR 0005 — Execute stage carries the plan path so out-of
 
 **What the edit is:** each `plugin.json`'s `version` minor segment bumps by one, **derived from that plugin's `origin/main` version at apply time**, so it is guaranteed past `origin/main` even if a concurrent branch already advanced it. Expected result: `dev-flow` `2.16.0 → 2.17.0`, `dev-flow-worktree` `1.18.0 → 1.19.0`. **If `origin/main` has advanced so the natural bump is not `2.17.0` / `1.19.0`, the applier HALTS and reports** — because the design's `## Verification` hardcodes the `2.16.0 → 2.17.0` / `1.18.0 → 1.19.0` pair against the merge-base blob, so a concurrent publish is a design-owner re-confirmation, not an implementer improvisation. The bumper selects the unique `"version"` line by content, edits only that line, and is idempotent.
 
-- [ ] **Step 1: Refresh `origin/main`, then apply both bumps.**
+- [x] **Step 1: Refresh `origin/main`, then apply both bumps.**
 
 `git fetch origin main` first so the bump derives from and validates against the true remote tip (a resumed run may otherwise see a stale ref). Expect two `… -> …` lines, e.g. `plugins/dev-flow/.claude-plugin/plugin.json: 2.16.0 -> 2.17.0` and `plugins/dev-flow-worktree/.claude-plugin/plugin.json: 1.18.0 -> 1.19.0`. The applier works in two passes — it validates every file and computes both targets first, and only then writes — so if `origin/main` has advanced and the HALT fires, no file has been modified (no half-applied bump left in the tree).
 
@@ -324,7 +324,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 2: Verify both versions are strictly greater than `origin/main`, and byte-for-byte otherwise unchanged.**
+- [x] **Step 2: Verify both versions are strictly greater than `origin/main`, and byte-for-byte otherwise unchanged.**
 
 The program re-reads `origin/main`, and for each file asserts: (a) the working-tree version, compared as a **tuple of integers** (not a string — `"2.10.0" > "2.9.0"` is false lexically once the minor reaches two digits, though 2.10.0 is the newer version), is strictly greater than `origin/main`'s; and (b) the file is byte-for-byte its merge-base blob with **only** the version value swapped. Expect `task 3 conformance: OK` and `exit=0`. Run before Step 1 it prints a `not strictly greater` mismatch per plugin (the working tree still equals the base version) and exits 1.
 
@@ -375,7 +375,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 3: Commit.**
+- [x] **Step 3: Commit.**
 
 ```bash
 git add plugins/dev-flow/.claude-plugin/plugin.json \
@@ -384,7 +384,7 @@ git commit -m "gh-65: bump dev-flow 2.17.0 and dev-flow-worktree 1.19.0" \
            -m "Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 4: Confirm the bump is registered (runs AFTER the Step 3 commit).**
+- [x] **Step 4: Confirm the bump is registered (runs AFTER the Step 3 commit).**
 
 `check-version-bump.py` reads each plugin's **committed** version via `git show HEAD:…plugin.json`, so it can only see the bump once it is committed — run it *after* Step 3, never before (before, it compares `origin/main`'s version against the still-unbumped committed HEAD and reports FAIL, a staleness artifact, not a real collision). Expect it to pass (both touched plugins now ahead of `origin/main`).
 
