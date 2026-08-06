@@ -165,7 +165,7 @@ git commit -m "gh-65: Stage 3 hands each implementer the plan path (both pipelin
 
 **What the edit is:** the file is **created** (absent at the merge base). Its content is block 1, read from the design and written as `("\n".join(b1) + "\n")` bytes — each of block 1's 31 paragraphs is one physical line; the reader's `[1, 31]` shape guard fails loudly if the design's ADR block ever drifts off 31 lines. The next free ADR number is **0005** (`docs/adr/` holds 0001–0004). The writer is idempotent (writing the same deterministic bytes again is a no-op in content).
 
-- [ ] **Step 1: Confirm the design's block shape, then run the red check.**
+- [x] **Step 1: Confirm the design's block shape, then run the red check.**
 
 The shape smoke-test must print `shape: [1, 31]`. The conformance program then confirms the ADR is **not yet** present with block 1's bytes — expect `task 2 conformance: FAIL` and `exit=1` (its red form: the file does not exist yet).
 
@@ -213,7 +213,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 2: Apply the edit — write the ADR from block 1.**
+- [x] **Step 2: Apply the edit — write the ADR from block 1.**
 
 The writer reads block 1 from the design (never retyped) and writes it as the new file's exact bytes. Expect `wrote docs/adr/0005-implementer-briefs-carry-the-plan-path.md (31 lines from block 1)`.
 
@@ -234,11 +234,11 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 3: Run the green check — re-run the Step 1 conformance program verbatim.**
+- [x] **Step 3: Run the green check — re-run the Step 1 conformance program verbatim.**
 
 Re-run the exact `python3 - <<'PY' … PY` conformance block from Step 1 (the shape smoke-test above it is optional to repeat). Expect `task 2 conformance: OK` and `exit=0`: the file exists, its bytes equal block 1 joined with a trailing newline, and it was absent at the merge base (so it is genuinely created, not a stray already-tracked file).
 
-- [ ] **Step 4: Commit.**
+- [x] **Step 4: Commit.**
 
 ```bash
 git add docs/adr/0005-implementer-briefs-carry-the-plan-path.md
