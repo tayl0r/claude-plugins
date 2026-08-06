@@ -36,9 +36,10 @@ reason. So the *practice* of computing the base is settled and dogfooded; the
 only thing missing is that it is unwritten as guidance the pipeline emits.
 
 **The failure mode to name.** A hardcoded base in a this-change check silently
-stops meaning "what this branch changed" the moment the branch is rebased or the
-default branch advances. It becomes "what changed since some commit" — which on
-a rebased branch can fold in other people's work or omit your own — and it turns
+stops meaning "what this branch changed" the moment the branch is rebased, moving
+its fork point out from under the pasted SHA. It becomes "what changed since some
+commit" — which on a rebased branch can fold in other people's work or omit your
+own — and it turns
 the check into a wrong-verdict hazard: a permissive check still prints OK against
 the drifted base, while an exact scope or reconstruction check fails loud against
 a change that is actually correct — either way the verdict stops meaning "what
@@ -91,8 +92,8 @@ accurate and no retitle is needed.
 Command discipline's argv clause says **how** to pass a computed ref once you
 have one ("a step that consumes a **computed** git ref runs its `git` calls
 through `python3`/`subprocess` with the ref as an `argv` element"). The inserted
-text hands off to it in a parenthetical — *"a computed ref, passed to `git` as an
-`argv` element per **Command discipline**"* — so Measurements owns the
+text hands off to it in a parenthetical — *"a computed ref per **Command
+discipline**"* — so Measurements owns the
 compute-vs-pin decision and Command discipline owns the safe-passing mechanics,
 each in one place, threaded rather than duplicated.
 
@@ -127,7 +128,7 @@ each in one place, threaded rather than duplicated.
 **Both** `SKILL.md` copies carry this bullet **byte-for-byte identically** (the
 Measurements bullet has no declared per-copy differences — it names no plugin and
 no routing ref), so the replacement below is applied verbatim to both. It is a
-**pure insertion** into the existing single-line bullet: two sentences are spliced
+**pure insertion** into the existing single-line bullet: a single sentence is spliced
 in after `… state no number its output does not show.` and before `A spec
 self-review names …`. Nothing existing is deleted or reworded.
 
@@ -144,14 +145,14 @@ fenced block so a plan's design-conformance check can re-read it from this
 document:
 
 ```
-- **Measurements are derived, not typed.** Every measurement an artifact states was printed by a command its author ran, or it is cut. A measurement of the artifact's **own replacement text** — a word or line count, "the shortest bullet", "in seven words" — is asserted in that artifact's own success criteria: the text is still under the author's hand, and a later rewrite silently falsifies anything typed beside it. A measurement of the **tree before the edit** is the opposite case — re-deriving it afterwards falsifies a design that is correct — so give the command pinned to the base revision (`git grep … <base> -- …`) beside the claim, state the claim in the past tense at that revision, and state no number its output does not show. A measurement of **the change itself** — its file scope, its diff, its byte-for-byte reconstruction — is the mirror image of that one: it must keep tracking what *this branch* changed as the base moves, so it computes its base with `git merge-base origin/<default> HEAD` (a computed ref, passed to `git` as an `argv` element per **Command discipline**), never a hardcoded SHA. A hardcoded base there is a wrong-verdict hazard — the moment the branch is rebased or the default branch advances, it silently stops measuring what this branch changed and starts measuring what changed since some commit, folding in others' work or dropping your own. A spec self-review names every measurement the artifact states and the command that printed it.
+- **Measurements are derived, not typed.** Every measurement an artifact states was printed by a command its author ran, or it is cut. A measurement of the artifact's **own replacement text** — a word or line count, "the shortest bullet", "in seven words" — is asserted in that artifact's own success criteria: the text is still under the author's hand, and a later rewrite silently falsifies anything typed beside it. A measurement of the **tree before the edit** is the opposite case — re-deriving it afterwards falsifies a design that is correct — so give the command pinned to the base revision (`git grep … <base> -- …`) beside the claim, state the claim in the past tense at that revision, and state no number its output does not show. A criterion about **the change itself** — its file scope, its diff, its byte-for-byte reconstruction — is the mirror image of that one: it must keep tracking what *this branch* changed as the fork point moves, so it computes its base with `git merge-base origin/<default> HEAD` (a computed ref per **Command discipline**), never a hardcoded SHA, which a rebase silently strands behind the moved fork point, decoupling the verdict from what *this branch* changed. A spec self-review names every measurement the artifact states and the command that printed it.
 ```
 
-The inserted text only (for reviewer convenience; it is the second and third
-sentences added mid-bullet, and is *not* a separate edit — it is the delta
+The inserted text only (for reviewer convenience; it is the single sentence
+added mid-bullet, and is *not* a separate edit — it is the delta
 already contained in the block above):
 
-> A measurement of **the change itself** — its file scope, its diff, its byte-for-byte reconstruction — is the mirror image of that one: it must keep tracking what *this branch* changed as the base moves, so it computes its base with `git merge-base origin/<default> HEAD` (a computed ref, passed to `git` as an `argv` element per **Command discipline**), never a hardcoded SHA. A hardcoded base there is a wrong-verdict hazard — the moment the branch is rebased or the default branch advances, it silently stops measuring what this branch changed and starts measuring what changed since some commit, folding in others' work or dropping your own.
+> A criterion about **the change itself** — its file scope, its diff, its byte-for-byte reconstruction — is the mirror image of that one: it must keep tracking what *this branch* changed as the fork point moves, so it computes its base with `git merge-base origin/<default> HEAD` (a computed ref per **Command discipline**), never a hardcoded SHA, which a rebase silently strands behind the moved fork point, decoupling the verdict from what *this branch* changed.
 
 Terminology note: `<default>` is the pipeline's already-resolved default branch
 (SKILL.md's *Base ref and `<default-ref>`* step). `origin/<default>` spells the
@@ -205,7 +206,7 @@ Run from the repo root, after the edit unless stated. The reconstruction base is
 2. **Removed-phrase grep (the broken adjacency).** This is a pure insertion, so
    the only text that ceases to exist is the old sentence junction. Assert
    `grep -F "does not show. A spec self-review"` returns **no** hits in either
-   `SKILL.md` (the two sentences are no longer adjacent). Expect exit 1 / empty.
+   `SKILL.md` (the inserted sentence now sits between them). Expect exit 1 / empty.
 
 3. **Byte-for-byte merge-base blob reconstruction** (CLAUDE.md *Verifying a
    change*, **Always**). For each `SKILL.md`: read raw bytes, locate the bullet by
