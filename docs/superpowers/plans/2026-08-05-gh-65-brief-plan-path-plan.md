@@ -413,23 +413,23 @@ echo "exit=$?"
 
 Read its `## Verification` section verbatim from the design file at that path; run each of its four numbered checks exactly as written; never reconstruct, retype, or substitute any of them; if you cannot read the design file, stop and report. That section's `python`/`sh` blocks re-read blocks 0 and 1 from the design through `read_blocks(DESIGN, [1, 31])`, compute the base as `git merge-base origin/main HEAD` (captured, validated non-empty, passed to `git` as an `argv` element — never shell-interpolated), and are already consistent at shape `[1, 31]`; they are the whole correctness surface for this change and supersede the per-task checks, which each ran before the next task's edits.
 
-- [ ] **Step 1: Run the design's `## Verification` check 1 — Design-block conformance.**
+- [x] **Step 1: Run the design's `## Verification` check 1 — Design-block conformance.**
 
 Run, verbatim from the design's `## Verification`, its check **1. Design-block conformance** — the `python3 scripts/design_blocks.py …` shape smoke-test (expect `shape: [1, 31]`) followed by its `python` block. It asserts block 0 is the line immediately after **each file's exact full `Baseline` anchor** and that the created ADR's content equals block 1. Expect `design-conformance: OK` and exit 0. This is the finished-tree, exact-anchor re-check of Tasks 1 and 2.
 
-- [ ] **Step 2: Run the design's `## Verification` check 2 — Byte-for-byte blob + file scope.**
+- [x] **Step 2: Run the design's `## Verification` check 2 — Byte-for-byte blob + file scope.**
 
 Run, verbatim from the design's `## Verification`, its check **2. Byte-for-byte blob check + file scope**. It compares `merge-base..HEAD`, so it is a **committed-HEAD check** and only runs correctly now that Tasks 1–3 are committed; it guards itself onto the feature branch (asserts `merge-base != HEAD`) and asserts the changed set — excluding `docs/superpowers/` — equals exactly the five files, each byte-for-byte its base blob with only its intended edit, and the ADR absent at base and equal to block 1. Expect `file scope + byte-for-byte: OK` and exit 0. This is the only check that proves **no other line anywhere moved** — the doubled-hunk blind spot the hand-mirrored pair cannot otherwise catch.
 
-- [ ] **Step 3: Run the design's `## Verification` check 3 — Removed-phrase grep.**
+- [x] **Step 3: Run the design's `## Verification` check 3 — Removed-phrase grep.**
 
 Run, verbatim from the design's `## Verification`, its check **3. Removed-phrase grep** — the two file-scoped `git grep -F` commands for the old version literals (`"version": "2.16.0"` scoped to `plugins/dev-flow/.claude-plugin/plugin.json`, `"version": "1.18.0"` scoped to `plugins/dev-flow-worktree/.claude-plugin/plugin.json`). Expect **0 matches** each (the literals were 1 each at base). The `SKILL.md` insertions and the created ADR remove no prose, so the grep is N/A for those three files, as the design states.
 
-- [ ] **Step 4: Run the design's `## Verification` check 4 — Sync, version-bump, and marketplace validation.**
+- [x] **Step 4: Run the design's `## Verification` check 4 — Sync, version-bump, and marketplace validation.**
 
 Run, verbatim from the design's `## Verification`, its check **4**: `python3 scripts/check-sync.py` (expect pass — the `adversarial-review` pairs and author counts are untouched, and the pipeline `SKILL.md` pair is hand-mirrored, not compared), `python3 scripts/check-version-bump.py origin/main` (a **committed-HEAD check**, expect pass now that Task 3 is committed), and `claude plugin validate .` (expect exit 0 with exactly the expected author-less warnings — **do NOT add author keys**).
 
-- [ ] **Step 5: Confirm nothing is uncommitted in scope (belt-and-braces beyond the design's Verification).**
+- [x] **Step 5: Confirm nothing is uncommitted in scope (belt-and-braces beyond the design's Verification).**
 
 The check-2 scope equality reads `merge-base..HEAD` and so cannot see an *uncommitted* stray file in scope. This closes that gap. Expect **no output** and `exit=0`; any line printed is an uncommitted or untracked file inside the change's scope — report it rather than committing it, since the five authorized files are already committed.
 
@@ -438,7 +438,7 @@ git status --porcelain -- . ':!docs/superpowers/'
 echo "exit=$?"
 ```
 
-- [ ] **Step 6: Hand the pre-merge version re-check to the orchestrator.**
+- [x] **Step 6: Hand the pre-merge version re-check to the orchestrator.**
 
 This is the last checkbox in the plan. Do **not** attempt the pre-merge re-check yourself — it runs at a stage boundary that has not happened. Report to the orchestrator, in the Execute-stage completion report, the whole of the *After the last task* section below, and say plainly that it is outstanding.
 
