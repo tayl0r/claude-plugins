@@ -43,7 +43,7 @@ dev-flow:
 
 **What the edit is:** block 0 becomes a **new bullet immediately after each file's own `Baseline` anchor** — the first Stage 3 override in that list. The two files are a **hand-mirrored pair that `check-sync.py` does not compare**, so a one-sided edit is caught by nothing mechanical; both insertions therefore move together in this one task, and block 0 is byte-identical in both. Each file's anchor differs (dev-flow's names the checkout, worktree's names the pipeline worktree), so each insertion is located by a **content match on its own anchor's stable ASCII prefix**, asserted to occur exactly once — never by line number. The applier is idempotent (a re-run that finds block 0 already after the anchor makes no change). Task 4's design-conformance check re-verifies placement against the design's **exact full `Baseline` anchor** on the finished tree.
 
-- [ ] **Step 1: Confirm the design's block shape, then run the red check.**
+- [x] **Step 1: Confirm the design's block shape, then run the red check.**
 
 The shape smoke-test must print `shape: [1, 31]`. The conformance program then confirms block 0 is **not yet** the byte-for-byte reconstruction after each anchor — expect `task 1 conformance: FAIL` and `exit=1` (its demonstrated red form: the working tree still equals the base blob, so block 0 is absent).
 
@@ -99,7 +99,7 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 2: Apply the edit — insert block 0 after each file's `Baseline` anchor.**
+- [x] **Step 2: Apply the edit — insert block 0 after each file's `Baseline` anchor.**
 
 The applier reads block 0 from the design (never retyped), locates each file's anchor by its unique ASCII prefix, asserts the prefix matches exactly one line, and inserts the bullet directly after it. Expect one `inserted block 0 immediately after the Baseline anchor` line per file.
 
@@ -136,11 +136,11 @@ PY
 echo "exit=$?"
 ```
 
-- [ ] **Step 3: Run the green check — re-run the Step 1 conformance program verbatim.**
+- [x] **Step 3: Run the green check — re-run the Step 1 conformance program verbatim.**
 
 Re-run the exact `python3 - <<'PY' … PY` conformance block from Step 1 (the shape smoke-test above it is optional to repeat). Expect `task 1 conformance: OK` and `exit=0`. This proves, per file: the working tree is byte-for-byte its merge-base blob with block 0 spliced immediately after the (unique) `Baseline` anchor and **nothing else moved** — the byte comparison covers a lost final newline and a CRLF flip the line list cannot see.
 
-- [ ] **Step 4: Commit.**
+- [x] **Step 4: Commit.**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md \
