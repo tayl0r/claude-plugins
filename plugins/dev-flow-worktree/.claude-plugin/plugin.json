@@ -1,5 +1,5 @@
 {
   "name": "dev-flow-worktree",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline, isolated in a dedicated git worktree, with adversarial review at each artifact boundary"
 }
