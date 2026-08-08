@@ -1,7 +1,7 @@
 ---
 dev-flow:
   slug: produce-agent-tiers
-  stops: [post-plan]
+  stops: [pre-merge]
   docs: commit
 ---
 # Produce-subagents get their own pinned model tier
