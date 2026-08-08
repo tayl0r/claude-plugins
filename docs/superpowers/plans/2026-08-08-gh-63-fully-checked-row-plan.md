@@ -45,7 +45,7 @@ Applies the Block [0] whole-line replacement to both files (the mirror obligatio
 - Consumes: the design's two fenced blocks, shape `[1, 1]`, read verbatim from the design doc at `docs/superpowers/specs/2026-08-08-gh-63-fully-checked-row-design.md` via `read_blocks(DESIGN, [1, 1])` (`sys.path.insert(0, "scripts")`; `read_blocks` from `scripts/design_blocks.py`). `b[0][0]` is the new "Plan fully checked" row (inlined in Steps 2-3); `b[1][0]` is the amended gh-58 line, consumed by Task 2. Never reconstruct or substitute either block; if you cannot read the design doc, stop and report.
 - Produces: two edited `SKILL.md` files whose lines 196 (dev-flow) and 190 (worktree) equal Block [0]; two bumped `plugin.json` versions. Task 3 consumes these for the verification pass.
 
-- [ ] **Step 1: Confirm the design block shape before touching anything**
+- [x] **Step 1: Confirm the design block shape before touching anything**
 
 Run:
 ```bash
@@ -53,7 +53,7 @@ python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-08-gh-63-fully-c
 ```
 Expected: first line reads `shape: [1, 1]`, with `[0]` starting `| Plan fully checked —` and `[1]` starting `- **The two target sites, per file.**`. If the shape is anything other than `[1, 1]`, STOP — the design's blocks moved and every edit below is misrouted.
 
-- [ ] **Step 2: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 196 (the "Plan fully checked" resume row) with Block [0]**
+- [x] **Step 2: Replace `plugins/dev-flow/skills/dev-flow/SKILL.md` line 196 (the "Plan fully checked" resume row) with Block [0]**
 
 Old line (`old_string`, currently line 196):
 ```text
@@ -65,7 +65,7 @@ Replace with Block [0] (`new_string`):
 ```
 The new line must be byte-identical to the design's Block [0] (one em dash U+2014 after "checked"; the only asterisks are inside the regex code span). Task 3's design-conformance check re-reads the block from the design and asserts it landed verbatim, so a transcription error here is caught — but do not introduce one.
 
-- [ ] **Step 3: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 190 (the same row) with Block [0]**
+- [x] **Step 3: Replace `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md` line 190 (the same row) with Block [0]**
 
 Block [0] is byte-identical to the dev-flow replacement. Old line (`old_string`, currently line 190):
 ```text
@@ -76,7 +76,7 @@ Replace with Block [0] (`new_string`):
 | Plan fully checked — no unchecked task box (no line matching `^[[:space:]]*[-*+] \[ \]`); no PR for the branch (`--state all` list empty) | PR: create + review |
 ```
 
-- [ ] **Step 4: Bump `plugins/dev-flow/.claude-plugin/plugin.json` version to `2.20.0` (re-checked against `origin/main`)**
+- [x] **Step 4: Bump `plugins/dev-flow/.claude-plugin/plugin.json` version to `2.20.0` (re-checked against `origin/main`)**
 
 First read what `origin/main` publishes and what the working tree currently declares, then bump past `origin/main`:
 ```bash
@@ -86,7 +86,7 @@ python3 -c "import json; print(json.load(open('plugins/dev-flow/.claude-plugin/p
 ```
 The first line is `origin/main`'s version; the second is the working tree's current version — the edit's `old_string`. If the first prints `2.19.0`, edit the manifest's `version` field from the working tree's current version to `2.20.0` (bump the minor segment). If `origin/main` has advanced past `2.19.0`, bump the minor segment past whatever it now publishes instead (e.g. if it prints `2.20.0`, use `2.21.0`). Edit only the `version` value; leave the rest of the manifest untouched.
 
-- [ ] **Step 5: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json` version to `1.22.0` (re-checked against `origin/main`)**
+- [x] **Step 5: Bump `plugins/dev-flow-worktree/.claude-plugin/plugin.json` version to `1.22.0` (re-checked against `origin/main`)**
 
 Same procedure:
 ```bash
@@ -96,7 +96,7 @@ python3 -c "import json; print(json.load(open('plugins/dev-flow-worktree/.claude
 ```
 The first line is `origin/main`'s version; the second is the working tree's current version — the edit's `old_string`. If the first prints `1.21.0`, edit the `version` field from the working tree's current version to `1.22.0`. If `origin/main` has advanced, bump the minor segment past whatever it now publishes.
 
-- [ ] **Step 6: Verify the removed phrasing is gone (criterion #1)**
+- [x] **Step 6: Verify the removed phrasing is gone (criterion #1)**
 
 Run — must return **no** output (exit status 1 from grep is expected on no match):
 ```bash
@@ -104,7 +104,7 @@ git grep -F -- 'fully checked;' -- plugins/
 ```
 Expected: no line printed. (At the merge-base this returned exactly the two rows — `dev-flow:196` and `worktree:190`.)
 
-- [ ] **Step 7: Verify the shipped anchored literal is present at all three per-file sites (criterion #4)**
+- [x] **Step 7: Verify the shipped anchored literal is present at all three per-file sites (criterion #4)**
 
 Run:
 ```bash
@@ -112,7 +112,7 @@ git grep -F -- '^[[:space:]]*[-*+] \[ \]' -- plugins/
 ```
 Expected: **six** matching lines — three per file (the Execution-complete signal paragraph, the Execute resume row, and the new fully-checked row). `-F` (fixed-string) is required because the literal is entirely regex metacharacters. This pins the character-for-character string that ships to the one the other two sites carry.
 
-- [ ] **Step 8: `check-sync.py` still exits 0 (criterion #5)**
+- [x] **Step 8: `check-sync.py` still exits 0 (criterion #5)**
 
 Run:
 ```bash
@@ -120,7 +120,7 @@ python3 scripts/check-sync.py; echo "exit=$?"
 ```
 Expected: `exit=0`. The edit touches no `MIRROR_PAIRS` member and no manifest `description`, and the pipeline pair is outside `MIRROR_PAIRS`, so sync is unaffected.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add plugins/dev-flow/skills/dev-flow/SKILL.md plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md plugins/dev-flow/.claude-plugin/plugin.json plugins/dev-flow-worktree/.claude-plugin/plugin.json
@@ -135,7 +135,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 MSG
 ```
 
-- [ ] **Step 10: Verify both plugins are bumped ahead of `origin/main` (criterion #6)**
+- [x] **Step 10: Verify both plugins are bumped ahead of `origin/main` (criterion #6)**
 
 This reads committed `HEAD`, so it runs after Step 9's commit. Run:
 ```bash
