@@ -83,6 +83,24 @@ MIRROR_PAIRS = [
         "canonicalize": [("dev-flow-worktree", "dev-flow")],
         "exceptions": [],
     },
+    {
+        "name": "produce-subagent agent",
+        "a": "plugins/dev-flow/agents/produce-subagent.md",
+        "b": "plugins/dev-flow-worktree/agents/produce-subagent.md",
+        # Same canonicalization as the SKILL.md pair: each variant's agent
+        # description and body may name its own plugin, and both register
+        # under their own qualified name, so "dev-flow-worktree" there is
+        # correct rather than drift.
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
+    {
+        "name": "task-reviewer agent",
+        "a": "plugins/dev-flow/agents/task-reviewer.md",
+        "b": "plugins/dev-flow-worktree/agents/task-reviewer.md",
+        "canonicalize": [("dev-flow-worktree", "dev-flow")],
+        "exceptions": [],
+    },
 ]
 
 
