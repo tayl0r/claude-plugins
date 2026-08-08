@@ -83,7 +83,7 @@ You are a **task-reviewer** for dev-flow — the per-task review gate SDD's cont
 spawns after a `risk: high` task. You check the task's own verification command and
 report pass/fail plus findings; you do not fix, rewrite, or implement.
 
-The dispatch names the task, its verification command, and the absolute working-directory
+The dispatch names the task (its `## Task N` section text), its verification command, and the absolute working-directory
 path. Run the verification, check the diff against the task's `## Task N` section, and
 report. Address the absolute working-directory path explicitly — with `git -C <path>`
 and absolute file paths — and never rely on inherited cwd.
@@ -294,7 +294,7 @@ with:
 
 After the **Implementer briefing** bullet (line 228), insert:
 
-`- **Per-task reviewer routing:** as SDD's controller, the orchestrator spawns each per-task reviewer on the session model, except for a task whose \`## Task N\` section carries \`risk: high\` (per the marker contract in the Stage 2 edit), whose reviewer it spawns as \`dev-flow-worktree:task-reviewer\` (the pinned opus-tier leaf). Require the per-task reviewer to state its model as the first line of its report, and verify it against the expected tier — the session model for routine tasks, the opus tier for \`risk: high\` tasks — halting on a mismatch. Fix-loop escalation: SDD's ladder says "a model at least one tier above the implementer that got stuck"; on Ollama the sonnet tier *is* flash, so dev-flow resolves the ladder to \`model: opus\` at the spawn site — a new, concrete decision, not a restatement of today's intent (today's Stage 3 Halts bullet defers to SDD's generic ladder).`
+`- **Per-task reviewer routing:** as SDD's controller, the orchestrator spawns each per-task reviewer on the session model, except for a task whose \`## Task N\` section carries \`risk: high\` (per the marker contract in the Stage 2 edit), whose reviewer it spawns as \`dev-flow-worktree:task-reviewer\` (the pinned opus-tier leaf). Require the per-task reviewer to state its model as the first line of its report, and verify it against the expected tier — the session model for routine tasks, the opus tier for \`risk: high\` tasks — halting on a mismatch. Fix-loop escalation: SDD's ladder says "a model at least one tier above the implementer that got stuck"; on Ollama the sonnet tier *is* flash, so dev-flow-worktree resolves the ladder to \`model: opus\` at the spawn site — a new, concrete decision, not a restatement of today's intent (today's Stage 3 Halts bullet defers to SDD's generic ladder).`
 
 - [ ] **Step 7: Cross-Cutting Concerns — add produce-tier provenance**
 
@@ -329,13 +329,13 @@ git commit -m "feat: mirror produce-subagent routing into dev-flow-worktree"
 In `plugins/dev-flow/skills/adversarial-review/SKILL.md`, line 75, replace:
 `**Design / plan docs:** rewrite the doc incorporating the resolutions, **preserving the doc's front-matter block and its \`## Original problem\` section unchanged** (caller state, not review content), and commit the rewritten doc on the working directory's branch.`
 with:
-`**Design / plan docs:** rewrite the doc incorporating the resolutions, **preserving the doc's front-matter block, its \`## Original problem\` section, and every \`risk:\` line in \`## Task N\` sections unchanged** (caller state, not review content), and commit the rewritten doc on the working directory's branch.`
+`**Design / plan docs:** rewrite the doc incorporating the resolutions, **preserving the doc's front-matter block, its \`## Original problem\` section, and every \`risk:\` line in \`## Task N\` sections unchanged — except where the review resolves a finding about the marker itself** (caller state, not review content), and commit the rewritten doc on the working directory's branch.`
 
 - [ ] **Step 2: Add the marker backstop to the plan correctness seed (dev-flow copy)**
 
 In the same file, the **plan** row of the Seed passes table (line 30), append to the correctness-seed cell:
 
-`and the \`risk:\` marker contract: a \`## Task N\` section whose work touches concurrency, auth, state machines, or other subtle invariants must carry a \`risk: high\` line (lowercase, single space after the colon) — a risky task missing the marker, a \`risk:\` line with any other value, or a \`risk:\` line in a non-task section is a finding.`
+`and, for a plan carrying a \`dev-flow:\` or \`dev-flow-worktree:\` front-matter block, the \`risk:\` marker contract: a \`## Task N\` section whose work touches concurrency, auth, state machines, or other subtle invariants must carry a \`risk: high\` line (lowercase, single space after the colon) — a risky task missing the marker, a \`risk:\` line with any other value, or a \`risk:\` line in a non-task section is a finding.`
 
 - [ ] **Step 3: Mirror both edits to the worktree copy**
 
