@@ -193,7 +193,7 @@ Both counts derive from the same range, so equality is exactly "every commit mat
 | Branch exists; no design doc with `dev-flow` front-matter at tip | **No commits beyond `<base>`** (`git log "<default-ref>..<branch-ref>" --format=%H` empty — the ungrep'd form of the ownership scan; our just-created branch, Design crashed before committing) -> Design (redo; uncommitted drafts discarded). **`dev-flow-stripped: <slug>` trailer in `<default-ref>..<branch-ref>`** (the stripped state, per Docs policy; Branch ownership's detection command) -> **Merge gate** — the gate's ordinary steps handle it; there is no stripped-only entry point. **Otherwise foreign** (has commits beyond `<base>`, per Branch ownership) -> **Halt** — never adopt or delete a branch we didn't create |
 | Design committed at tip; no plan doc at tip | Plan |
 | Plan at tip has ≥1 unchecked task box (a line matching `^[[:space:]]*[-*+] \[ \]`) | Execute — resume at first unchecked task (cross-check ledger + `git log`) |
-| Plan fully checked; no PR for the branch (`--state all` list empty) | PR: create + review |
+| Plan fully checked — no unchecked task box (no line matching `^[[:space:]]*[-*+] \[ \]`); no PR for the branch (`--state all` list empty) | PR: create + review |
 | Open PR; no `review clean` marker, or the marker is **invalid** (Marker validity) | PR review |
 | Open PR; marker **valid** (Marker validity — SHA equals head, or a proven strip since) | Merge gate (CI, `stops` from front-matter) |
 | No row matches (e.g. resume with an unknown slug) | Nothing to resume — report it. If `gh pr list --head <username>/<slug> --state merged` shows a PR, say "already shipped (PR #N)"; else list `<username>/*` branches (local + origin, both candidate prefixes) as candidates. |
