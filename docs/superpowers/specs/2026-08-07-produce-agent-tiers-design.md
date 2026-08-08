@@ -43,7 +43,7 @@ Give the produce-subagent its own dedicated agent definition, pinned to the exis
 
 `plugins/dev-flow/agents/produce-subagent.md`:
 
-```markdown
+```
 ---
 name: produce-subagent
 description: Drafts a best-judgment design doc (Stage 1) or a self-sufficient task plan (Stage 2) for dev-flow's produce work, following the dispatch's inlined protocol or skill. Pinned to claude-opus-4-8.
@@ -69,7 +69,7 @@ One agent, dispatched twice. The first draft proposed two agents (`design-drafte
 
 The risky-task reviewer gets the same pinning treatment — a second agent, `plugins/dev-flow/agents/task-reviewer.md`:
 
-```markdown
+```
 ---
 name: task-reviewer
 description: Per-task review gate for dev-flow's Execute stage, spawned by the orchestrator (SDD's controller) for plan-marked risky tasks. Pinned to claude-opus-4-8.
