@@ -35,7 +35,7 @@ There are exactly three stop boundaries:
 | `post-plan` | Halt after the plan is reviewed, rewritten, and committed. |
 | `pre-merge` | Run everything through the reviewed PR, then halt before `gh pr merge`. A testing note (what to check) is part of the halt report, not a separate state. |
 
-- **Default:** none (full-auto to merge) for **design-file entry** — the file the user wrote is their approval. **Bare-idea entry defaults to `post-design`**: a bare idea is one giant unanswered design question, and full-auto-to-merge on a *guessed* design is the pipeline's worst failure mode. The user opts out with "full auto" or "no stops."
+- **Default:** none (full-auto to merge) for **design-file entry** — the file the user wrote is their approval. **Bare-idea and issue entries default to `post-design`**: a bare idea is one giant unanswered design question, and full-auto-to-merge on a *guessed* design is the pipeline's worst failure mode. The user opts out with "full auto" or "no stops."
 - **Persistence:** write stops into the design doc's `dev-flow-worktree` front-matter and commit them, so resume honors them.
 - **Precedence:** an explicit stop given in *this* invocation beats a recorded front-matter stop, which beats the full-auto default. So "continue dev-flow-worktree on rate-limit" honors a recorded `pre-merge` stop; "continue to merge, no stops" clears it.
 - Every halt report **prints the exact resume invocation** the user should run next.
@@ -70,7 +70,7 @@ State lives in artifacts, not a side file. **A dev-flow-worktree feature *is* it
 - branch: `<username>/<slug>` (see Branch identity, below)
 - PR: `gh pr list --head <username>/<slug> --state all` (branch->PR mapping is native to `gh`; branch existence is read per Branch identity's dual-prefix probe). Always pass `--state all` — the default listing is open-only and silently hides merged/closed PRs. "Latest PR" = the highest-numbered result.
 
-**Issue-driven intake.** Invocation references a GitHub issue (the Slug rule's `#42`), no design file to adopt: the Stage 1 produce-subagent's dispatch names the issue and requires it to fetch the full thread — `gh issue view <n> --json number,title,body,labels,url,comments` (every comment; a bare `gh issue view <n>` is body-only) — and draft from body + all comments, never from the invocation's words alone, recording the seed — the issue reference + the full thread — in the design doc's `## Original problem` section. Fetch failure halts and reports. Resume reads the design doc — no re-fetch.
+**Issue-driven intake.** Invocation references a GitHub issue (the Slug rule's `#42`), no design file to adopt: the Stage 1 produce-subagent's dispatch names the issue and requires it to fetch the full thread — `gh issue view <n> --json number,title,body,labels,url,comments` (every comment; a bare `gh issue view <n>` is body-only) — and draft from body + all comments, never from the invocation's words alone, recording the issue reference + the full thread in the design doc's `## Original problem` section. Fetch failure halts and reports. Resume reads the design doc — no re-fetch.
 
 **Branch identity.** The feature branch is `<username>/<slug>`.
 
@@ -80,7 +80,7 @@ State lives in artifacts, not a side file. **A dev-flow-worktree feature *is* it
 
 Intake collision check: before creating `<username>/<slug>`, if it already exists (local or origin) and is **foreign** (per Branch ownership), qualify the new slug (append a disambiguator) or halt — never build on it (and `git worktree add -b` would fail outright on an existing branch anyway); if it already carries our design, this is a resume, routed by the resume table. Also qualify if no branch exists but `gh pr list --head <username>/<slug> --state all` is non-empty — a slug whose PR history belongs to an earlier shipped feature is retired, so the resume table's PR-state reads stay unambiguous forever. (This replaces fuzzy topic-matching with mechanical existence checks.)
 
-**Front-matter and the seed section (the only new schema).** Design doc:
+**Front-matter (the only new schema).** Design doc:
 
 ```yaml
 ---
@@ -93,7 +93,7 @@ dev-flow-worktree:
 
 Plan doc: `dev-flow-worktree: {slug: rate-limit, spec: docs/superpowers/specs/2026-07-20-rate-limit-design.md}` (linkage only). **Stops live solely in the design doc.** The PR body links both doc paths. `dev-flow-worktree:adversarial-review` preserves front-matter on every rewrite (part of its contract), so this block survives all reviews.
 
-**The seed section (`## Original problem`).** When the design is drafted from a seed — a bare-idea prompt, a Linear/Jira ticket, or a GitHub issue thread — the design doc carries the seed verbatim in a `## Original problem` section (the issue reference + the full thread for an issue; the prompt for a bare idea). The design review reads it to check the design solves the problem the seed states; `dev-flow-worktree:adversarial-review` preserves it unchanged on every rewrite, like front-matter.
+**The `## Original problem` section.** When the design is drafted from a bare-idea prompt or a GitHub issue thread, the design doc carries that input verbatim in a `## Original problem` section (the issue reference + the full thread for an issue; the prompt for a bare idea). The design review reads it to check the design solves the problem the input states, and the plan review reads it to check the plan delivers the design's solution to that problem; `dev-flow-worktree:adversarial-review` preserves it unchanged on every rewrite, like front-matter.
 
 **Docs policy — commit or strip the scaffolding.** Whether this pipeline's design and plan docs reach the default branch is a **per-repo setting**, resolved once at intake and then carried in the artifact.
 
@@ -202,7 +202,8 @@ The orchestrator drives every stage, running the worktree-entry procedure (Artif
 
 - **First act:** fix the slug, then create `<username>/<slug>` and its worktree per the worktree lifecycle (Artifact Contract): resolve the default branch, `git worktree add <main-root>/.claude/worktrees/dev-flow-<slug> -b <username>/<slug> <base>`, and enter it. Plain git, not a delegated skill — every resume check and the PR mapping key off that exact branch name and base, and no delegated mechanism guarantees either. Creation failure halts and reports.
 - **Design-file entry:** adopt the given file — branch from main, copy the file into the worktree, stamp `dev-flow-worktree` front-matter, then review — which rewrites and commits.
-- **Bare-idea entry:** the orchestrator dispatches a produce-subagent to draft a best-judgment design doc (written into the worktree by absolute path) using the inlined non-interactive protocol below, recording the seed — the invocation's prompt — in the design doc's `## Original problem` section. **brainstorming is NOT invoked** — dialogue is its core mechanism, and this pipeline never lets a delegated skill talk to the user. Inline its non-interactive bones instead:
+- **Issue entry:** the invocation references a GitHub issue (the Slug rule's `#42`), no design file to adopt — dispatch the produce-subagent per the Artifact Contract's Issue-driven intake, using the inlined non-interactive protocol below. The dispatch names the issue and requires the full-thread fetch; the subagent drafts from body + all comments, never from the invocation's words alone, recording the issue reference + the full thread in the design doc's `## Original problem` section. Fetch failure halts and reports.
+- **Bare-idea entry:** the orchestrator dispatches a produce-subagent to draft a best-judgment design doc (written into the worktree by absolute path) using the inlined non-interactive protocol below, recording the invocation's prompt in the design doc's `## Original problem` section. **brainstorming is NOT invoked** — dialogue is its core mechanism, and this pipeline never lets a delegated skill talk to the user. Inline its non-interactive bones instead:
   1. Explore project context.
   2. Scope/decomposition check — if the idea spans independent subsystems, **halt and report** the proposed decomposition rather than forcing it through.
   3. Consider 2-3 approaches, pick one, and record the choice plus rejected alternatives and reasoning.
@@ -210,7 +211,7 @@ The orchestrator drives every stage, running the worktree-entry procedure (Artif
   5. Run brainstorming's spec self-review checklist (placeholders, consistency, scope, ambiguity).
 - **Docs policy (intake):** resolve `docs` per the Artifact Contract's Docs policy — read `.claude/dev-flow.local.md`, apply the resolution table (emitting the one-line warning on an unrecognized value), and stamp the result into the design doc's `dev-flow-worktree` front-matter block alongside `slug` and `stops`. Do this **before** the review runs, so the review's rewrite carries it. A `docs` value already present in the front-matter wins outright — a resume never re-reads the settings file.
 - The **orchestrator** invokes `dev-flow-worktree:adversarial-review` (mode: `design`) in-context from inside the worktree, passing the worktree as `working-dir` — it is the approval gate that substitutes for the user's. The review rewrites the design and commits it on the branch (its contract); the orchestrator then checks the returned provenance line (Cross-Cutting Concerns) before proceeding. No separate apply or commit step.
-- **Bare-idea entry defaults to a `post-design` stop** (see Stops, above).
+- **Bare-idea and issue entries default to a `post-design` stop** (see Stops, above).
 
 ### Stage 2 — Plan
 
