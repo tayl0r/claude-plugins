@@ -157,7 +157,7 @@ Replaces line 31 of the gh-58 design doc with Block [1] — the same bullet, wit
 - Consumes: Block [1] from the design doc at `docs/superpowers/specs/2026-08-08-gh-63-fully-checked-row-design.md`, read verbatim via `read_blocks(DESIGN, [1, 1])` (`sys.path.insert(0, "scripts")`; `read_blocks` from `scripts/design_blocks.py`). `b[1][0]` is the amended gh-58 line (inlined in Step 1). Never reconstruct or substitute it; if you cannot read the design doc, stop and report.
 - Produces: the amended gh-58 design line 31. Task 3 consumes it for the verification pass.
 
-- [ ] **Step 1: Replace `docs/superpowers/specs/2026-08-03-gh-58-completion-predicate-design.md` line 31 with Block [1]**
+- [x] **Step 1: Replace `docs/superpowers/specs/2026-08-03-gh-58-completion-predicate-design.md` line 31 with Block [1]**
 
 Old line (`old_string`, currently line 31 — the bullet beginning `- **The two target sites, per file.**`):
 ```text
@@ -169,7 +169,7 @@ Replace with Block [1] (`new_string`):
 ```
 The new line must be byte-identical to the design's Block [1]. Task 3's design-conformance check re-reads the block from the design and asserts it landed verbatim.
 
-- [ ] **Step 2: Verify the amendment landed**
+- [x] **Step 2: Verify the amendment landed**
 
 Run:
 ```bash
@@ -181,7 +181,7 @@ git grep -F -- 'references the count predicate. The Stage 3' -- docs/superpowers
 ```
 Expected: no output (the old period is replaced by the em-dash amendment).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add docs/superpowers/specs/2026-08-03-gh-58-completion-predicate-design.md
