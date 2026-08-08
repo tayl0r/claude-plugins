@@ -209,7 +209,7 @@ Proves the design's remaining success criteria against the committed edits from 
 - Consumes: Task 1's and Task 2's committed edits (the working tree).
 - Produces: evidence that all seven design success criteria hold. No artifacts.
 
-- [ ] **Step 1: Design-conformance check (criterion #2) — re-read the design's blocks, never retyped**
+- [x] **Step 1: Design-conformance check (criterion #2) — re-read the design's blocks, never retyped**
 
 First confirm the shape:
 ```bash
@@ -263,7 +263,7 @@ PY
 ```
 Expected: two `OK …: Block [0] present verbatim` lines, one `OK …: Block [1] present verbatim`, the issue-tie `OK`, then `PASS: design-conformance check` (exit 0). Any `AssertionError` or non-zero exit means STOP and fix before proceeding.
 
-- [ ] **Step 2: Byte-for-byte blob check (criterion #3) — every touched file is its merge-base blob with exactly the intended edit**
+- [x] **Step 2: Byte-for-byte blob check (criterion #3) — every touched file is its merge-base blob with exactly the intended edit**
 
 Run this inline. It captures `base=$(git merge-base origin/main HEAD)` (validated non-empty), then for each of the five touched files reconstructs the expected working-tree bytes from the base blob with exactly the intended edit and asserts the working tree matches byte-for-byte via `verify_blob`'s `blob`/`to_lines`/`reconstructed`. The design doc itself is a newly created file, so its own base is empty and it is not checked here.
 
@@ -319,7 +319,7 @@ PY
 ```
 Expected: three `OK …: base line N replaced by its design block` lines, two `OK …: version line replaced (now …)` lines, then `PASS: all five touched files are byte-for-byte their merge-base blob with exactly the intended edit` (exit 0). Any `AssertionError` or non-zero exit means STOP and fix.
 
-- [ ] **Step 3: `claude plugin validate .` passes (criterion #7)**
+- [x] **Step 3: `claude plugin validate .` passes (criterion #7)**
 
 Run:
 ```bash
