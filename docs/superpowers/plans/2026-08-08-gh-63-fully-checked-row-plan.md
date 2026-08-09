@@ -80,8 +80,8 @@ Replace with Block [0] (`new_string`):
 
 First read what `origin/main` publishes and what the working tree currently declares, then bump past `origin/main`:
 ```bash
-base=$(git rev-parse origin/main); [ -n "$base" ] || { echo "empty base"; exit 1; }
-git show "$base:plugins/dev-flow/.claude-plugin/plugin.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])"
+tip=$(git rev-parse origin/main); [ -n "$tip" ] || { echo "empty tip"; exit 1; }
+git show "$tip:plugins/dev-flow/.claude-plugin/plugin.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])"
 python3 -c "import json; print(json.load(open('plugins/dev-flow/.claude-plugin/plugin.json'))['version'])"
 ```
 The first line is `origin/main`'s version; the second is the working tree's current version — the edit's `old_string`. If the first prints `2.19.0`, edit the manifest's `version` field from the working tree's current version to `2.20.0` (bump the minor segment). If `origin/main` has advanced past `2.19.0`, bump the minor segment past whatever it now publishes instead (e.g. if it prints `2.20.0`, use `2.21.0`). Edit only the `version` value; leave the rest of the manifest untouched.
@@ -90,8 +90,8 @@ The first line is `origin/main`'s version; the second is the working tree's curr
 
 Same procedure:
 ```bash
-base=$(git rev-parse origin/main); [ -n "$base" ] || { echo "empty base"; exit 1; }
-git show "$base:plugins/dev-flow-worktree/.claude-plugin/plugin.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])"
+tip=$(git rev-parse origin/main); [ -n "$tip" ] || { echo "empty tip"; exit 1; }
+git show "$tip:plugins/dev-flow-worktree/.claude-plugin/plugin.json" | python3 -c "import json,sys; print(json.load(sys.stdin)['version'])"
 python3 -c "import json; print(json.load(open('plugins/dev-flow-worktree/.claude-plugin/plugin.json'))['version'])"
 ```
 The first line is `origin/main`'s version; the second is the working tree's current version — the edit's `old_string`. If the first prints `1.21.0`, edit the `version` field from the working tree's current version to `1.22.0`. If `origin/main` has advanced, bump the minor segment past whatever it now publishes.
@@ -147,7 +147,7 @@ Expected: a leading `check-version-bump: base <sha>, head <sha>, merge-base <sha
 
 ## Task 2: Amend the gh-58 design doc's over-strong "no other site" claim
 
-Replaces line 31 of the gh-58 design doc with Block [1] — the same bullet, with the claim amended in place (prefix-preserving) and the line's file citations refreshed to the current tree.
+Replaces line 31 of the gh-58 design doc with Block [1] — the same bullet, with the claim amended in place (prefix-preserving), the correction marker bolded, and the line's file citations left at their gh-58-era values (the gh-58 doc is a dated snapshot whose numbers are measurements at its own `$base`).
 
 **Files:**
 - Modify: `docs/superpowers/specs/2026-08-03-gh-58-completion-predicate-design.md` (line 31)
@@ -165,7 +165,7 @@ Old line (`old_string`, currently line 31 — the bullet beginning `- **The two 
 ```
 Replace with Block [1] (`new_string`):
 ```text
-- **The two target sites, per file.** `git grep -nE 'Execution is complete|≥1 unchecked' -- plugins/` returned exactly two lines in each file: the **Execution-complete signal** paragraph and the resume-table row. `plugins/dev-flow/skills/dev-flow/SKILL.md:169` / `:195`; `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md:163` / `:189`. No other site in either file references the count predicate — a claim corrected by gh-63: the sibling "Plan fully checked" resume row directly below the anchored Execute row also expresses the count predicate, in different words that the phrase-grep `Execution is complete|≥1 unchecked` structurally cannot match, so this claim was a measurement blind spot, now fixed. The Stage 3 **Bookkeeping** bullet (`:239` / `:233`) mentions *ticking* (the action) but no count, so it is untouched.
+- **The two target sites, per file.** `git grep -nE 'Execution is complete|≥1 unchecked' -- plugins/` returned exactly two lines in each file: the **Execution-complete signal** paragraph and the resume-table row. `plugins/dev-flow/skills/dev-flow/SKILL.md:165` / `:191`; `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md:159` / `:185`. No other site in either file references the count predicate — **a claim corrected by gh-63**: the sibling "Plan fully checked" resume row directly below the anchored Execute row also expresses the count predicate, in different words that the phrase-grep `Execution is complete|≥1 unchecked` structurally cannot match, so this claim was a measurement blind spot, now fixed. The Stage 3 **Bookkeeping** bullet (`:231` / `:225`) mentions *ticking* (the action) but no count, so it is untouched.
 ```
 The new line must be byte-identical to the design's Block [1]. Task 3's design-conformance check re-reads the block from the design and asserts it landed verbatim.
 
@@ -191,7 +191,7 @@ gh-63: amend the gh-58 design's over-strong "no other site" claim
 The gh-58 design claimed no other site in either file references the count
 predicate; the sibling "Plan fully checked" resume row expresses it in words
 the phrase-grep cannot match. Amend the claim in place, prefix-preserving,
-and refresh the line's file citations to the current tree.
+with the correction marker bolded; the line's file citations stay at their gh-58-era values, per the dated-record snapshot convention.
 
 Co-Authored-By: Claude <noreply@anthropic.com>
 MSG
@@ -217,7 +217,7 @@ python3 scripts/design_blocks.py docs/superpowers/specs/2026-08-08-gh-63-fully-c
 ```
 Expected: `shape: [1, 1]`.
 
-Then run this inline — a `python3 - <<'PY'` heredoc, so nothing is written into the repo. It re-reads the two blocks from the design on disk (never retyped), asserts Block [0] appears verbatim in both `SKILL.md` files (one block → byte-identical across the pair), asserts Block [1] appears verbatim in the gh-58 design doc, and asserts Block [0] equals, modulo leading whitespace on both sides, the issue's suggested row inside the design's `## Original problem` fenced block (the unique line there whose stripped form begins `| Plan fully checked —`). The issue-text tie closes the single-mistype case: a prose typo in the block can no longer propagate identically to both files and pass every criterion.
+Then run this inline — a `python3 - <<'PY'` heredoc, so nothing is written into the repo. It re-reads the two blocks from the design on disk (never retyped), asserts Block [0] appears verbatim in both `SKILL.md` files (one block → byte-identical across the pair), asserts Block [1] appears verbatim in the gh-58 design doc, and asserts Block [0] equals, modulo leading whitespace on both sides, the issue's suggested row inside the design's `## Original problem` fenced block (the unique line there whose stripped form begins `| Plan fully checked —`). The issue-text tie closes the single-mistype case as far as an in-repo check can: a prose typo in the block can no longer propagate identically to both files and pass every criterion. A mistype in the issue fetch itself would land in both the `## Original problem` copy and the block and pass the tie; that residual is covered by the design-time repr-verification against the live issue, not by this check.
 
 ```bash
 python3 - <<'PY'
