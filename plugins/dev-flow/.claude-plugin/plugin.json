@@ -1,5 +1,5 @@
 {
   "name": "dev-flow",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "description": "Autonomous design -> plan -> execute -> PR -> merge pipeline (works on a feature branch in your checkout) with adversarial review at each artifact boundary"
 }
