@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Make dev-flow's review tiers (seeds, task-reviewers, fixers) provider-configurable — `session` | `codex` | `ollama-<tier>` | `claude` — so each laptop can blend a small amount of review work onto its $20 Ollama and $20 Codex quotas while writing and judgment stay on Anthropic opus.
+**Goal:** Make dev-flow's review tiers (seeds, task-reviewers, fixers) provider-configurable — `session` | `codex` | `ollama-<tier>` — so each laptop can blend a small amount of review work onto its $20 Ollama and $20 Codex quotas while writing and judgment stay on Anthropic opus.
 
 **Architecture:** The `providers:` config key in `.claude/dev-flow.local.md` (per-machine, git-ignored) selects each tier's provider. Unset = `session` (current behavior). Non-session providers shell-delegate: the orchestrator runs the codex companion or `claude-ollama <tier> -p` as a one-shot via Bash instead of spawning the Agent-tool subagent. Delegated seed findings join the adversarial review as caller-supplied findings; the review's seed spawn is skipped. Produce and resolvers are untouched (pinned to opus via agent frontmatter).
 
@@ -13,7 +13,7 @@
 - **Version bump:** any behavior change bumps the **minor** segment of `plugins/<name>/.claude-plugin/plugin.json` — `dev-flow` 2.19.0 → 2.20.0, `dev-flow-worktree` 1.21.0 → 1.22.0. Bump past `origin/main`, not past the branch base.
 - **Mirroring:** `skills/adversarial-review/SKILL.md` is machine-checked (line-for-line identical after `dev-flow-worktree` → `dev-flow`); the pipeline SKILL.md pair and the example configs are hand-mirrored. `python3 scripts/check-sync.py` must pass.
 - **Verification:** every edit must be byte-for-byte its merge-base blob with exactly the intended edit applied (`verify_blob`); grep for removed phrases expecting no hits; `claude plugin validate .` must pass.
-- **Design blocks:** the spec `docs/superpowers/specs/2026-08-09-provider-blended-reviews-design.md` carries the exact insertion text as Blocks A–G. A `design_blocks` check re-reads them (via `read_blocks`, never retyped) and asserts each appears verbatim in its target, directly after its anchor line.
+- **Design blocks:** the spec `docs/superpowers/specs/2026-08-09-provider-blended-reviews-design.md` carries the exact insertion text as Blocks A–H. These blocks use tagged fences (`markdown`, `yaml`) because some contain nested fenced code blocks — a documented limitation of `scripts/design_blocks.py`. A custom reader (not `design_blocks`) is needed for the design-conformance check; the check re-reads these blocks from the spec on disk, never retyped, and asserts each appears verbatim in its target.
 - **Driver model:** the session model is a launch choice, not a config key. Recommended opus driver; sonnet is a cost lever. Not part of this plan's config surface.
 
 ---
@@ -39,7 +39,13 @@ Open `plugins/dev-flow/skills/dev-flow/SKILL.md`. Find the end of the Docs polic
 - [ ] **Step 3: Verify the insertion**
 
 Run: `grep -n "Provider policy" plugins/dev-flow/skills/dev-flow/SKILL.md`
-Expected: a hit at the inserted location. Then run: `grep -n "shell-delegate to the codex companion" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit.
+Expected: a hit at the inserted location. Then verify key phrases are present:
+- `grep -n "shell-delegate to the codex companion" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit.
+- `grep -n "auto-detects the base ref" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit (codex PR command).
+- `grep -n "Non-zero exit codes halt" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit (error handling).
+- `grep -n "passed through as-is" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit (pass-through).
+- `grep -n "Unknown keys are ignored" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit (config validation).
+- `grep -n "read from the repository root" plugins/dev-flow/skills/dev-flow/SKILL.md` — expected a hit (worktree file path).
 
 - [ ] **Step 4: Commit**
 
@@ -69,7 +75,7 @@ Find the Cross-Cutting Concerns bullet beginning `- **Review provenance is check
 
 - [ ] **Step 3: Verify the insertions**
 
-Run: `grep -n "never delegated" plugins/dev-flow/skills/dev-flow/SKILL.md` and `grep -n "accepts both forms" plugins/dev-flow/skills/dev-flow/SKILL.md`
+Run: `grep -n "never delegated" plugins/dev-flow/skills/dev-flow/SKILL.md` and `grep -n "provider name (e.g." plugins/dev-flow/skills/dev-flow/SKILL.md`
 Expected: one hit each, at the appended locations.
 
 - [ ] **Step 4: Commit**
@@ -84,15 +90,15 @@ git commit -m "feat(dev-flow): delegate routine task-reviewers, dual-form proven
 ### Task 3: Adversarial-review SKILL.md changes (dev-flow)
 
 **Files:**
-- Modify: `plugins/dev-flow/skills/adversarial-review/SKILL.md` — append Block D to the "Review integrity (never inline)" paragraph; append Block E to the seed-passes section; append Block F to the Resolution step 6 provenance sentence.
+- Modify: `plugins/dev-flow/skills/adversarial-review/SKILL.md` — append Block D to the "Review integrity (never inline)" paragraph; append Block E to the seed-passes section; append Block F to the Resolution step 6 provenance sentence; insert Block G after "Executors, fixers, and the orchestrator run on the main session model."
 
 **Interfaces:**
 - Consumes: Task 1's delegation contract (delegated seed findings arrive as caller-supplied findings with `seeds: skipped`).
-- Produces: the amended "never inline" rule and provenance format that the orchestrator's provenance check (Task 2) validates.
+- Produces: the domain-neutral "never inline" amendment, seed-skip mechanics, provenance format, and fixer-delegation rule that the orchestrator's provenance check (Task 2) validates.
 
 - [ ] **Step 1: Append Block D to the never-inline rule**
 
-In `plugins/dev-flow/skills/adversarial-review/SKILL.md`, find the paragraph beginning `**Review integrity (never inline).**`. Append Block D's exact text (from the spec) at the end of that paragraph.
+In `plugins/dev-flow/skills/adversarial-review/SKILL.md`, find the paragraph beginning `**Review integrity (never inline).**`. Append Block D's exact text (from the spec) at the end of that paragraph. Block D is domain-neutral — it references the invocation interface (`extra findings`, `seeds: skipped`), not any caller's config schema.
 
 - [ ] **Step 2: Append Block E to the seed-passes section**
 
@@ -102,25 +108,29 @@ Find the seed-passes section (the paragraph ending `...the glossary's own state 
 
 Find Resolution step 6's provenance sentence (the one beginning `Report back: ... a **provenance** line naming the reviewers actually spawned per tier`). Append Block F's exact text (from the spec) at the end of that sentence.
 
-- [ ] **Step 4: Verify the insertions**
+- [ ] **Step 4: Insert Block G after the Model section's fixer sentence**
 
-Run: `grep -n "shell-delegated one-shot" plugins/dev-flow/skills/adversarial-review/SKILL.md`, `grep -n "seeds: skipped" plugins/dev-flow/skills/adversarial-review/SKILL.md`, and `grep -n "delegated seed pass reports" plugins/dev-flow/skills/adversarial-review/SKILL.md`
+Find the Model section sentence `Executors, fixers, and the orchestrator run on the main session model.`. Insert Block G's exact text (from the spec) as a new paragraph directly after it.
+
+- [ ] **Step 5: Verify the insertions**
+
+Run: `grep -n "caller may supply seed findings" plugins/dev-flow/skills/adversarial-review/SKILL.md`, `grep -n "seeds: skipped" plugins/dev-flow/skills/adversarial-review/SKILL.md`, `grep -n "delegated seed pass reports" plugins/dev-flow/skills/adversarial-review/SKILL.md`, and `grep -n "fixers run as shell-delegated" plugins/dev-flow/skills/adversarial-review/SKILL.md`
 Expected: one hit each.
 
-- [ ] **Step 5: Mirror the insertions into dev-flow-worktree**
+- [ ] **Step 6: Mirror the insertions into dev-flow-worktree**
 
-Apply the same three insertions (Blocks D, E, F) verbatim to `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md` at the analogous locations. The `adversarial-review/SKILL.md` pair is machine-checked line-for-line identical after `dev-flow-worktree` → `dev-flow`, so the text must match exactly.
+Apply the same four insertions (Blocks D, E, F, G) verbatim to `plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md` at the analogous locations. The `adversarial-review/SKILL.md` pair is machine-checked line-for-line identical after `dev-flow-worktree` → `dev-flow`, so the text must match exactly.
 
-- [ ] **Step 6: Verify the mirrored pair agrees**
+- [ ] **Step 7: Verify the mirrored pair agrees**
 
 Run: `python3 scripts/check-sync.py`
 Expected: passes (this verifies the `adversarial-review/SKILL.md` pair is identical).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add plugins/dev-flow/skills/adversarial-review/SKILL.md plugins/dev-flow-worktree/skills/adversarial-review/SKILL.md
-git commit -m "feat(adversarial-review): allow shell-delegated seed passes, dual-form provenance"
+git commit -m "feat(adversarial-review): domain-neutral seed delegation, fixer delegation, provenance"
 ```
 
 ---
@@ -132,21 +142,21 @@ git commit -m "feat(adversarial-review): allow shell-delegated seed passes, dual
 - Create: `plugins/dev-flow/examples/dev-flow.local.home.md`
 
 **Interfaces:**
-- Consumes: spec Block G (the two example configs).
+- Consumes: spec Block H (the two example configs).
 - Produces: the reference configs that Task 5 mirrors and that document the two laptop setups.
 
 - [ ] **Step 1: Create the work-laptop example**
 
-Write `plugins/dev-flow/examples/dev-flow.local.work.md` with Block G's work config verbatim (from the spec): `docs: commit`, `seeds: codex`, `task-reviewers: codex`, `fixers: session`, `risk-high-reviewers: session`.
+Write `plugins/dev-flow/examples/dev-flow.local.work.md` with Block H's work config verbatim (from the spec): `docs: commit`, `seeds: codex`, `task-reviewers: codex`, `fixers: session`.
 
 - [ ] **Step 2: Create the home-laptop example**
 
-Write `plugins/dev-flow/examples/dev-flow.local.home.md` with Block G's home config verbatim (from the spec): `docs: commit`, `seeds: codex`, `task-reviewers: ollama-flash`, `fixers: session`, `risk-high-reviewers: session`.
+Write `plugins/dev-flow/examples/dev-flow.local.home.md` with Block H's home config verbatim (from the spec): `docs: commit`, `seeds: codex`, `task-reviewers: ollama-flash`, `fixers: session`.
 
 - [ ] **Step 3: Verify the files**
 
 Run: `cat plugins/dev-flow/examples/dev-flow.local.work.md plugins/dev-flow/examples/dev-flow.local.home.md`
-Expected: the two configs, each with the `providers:` block from Block G.
+Expected: the two configs, each with the `providers:` block from Block H.
 
 - [ ] **Step 4: Commit**
 
@@ -169,7 +179,7 @@ git commit -m "docs(dev-flow): example provider configs for work and home laptop
 
 - [ ] **Step 1: Hand-mirror the pipeline SKILL.md changes**
 
-Open `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`. Apply the same three insertions as Tasks 1–2 (Block A after the Docs policy section; Block B appended to the task-reviewer routing bullet; Block C appended to the provenance bullet), matching the worktree variant's existing wording and section structure. The `providers:` config contract, delegation command mappings, and provenance format are identical to the dev-flow variant.
+Open `plugins/dev-flow-worktree/skills/dev-flow-worktree/SKILL.md`. Apply the same three insertions as Tasks 1–2 (Block A after the Docs policy section; Block B appended to the task-reviewer routing bullet; Block C appended to the provenance bullet), matching the worktree variant's existing wording and section structure. The `providers:` config contract, delegation command mappings, error handling, config validation, worktree file path, and provenance format are identical to the dev-flow variant.
 
 - [ ] **Step 2: Copy the example configs**
 
@@ -206,14 +216,14 @@ git commit -m "feat(dev-flow-worktree): mirror provider policy, routing, provena
 
 Edit both `plugin.json` files to the minor-bumped versions above.
 
-- [ ] **Step 2: Write the design_blocks check**
+- [ ] **Step 2: Write the design-conformance check**
 
-Write a short `python3` check (e.g. `scripts/check-provider-blocks.py`) that `sys.path.insert(0, "scripts")`, calls `read_blocks(<spec>, <shape>)` (shape from `python3 scripts/design_blocks.py <spec>`), and asserts:
-- Blocks A–F appear verbatim in the **dev-flow** files, each directly after its anchor line (end of Docs policy section for A; the routing bullet for B; the provenance bullet for C; the never-inline paragraph for D; the seed-passes section for E; the provenance sentence for F).
-- Blocks A, B, C appear verbatim in the **dev-flow-worktree** pipeline SKILL.md, and Blocks D, E, F in the dev-flow-worktree adversarial-review SKILL.md (verbatim, no anchor assertion — the worktree variant's anchors differ).
-- Block G's two configs match the two example files byte-for-byte.
+Write a short `python3` check (e.g. `scripts/check-provider-blocks.py`) that reads the blocks from the spec on disk (never retyped) and asserts:
+- Blocks A–G appear verbatim in the **dev-flow** files, each directly after its anchor line (end of Docs policy section for A; the routing bullet for B; the provenance bullet for C; the never-inline paragraph for D; the seed-passes section for E; the provenance sentence for F; the Model section fixer sentence for G).
+- Blocks A, B, C appear verbatim in the **dev-flow-worktree** pipeline SKILL.md, and Blocks D, E, F, G in the dev-flow-worktree adversarial-review SKILL.md (verbatim, no anchor assertion — the worktree variant's anchors differ).
+- Block H's two configs match the two example files byte-for-byte.
 
-Never retype the blocks — read them from the spec.
+Note: these blocks use tagged fences (`markdown`, `yaml`) because some contain nested fenced code blocks — a documented limitation of `scripts/design_blocks.py`. Use a custom reader (not `design_blocks`) that can handle tagged fences. The check re-reads the blocks from the spec on disk, never retyped.
 
 - [ ] **Step 3: Run the full verification battery**
 
@@ -239,15 +249,18 @@ git commit -m "chore: bump dev-flow to 2.20.0, dev-flow-worktree to 1.22.0"
 
 **Spec coverage:**
 - `providers:` config (spec "Config") → Task 1 (Block A).
-- Delegation command mappings (spec "Delegation mechanics") → Task 1 (Block A).
+- Delegation command mappings + error handling + pass-through (spec "Delegation mechanics") → Task 1 (Block A).
+- Config validation (spec "Config") → Task 1 (Block A).
+- Worktree file path (spec "Config") → Task 1 (Block A).
 - Task-reviewer routing (spec "Approach") → Task 2 (Block B).
-- Provenance dual-form (spec "Provenance") → Task 2 (Block C) + Task 3 (Block F).
-- Never-inline amendment (spec "Skill contract") → Task 3 (Block D).
+- Provenance (spec "Provenance") → Task 2 (Block C) + Task 3 (Block F).
+- Domain-neutral integrity amendment (spec "Skill contract") → Task 3 (Block D).
 - Seed-pass skip (spec "Approach") → Task 3 (Block E).
+- Fixer delegation (spec "Approach") → Task 3 (Block G).
 - Example configs (spec "Example configs") → Task 4 + Task 5.
 - Mirroring + version bumps (spec "Success criteria") → Task 5 + Task 6.
 - Driver model (spec "Driver model") → documented in Global Constraints (launch choice, not config).
 
 **Placeholder scan:** no TBD/TODO; every step names the exact block and location.
 
-**Type consistency:** the `providers:` key names (`seeds`, `task-reviewers`, `fixers`, `risk-high-reviewers`) and provider values (`session`, `codex`, `ollama-<tier>`, `claude`) are identical across Blocks A–G and the spec's Config section.
+**Type consistency:** the `providers:` key names (`seeds`, `task-reviewers`, `fixers`) and provider values (`session`, `codex`, `ollama-<tier>`) are identical across Blocks A–H and the spec's Config section. The `risk-high-reviewers` key and `claude` provider value have been removed per the design review.
