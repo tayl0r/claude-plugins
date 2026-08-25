@@ -61,19 +61,26 @@ If **0 actionable comments** remain after filtering, post "No new actionable fee
 
 ### Step 3: Categorize each comment
 
-For each actionable comment, read the relevant code and evaluate against the decision framework.
+Read the relevant code for each actionable comment. Then triage the full set together — don't decide comment-by-comment in isolation; the right design for one often only becomes clear once you see what else is flagged, plus any known upcoming work mentioned on the PR.
 
 **Decision framework:**
 
-> "Never factor in effort when deciding whether something is worth doing. If the outcome is clearly better and the change is low-risk, just do it. Defer to the user when the fix is ambiguous, has side effects or large blast radius, or needs architecture/design input."
+> Judge by long-term design and maintainability, not effort or severity — never skip a fix because it takes work, and never make one just because it's small. The question is always: does this leave the codebase better, for as many current and future callers as the fix reasonably covers?
+
+Apply, per comment:
+
+1. **Find the right boundary.** If the flagged code is one of a known family (connectors, handlers, jobs, repeated call sites) with 2+ instances that exist today, put the fix at the shared boundary so every member inherits it — a per-instance patch is a latent regression the next person has to remember to repeat. If it's a true one-off, fix it at the point of failure; don't build an abstraction for a single instance or a merely hypothetical sibling.
+2. **Prefer correct-by-default.** Between a fix that works automatically and one that requires every caller to remember a flag, an ordering, or a manual step, take the automatic one — even if it means changing adjacent code the PR didn't originally touch. When the fix reuses existing shared infrastructure, drop any inherited behavior that doesn't belong in the new context, even if it's harmless.
+3. **Weigh it against the alternative.** A fix must leave the code better than the wart it replaces — skip rare edge cases and race conditions unless closing them is essentially free, and don't take on complexity (new abstraction, wider blast radius) the current findings don't concretely justify.
 
 Categorize each comment as:
 
-- **FIX** — The outcome is clearly better and the change is low-risk. Fix it.
-- **SKIP (pre-existing)** — The issue exists in code the PR didn't modify. Not our problem.
+- **FIX** — Steps 1-3 land on a design that's clearly better and proportionate, including any shared-boundary widening. Fix it.
 - **SKIP (false positive)** — The reviewer is wrong or misunderstands the code. Explain why.
-- **DEFER (ambiguous)** — The fix is ambiguous, has side effects, or needs design input. Flag for user.
-- **DEFER (large blast radius)** — The fix touches many files or changes behavior significantly. Flag for user.
+- **SKIP (not worth it)** — Real issue, but the fix would cost more design complexity than the wart it removes (speculative, rare-edge-case-only, etc). Explain why.
+- **SKIP (unrelated pre-existing)** — A different problem, in code neither the PR nor the comment touches. Out of scope for this comment.
+- **DEFER (ambiguous)** — Genuinely unclear which design is better, or it needs product/architecture input.
+- **DEFER (large blast radius)** — The right fix (e.g. a shared-boundary change) touches enough call sites or files that it shouldn't be auto-applied. Propose the shared-boundary approach and flag for user approval.
 
 ### Step 4: Fix all FIX items
 
@@ -127,11 +134,11 @@ gh api repos/$REPO/pulls/{PR}/comments/{comment_id}/replies \
 
 ## Important rules
 
-- Never fix pre-existing issues that the PR didn't introduce
+- Stay scoped to what each comment actually flags — don't go fix unrelated pre-existing issues nobody raised. Widening a fix to a shared boundary (Step 3) is still in scope even when that touches pre-existing sibling code, because it's addressing the flagged comment, not scope creep.
 - Never make changes that alter user-facing behavior without explicit approval
 - Always verify fixes pass lint/typecheck before committing
 - If a comment suggests a large refactor, defer rather than attempt it
 - CodeRabbit inline comments (with a `path` field) are the actionable ones — CodeRabbit conversation comments (summaries/walkthroughs) are noise
 - CodeRabbit "nitpick" severity items can generally be skipped unless they're clearly correct
 - CodeRabbit "Major" severity items should be carefully evaluated — they're often real but sometimes false positives
-- When in doubt about whether to fix or skip, err toward fixing (effort is near-zero)
+- When in doubt about whether a design is better, lean toward making the improvement — effort is never the reason to skip it
