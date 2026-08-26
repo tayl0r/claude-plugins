@@ -61,9 +61,9 @@ If **0 actionable comments** remain after filtering, post "No new actionable fee
 
 ### Step 3: Categorize each comment
 
-Read the relevant code for each actionable comment, then weigh the full set together against the rubric below — don't decide in isolation; the right design for one often only becomes clear once you see what else is flagged, plus any known upcoming work mentioned on the PR.
+Read the relevant code for each actionable comment, then apply the rubric below to the full set together — don't decide comment-by-comment in isolation.
 
-**Design rubric** (verbatim from `plugins/dev-flow/skills/adversarial-review/SKILL.md`'s "The design rubric" — if that copy changes, update this one to match):
+**Design rubric** (verbatim from `plugins/dev-flow/skills/adversarial-review/SKILL.md`'s "The design rubric"):
 
 > - Best long-term design over short-term tradeoffs; we care about codebase quality and maintainability, not effort or severity.
 > - OK to change adjacent code if it gets us to the better design.
@@ -87,7 +87,7 @@ Categorize each comment against the rubric as:
 ### Step 4: Fix all FIX items
 
 For each FIX item:
-1. Make the code change — or confirm it's already covered, if an earlier FIX item's shared-seam fix already reaches this one
+1. Make the code change
 2. Track which files were modified
 
 After all fixes, verify and commit:
@@ -149,4 +149,3 @@ gh api repos/$REPO/pulls/{PR}/comments/{comment_id}/replies \
 - CodeRabbit inline comments (with a `path` field) are the actionable ones — CodeRabbit conversation comments (summaries/walkthroughs) are noise
 - CodeRabbit "nitpick" severity items can generally be skipped unless they're clearly correct
 - CodeRabbit "Major" severity items should be carefully evaluated — they're often real but sometimes false positives
-- When the only question is whether a fix is worth doing (not which design is better — that's DEFER (ambiguous or has side effects)), lean toward making the improvement: effort is never the reason to skip it
