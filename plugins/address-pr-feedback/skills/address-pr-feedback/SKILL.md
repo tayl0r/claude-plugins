@@ -77,7 +77,7 @@ Read the relevant code for each actionable comment, then apply the rubric below 
 
 Categorize each comment against the rubric as:
 
-- **FIX** — The rubric points to a design that's clearly better and it's safe to apply automatically. Shared-seam widening is in scope here even when it reaches pre-existing sibling code the PR didn't touch — that's not scope creep, it's addressing the flagged comment at the right seam. Fix it.
+- **FIX** — The rubric points to a clearly better design that's safe to apply automatically, including shared-seam widening into pre-existing sibling code the PR didn't touch — that's the flagged comment, not scope creep. Fix it.
 - **SKIP (false positive)** — The reviewer is wrong or misunderstands the code. Explain why.
 - **SKIP (not worth it)** — Real issue, but the fix would cost more complexity than the wart it removes, regardless of scope (speculative, rare-edge-case-only, etc). Explain why.
 - **SKIP (unrelated pre-existing)** — A different problem, in code neither the PR nor the comment touches. Explain that it's out of scope for this comment.
