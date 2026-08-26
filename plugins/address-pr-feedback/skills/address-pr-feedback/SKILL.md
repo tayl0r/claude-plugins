@@ -5,7 +5,7 @@ description: This skill should be used when the user asks to "address PR comment
 
 # Address PR Feedback
 
-Fetch all unresolved review comments on a GitHub PR, evaluate each against project and global CLAUDE.md (`~/.claude/CLAUDE.md`) guidance, fix the ones that are clearly better and low-risk, and post a response to every comment explaining what was done or why it was skipped.
+Fetch all unresolved review comments on a GitHub PR, evaluate each against the design rubric below, fix the ones that are a clearly better design, and post a response to every comment explaining what was done, what's pending your approval, or why it was skipped.
 
 ## Process
 
@@ -61,19 +61,28 @@ If **0 actionable comments** remain after filtering, post "No new actionable fee
 
 ### Step 3: Categorize each comment
 
-For each actionable comment, read the relevant code and evaluate against the decision framework.
+Read the relevant code for each actionable comment, then apply the rubric below to the full set together — don't decide comment-by-comment in isolation.
 
-**Decision framework:**
+**Design rubric** (verbatim from `plugins/dev-flow/skills/adversarial-review/SKILL.md`'s "The design rubric"):
 
-> "Never factor in effort when deciding whether something is worth doing. If the outcome is clearly better and the change is low-risk, just do it. Defer to the user when the fix is ambiguous, has side effects or large blast radius, or needs architecture/design input."
+> - Best long-term design over short-term tradeoffs; we care about codebase quality and maintainability, not effort or severity.
+> - OK to change adjacent code if it gets us to the better design.
+> - Before fixing at the point of failure, zoom out one level: if the thing touched is one of a known kind (connectors, handlers, jobs…), put the fix at the shared seam so current and future members inherit it — a per-instance fix the next person must remember to repeat is a latent regression.
+> - Prefer correct-by-default seams over designs where each caller must remember a flag, ordering, or manual step.
+> - When reusing shared infrastructure, question whether each inherited behavior belongs in the new context — inherited-but-irrelevant behavior is a wart even when harmless.
+> - Judge findings together, not in isolation — the best design often only appears when several concerns plus known upcoming work are held at once.
+> - Value simplicity; widen the lens only against concrete demand (planned siblings, 2+ instances), never speculation — zooming out finds the right seam, it doesn't add layers.
+> - A fix must be worth its complexity: skip super-rare edge cases and race conditions unless the fix is essentially free.
+> - Every change must earn its place; if the fix is worse than the wart, leave it.
 
-Categorize each comment as:
+Categorize each comment against the rubric as:
 
-- **FIX** — The outcome is clearly better and the change is low-risk. Fix it.
-- **SKIP (pre-existing)** — The issue exists in code the PR didn't modify. Not our problem.
+- **FIX** — The rubric points to a clearly better design that's safe to apply automatically, including shared-seam widening into pre-existing sibling code the PR didn't touch — that's the flagged comment, not scope creep. Fix it.
 - **SKIP (false positive)** — The reviewer is wrong or misunderstands the code. Explain why.
-- **DEFER (ambiguous)** — The fix is ambiguous, has side effects, or needs design input. Flag for user.
-- **DEFER (large blast radius)** — The fix touches many files or changes behavior significantly. Flag for user.
+- **SKIP (not worth it)** — Real issue, but the fix would cost more complexity than the wart it removes, regardless of scope (speculative, rare-edge-case-only, etc). Explain why.
+- **SKIP (unrelated pre-existing)** — A different problem, in code neither the PR nor the comment touches. Explain that it's out of scope for this comment.
+- **DEFER (ambiguous or has side effects)** — Genuinely unclear which design is better, it needs product/architecture input, or it has side effects beyond what the comment's code shows. Flag for user.
+- **DEFER (large blast radius)** — The rubric points to a better design, but the shared-seam fix touches enough call sites or files that it shouldn't be auto-applied. Propose the approach and flag for user approval.
 
 ### Step 4: Fix all FIX items
 
@@ -105,7 +114,10 @@ Post a **single** `gh pr comment` summarizing all resolutions:
 - <description of fix 2> (from @reviewer)
 
 **Not fixing:**
-- <description> — <reason: pre-existing / false positive / needs design input> (from @reviewer)
+- <description> — <reason: false positive / not worth the complexity / unrelated pre-existing> (from @reviewer)
+
+**Deferred — needs your input:**
+- <description> — <reason: ambiguous design / side effects / large blast radius>, proposed approach: <approach> (from @reviewer)
 
 Pushed in commit <sha>.
 
@@ -123,15 +135,17 @@ gh api repos/$REPO/pulls/{PR}/comments/{comment_id}/replies \
 # For skipped items:
 gh api repos/$REPO/pulls/{PR}/comments/{comment_id}/replies \
   -f body="Not fixing: <reason>"
+
+# For deferred items:
+gh api repos/$REPO/pulls/{PR}/comments/{comment_id}/replies \
+  -f body="Deferred: <reason> — flagged for @<pr-author> to decide."
 ```
 
 ## Important rules
 
-- Never fix pre-existing issues that the PR didn't introduce
 - Never make changes that alter user-facing behavior without explicit approval
 - Always verify fixes pass lint/typecheck before committing
 - If a comment suggests a large refactor, defer rather than attempt it
 - CodeRabbit inline comments (with a `path` field) are the actionable ones — CodeRabbit conversation comments (summaries/walkthroughs) are noise
 - CodeRabbit "nitpick" severity items can generally be skipped unless they're clearly correct
 - CodeRabbit "Major" severity items should be carefully evaluated — they're often real but sometimes false positives
-- When in doubt about whether to fix or skip, err toward fixing (effort is near-zero)
